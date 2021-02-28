@@ -81,14 +81,14 @@ The ICS connection is as follows:
 
 ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout.jpg) ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout2.jpg)
 
-  All "terminal 30" pins = 12V power
+  - All "terminal 30" pins = 12V power
   
-  Audio:
+  - Audio:
     - Audio gnd: ICS F18
     - Left input: ICS F19
     - Right input: ICS F20
     
-   Unilink interface:
+   - Unilink interface:
     - Only Data and Clock are used. Reset and Enable are not implemented, not needed, it works perfectly.
     - Data: ICS F10, STM32 PC15
     - Clk: ICS F11, STM32 PC14
