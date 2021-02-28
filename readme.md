@@ -97,7 +97,7 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 	  
 		
 
-The debugging data is sent by the serial port and also throught the SWO pin.<br>
+The debugging data is sent using the serial port, and also throught the SWO pin.<br>
 I used a logic analyzer to sniff the Unilink and serial data, and view everything in real time.<br>
 Too see the data easier, I had to set up the serial in different speeds depending on "Debuglevel". You can change that in "serial.c".<br>
 - Debuglevel=1: 9600
