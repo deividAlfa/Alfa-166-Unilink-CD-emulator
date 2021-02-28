@@ -1,0 +1,1138 @@
+/*************************************************************************
+** 	File taken from https://github.com/ggaavv/Equinox-Clock
+**  Sony Unilink Bus Interface (Unilink Command Procedures)
+**  by Michael Wolf
+**
+**  Released under GNU GENERAL PUBLIC LICENSE
+**	See LICENSE.TXT for details
+**
+**  Revision History
+**
+**  when         what  who	why
+**
+**  2003-08-05   2.01  MIC  complete code revision
+**                          * changed display update procedure
+**  2003-08-06	 2.02  MIC  + added bus sleep flag indication
+**  2003-08-21   2.02  MIC	* changed appoint procedure to prevent reponses
+**                            to commands for other ID's
+**  2004-01-05	 2.03  MIC  + added broadcast command for list support
+**													+ added display update routine to send list items
+**														when LIST button was pressed (only CD mode)
+**													* changed playmode update routine
+**													- bufix in BANK mode display
+**													* improved unilink_parse routine, this increase
+**														reply speed like hell ;)
+**  2004-08-15	 2.04  MIC  * changed code to create requested poll respond
+**                            Thanks to Matt Dralle for his code example
+**													- bitfrig() and respond_masterpoll() removed
+**  2005-02-03   2.05  MIC  - removed all deprecaded avr-libc macros to be
+**                            combatible with avr-libc v1.2.1 and higher
+**************************************************************************/
+
+void unilink_ini(void)
+{
+
+#if defined(WATCHDOG)
+	wdt_enable(WDTO_2S);					// Watchdog enable with 2 seconds timeout
+#endif
+#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+//	GICR = 0x00;     							// disable external interupts
+#endif
+
+#if defined(__AVR_ATmega162__)
+//jc	GIMSK = 0x00; 		            // disable external interupts
+//	GICR = 0x00;
+#endif
+#if defined(__AVR_AT90S8515__) || defined(__AVR_ATmega8515__)
+//	MCUCR &=~ _BV(SRE);           // disable external RAM
+	PORTA = 0x00;		            	// PortA all low
+	DDRA = 0x00;		            	// PortA all input
+#endif
+
+//	MCUCR &=~ _BV(SRE);           // disable external RAM
+	PORTA = 0x00;		            	// PortA all low
+	DDRA = 0x00;		            	// PortA all input
+	PORTB = 0x00;		            	// PortB all low
+	DDRB = 0x00;		            	// PortB all input
+	PORTC = 0x00;		              // PortC all low
+	DDRC = 0x00;		            	// PortC all input
+	PORTD = 0x00;	                // PortD all low
+
+#if defined(__AVR_ATmega8__)
+#if defined(LED_OUT)
+	DDRD = (1<<d_LED1)|(1<<d_LED2)|(1<<d_LED3);	// set PortD LED output on ATmega8
+#elif defined(RELAIS_OUT)
+	DDRD = (1<<d_RELAIS);												// set PortD relais output on ATmega8
+#else
+	DDRD = (0<<d_RELAIS)|(0<<d_LED1)|(0<<d_LED2)|(0<<d_LED3);	// set PortD all input on ATmega8
+#endif	
+#else
+//	DDRD = 0x00;											// PORTD all input on AT...8515
+#endif
+
+	TIMSK = 1<<TOIE1;	  	            // enable Timer1 overflow interrupt
+	TCCR0 = 0x00;     	              // Stop Timer0
+	TCCR1A = 0x00;
+	TCNT1 = c_1s;											// Load Timer1 with 1s
+	TCCR1B = c_Timer1_run;		        // Start Timer1
+	unilink_field.track = 0x0E;				// init name field counter
+	unilink_field.disc = 0x0E;
+
+#ifdef UPDATE_JUMPER
+	if (bit_is_set(PINB, b_JUMPER)) 	// check state of mode select jumper
+	{
+#ifdef DEBUG
+usart_putc('1');
+#endif
+		unilink_ownaddr = C_UNILINK_OWNADDR_MD;// if set use MD mode
+		unilink_groupid = C_UNILINK_OWNADDR_MD;
+		flags.interface_mode = true;
+	}
+	else
+	{
+#ifdef DEBUG
+usart_putc('2');
+#endif
+		unilink_ownaddr = C_UNILINK_OWNADDR_CD;// else use CD mode
+		unilink_groupid = C_UNILINK_OWNADDR_CD;
+		flags.interface_mode = false;
+	};
+#else
+#ifdef REMOTE
+	unilink_ownaddr = C_UNILINK_OWNADDR_REMOTE;// else use REMOTE mode
+	unilink_groupid = C_UNILINK_OWNADDR_REMOTE;
+	flags.interface_mode = false;
+#endif
+#ifdef CD
+	unilink_ownaddr = C_UNILINK_OWNADDR_CD;// else use CD mode
+	unilink_groupid = C_UNILINK_OWNADDR_CD;
+	flags.interface_mode = false;
+#endif
+#ifdef MD
+	unilink_ownaddr = C_UNILINK_OWNADDR_MD;// if set use MD mode
+	unilink_groupid = C_UNILINK_OWNADDR_MD;
+	flags.interface_mode = true;
+#endif
+#endif
+	flags.unilink_anyone = false;
+	TCNT0 = c_6ms;		     		       	// load Timer0
+	TCCR0 = c_Timer0_run;		    			// start Timer0
+	SPCR = c_RUN_SPI;// slave and enable SPI
+	DDRB = 1<<b_MISO;	// MISO as output and low
+	SPDR = 0x00;
+}
+
+SIGNAL(SPI_STC_vect)
+{
+	if (!flags.spi_tx)                             		// do SPI Rx routine here
+	{
+#if defined(LED_OUT)
+		PORTD |= _BV(d_LED3);																// turn ON LED3
+#endif
+		unilink_rxdata_rx[unilink_bytecount_rx.rx] = SPDR;			// read byte
+		reset_spi();                                  		// reset SPI
+		if ((unilink_rxdata_rx[0] == 0x00) && (unilink_bytecount_rx.rx == 0))
+			return;																	// skip if 1st byte of packet is 0x00
+		unilink_rxsize_rx = 6;                           		// set packet size to short
+		if (unilink_rxdata_rx[2] >= 0x80)
+			unilink_rxsize_rx = 11;     												// set packet size to medium
+		if (unilink_rxdata_rx[2] >= 0xC0)
+			unilink_rxsize_rx = 16;    												// set packet size to long
+		unilink_bytecount_rx.rx++;
+		if (unilink_bytecount_rx.rx >= unilink_rxsize_rx)     	// if a packet is complete
+		{
+			unsigned char copy_rx_no;
+			for(copy_rx_no=0;copy_rx_no<=unilink_rxsize_rx;copy_rx_no++)
+			{
+				unilink_rxdata[copy_rx_no] = unilink_rxdata_rx[copy_rx_no];
+			}
+			unilink_rxsize = unilink_rxsize_rx;
+			unilink_bytecount_rx.rx = 0;                  			// reset byte counter
+#if defined(LED_OUT)
+			PORTD &= ~(d_LED3);															// turn OFF LED3
+#endif
+			unilink_bytecount.rx = 0;                  			// reset byte counter
+			flags.unilink_rx_compl = true;          	// set status flag
+    	}
+	} // end of SPI Rx routine
+	else                                            		// do SPI Tx routine here
+	{
+		if (unilink_bytecount.tx <= unilink_txsize)     	// check if bytes left
+		{
+			SPDR = unilink_txdata[unilink_bytecount.tx];		// output next byte
+			unilink_bytecount.tx++;
+		}
+		else
+		{
+			reset_spi();
+			SPDR = 0x00;          		        	    				// output last end byte 0x00
+			flags.spi_tx = false;       		        				// disable Tx mode
+#ifdef BUS_LOGGING
+			flags.unilink_tx_log = true;                	// enable Tx packet logging
+			bus_logging();                              	// send Tx packet via UART
+#endif
+#if defined(LED_OUT)
+			PORTD &=~ _BV(d_LED3);														// turn OFF LED3
+#endif
+			DDRB &=~ _BV(b_MISO);         		        				// disable SPI output
+			asm volatile ("nop");
+		}
+	} // end SPI Tx routine
+} //end of SPI interrupt routine
+
+
+void reset_spi(void)  // reset SPI
+{
+	SPDR = 0x00;				// force MISO low
+	SPCR = 0x00;				// reset SPI interrupt flag
+	SPCR = c_RUN_SPI;		// reconfig SPI
+}; //end RESET_SPI
+
+
+void unilink_tx(unsigned char *msg)
+{
+	unsigned char loc_checksum = 0;                   // local checksum
+	unsigned char loc_index = 0;                      // local index
+
+	if (msg[2] >= 0xC0) unilink_txsize = 14;          	// 16 byte command
+	else if (msg[2] >= 0x80) unilink_txsize = 9;      // 11 byte command
+	else unilink_txsize = 4;         			        		//  6 byte command
+	loc_checksum += msg[destaddr];                     // copy the 1st 4 bytes from msg to Tx buffer
+	unilink_txdata[destaddr]=msg[destaddr];            // and calculate checksum for it
+	loc_checksum += msg[srcaddr];
+	unilink_txdata[srcaddr]=msg[srcaddr];
+	loc_checksum += msg[cmd1];
+	unilink_txdata[cmd1]=msg[cmd1];
+	loc_checksum += msg[cmd2];
+	unilink_txdata[cmd2]=msg[cmd2];
+	unilink_txdata[parity1] = loc_checksum;             // store calculated checksum
+	loc_index = 4;                                      // start with 1st databyte in packet
+	do   // copy msg to Tx buffer and calculate checksum
+	{
+		unilink_txdata[loc_index+1] = msg[loc_index];   	// copy one byte from msg to Tx data buffer
+		loc_checksum += msg[loc_index];                 	// add each byte to checksum
+		loc_index++;
+	}while(loc_index < unilink_txsize-1);
+	unilink_txdata[loc_index+1] = loc_checksum;         // store 2nd checksum in Tx buffer
+#if defined(LED_OUT)
+	PORTD |= _BV(d_LED3);																// turn ON LED3
+#endif
+	SPDR = 0x00;	                                    	// reset SPI
+	SPCR = 0x00;
+	DDRB |= _BV(b_MISO);                                 // MISO as output
+	asm volatile ("nop");
+	SPCR = c_RUN_SPI;		                            		// reconfig SPI
+	flags.spi_tx = true;                               // enable Tx mode
+	unilink_bytecount.tx = 1;                           // set bytecount to 1 cause one byte is send direct
+	SPDR = unilink_txdata[destaddr];		            		// send 1st byte to SPI, rest via SPI interrupt routine
+}; // end of unilink_tx
+
+
+void unilink_keypress(void)
+{
+	if(flags.release_key_required && !flags.pressed_key_required)
+	{
+		unilink_tx(release_key_packet);
+		flags.release_key_required = false;
+		return;
+	}
+	if(flags.pressed_key_required)
+	{
+		unilink_tx(pressed_key_packet);
+		flags.pressed_key_required = false;
+		return;
+	}
+};
+
+
+// start Unilink packet evaluation
+void unilink_parse(void)
+{
+	if(unilink_rxdata[destaddr] == 0x18)
+	{
+		unilink_broadcast();                // parse broadcast packets
+		return;
+	}
+	if(unilink_rxdata[destaddr] == unilink_ownaddr)
+	{
+		unilink_myid_cmd();			     // parse packets for my ID
+		return;
+	}
+	if(update_display.time || update_display.discname || update_display.trackname ||
+		update_display.playmode || unilink_listcount > 0 || flags.release_key_required||flags.pressed_key_required)
+	{
+		slavebreak();		// do a display update after each ping respond (any ID) if needed
+		return;
+	}
+//#ifndef BUS_LOGGING
+	if(unilink_rxdata[destaddr] == 0x70 || unilink_rxdata[destaddr] == 0x77)
+	{
+		unilink_screenid_cmd();
+		return;
+	}
+//#endif
+	if(unilink_ownaddr == unilink_groupid)
+	{
+		unilink_appoint();												// do ID appoint procedure
+		return;
+	}
+}; // end UNILINK_RXPROC
+
+
+//*** Broadcast handler
+void unilink_broadcast(void)
+{
+	switch(unilink_rxdata[cmd1]) 													// Switch on CMD1
+	{
+		case 0x01:  // 0x01 Bus requests (Broadcast)
+			switch(unilink_rxdata[cmd2])  									// Switch on CMD2
+			{
+				// 0x01 0x00 Bus reset
+				case 0x00:
+#ifdef UPDATE_JUMPER
+					if (bit_is_clear(PINB, b_JUMPER))         // check which mode is selected
+						unilink_ownaddr = C_UNILINK_OWNADDR_CD; // clear my old ID
+					else
+						unilink_ownaddr = C_UNILINK_OWNADDR_MD; // clear my old ID
+#else
+#ifdef REMOTE
+					unilink_ownaddr = C_UNILINK_OWNADDR_REMOTE;
+#endif
+#ifdef CD
+					unilink_ownaddr = C_UNILINK_OWNADDR_CD;
+#endif
+#ifdef MD
+					unilink_ownaddr = C_UNILINK_OWNADDR_MD;
+#endif
+#endif
+					flags.unilink_anyone = false;
+					break;
+				// 0x01 0x02 Anyone?
+				case 0x02:
+#ifdef UPDATE_JUMPER
+					if (bit_is_clear(PINB, b_JUMPER))         // check which mode is selected
+					{   // CD mode
+						if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+						{
+							flags.unilink_anyone = true;
+							unsigned char msg[8] = CD_DEVICE_MSG;
+							unilink_tx(msg);                    	// send my device info string
+						};
+					}
+					else
+					{   // MD mode
+						if(unilink_ownaddr == C_UNILINK_OWNADDR_MD)
+						{
+							flags.unilink_anyone = true;
+							unsigned char msg[8] = MD_DEVICE_MSG;
+							unilink_tx(msg);               	// send my device info string
+						};
+					}; // end jumper check
+#else
+#ifdef REMOTE
+					if(unilink_ownaddr == C_UNILINK_OWNADDR_REMOTE)
+						{
+							flags.unilink_anyone = true;
+							unsigned char msg[8] = REMOTE_DEVICE_MSG;
+							unilink_tx(msg);               	// send my device info string
+						};
+#endif
+#ifdef CD
+					if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+						{
+							flags.unilink_anyone = true;
+							unsigned char msg[8] = CD_DEVICE_MSG;
+							unilink_tx(msg);               	// send my device info string
+						};
+#endif
+#ifdef MD
+					if(unilink_ownaddr == C_UNILINK_OWNADDR_MD)
+						{
+							flags.unilink_anyone = true;
+							unsigned char msg[8] = MD_DEVICE_MSG;
+							unilink_tx(msg);               	// send my device info string
+						};
+#endif
+#endif
+					break;
+				// 0x01 0x11 Missed Ping poll
+				case 0x11:
+					if ( (unilink_ownaddr == C_UNILINK_OWNADDR_CD) || (unilink_ownaddr == C_UNILINK_OWNADDR_MD) || (unilink_ownaddr == C_UNILINK_OWNADDR_REMOTE) )
+					{
+						unsigned char msg[4] = MISSED_POLL_MSG;
+						unilink_tx(msg);                        // send "hello" to master and force bus reset
+						
+					}
+					if (update_display.time || update_display.discname || update_display.trackname || flags.release_key_required||flags.pressed_key_required)
+					{
+//						unilink_no_timepoll_req_replies_required++;
+						slavebreak();           		// go and check if display needs to be updated
+					}
+					break;
+				// 0x01 0x15 Poll who want to talk
+				case 0x15:
+/*
+					if (flags.timepoll_req)
+					{
+						unsigned char msg_respond[8] = {0x10, 0x18, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00};
+						// calculate position and value for respond command from slave serial (cmd2 during Appoint)
+						msg_respond[ (unilink_slaveserial & 0xf0) < 0x20 ? cmd2 : (((unilink_slaveserial & 0xf0) >> 5) + cmd2) ] =
+						unilink_slaveserial & 0x10 ? unilink_slaveserial & 0x0f : (unilink_slaveserial & 0x0f) << 4;
+						unilink_tx(msg_respond);
+					}
+*/
+///*				
+					if(flags.release_key_required||flags.pressed_key_required)
+					{
+						unilink_keypress();
+						return;
+						//break;
+					}
+					if(flags.timepoll_req)
+					{
+						unsigned char msg_respond[8] = {0x10, 0x18, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00};
+						// calculate position and value for respond command from slave serial (cmd2 during Appoint)
+						msg_respond[ (unilink_slaveserial & 0xf0) < 0x20 ? cmd2 : (((unilink_slaveserial & 0xf0) >> 5) + cmd2) ] =
+						unilink_slaveserial & 0x10 ? unilink_slaveserial & 0x0f : (unilink_slaveserial & 0x0f) << 4;
+						unilink_tx(msg_respond);
+						flags.timepoll_req = false;               // clear flag, cause display update is in progress
+					}
+					break;
+			}; // end Switch on CMD 2
+			break;
+		// 0xF0 SRC Source select
+		case 0xF0:
+			if(unilink_rxdata[cmd2] != unilink_ownaddr)
+			{
+				flags.my_input_selected = 0;
+				flags.seeking = 0;
+				unilink_status = 0x80;                        // set idle status on deselect
+#ifndef BUS_LOGGING
+				usart_putc(Start_Tag);
+				usart_putc(Stop);
+				usart_putc(CR);		        		// CR
+#endif
+#if defined(LED_OUT)
+				PORTD &= ~(d_LED2);													// turn OFF LED2
+#endif					
+			};
+			break;
+		// 0x87 0x6B Power Event
+		case 0x87:
+			if((unilink_rxdata[cmd2]==0x6b)||(unilink_rxdata[cmd2]==0x8b)||(unilink_rxdata[cmd2]==0x8b))
+			{	// power off events
+#if defined(RELAIS_OUT)
+				PORTD &=~ _BV(d_RELAIS);												// turn OFF relais
+#else
+				usart_putc(Start_Tag);
+				usart_putc(Stop); 													// or send a Stop 
+				usart_putc(CR);		        		// CR
+#endif
+				unilink_status = 0x80;                 				// set idle status on power off
+#ifndef BUS_LOGGING
+				usart_putc(Start_Tag);
+				usart_putc(Power_Off);
+				usart_putc(CR);		        		// CR
+#endif
+#if defined(LED_OUT)
+				PORTD &=~ _BV(d_LED2);													// turn OFF LED2 and LED3
+#endif
+			}
+			if( (unilink_rxdata[cmd2] == 0x13) || (unilink_rxdata[cmd2] == 0x93) )
+			{
+					flags.bus_sleep = true;												// bus has gone in sleep mode
+			}
+        	break;
+		// display change with DISP button
+		case 0x80:
+			if (unilink_rxdata[cmd2] == 0x08)								// check for CD mode LIST
+			{
+				if (unilink_rxdata[d2] == 0x11) 								// check if list should be displayed
+					unilink_listcount = 10;												// yes, then set counter for 10 items
+				else if (unilink_rxdata[d2] == 0x00)						// no, 
+					unilink_listcount = 0;												// then stop item transmission
+			}
+			break;
+    }; // end Switch on CMD 1
+}; // end of Broadcast handler
+
+
+//*** Command handler ***
+void unilink_myid_cmd(void)
+{
+	switch(unilink_rxdata[cmd1]) 													// Switch on CMD1
+	{
+		// 0x01 Bus requests (for my ID)
+		case 0x01:  
+			switch(unilink_rxdata[cmd2])
+          	{
+				// 0x01 0x12 Respond to time poll (PONG)
+              	case 0x12:
+					asm volatile ("nop");               // without this, an parse error occurs, no idea why ???
+					unilink_missed_pings = 0;							// reset missed ping counter
+					flags.bus_sleep = false;
+					unsigned char msg[4] = STATUS_MSG;
+					unilink_tx(msg);
+					break;
+				// 0x01 0x13 permission to talk after poll request
+				case 0x13:
+					display_update();                   	// update display
+					break;
+			}; // end switch CMD2
+			break;
+		// 0x20 PLAY
+		case 0x20:
+			flags.my_input_selected = 1;
+#if !defined(BUS_LOGGING) && !defined(YAMPP3)
+			/* This "Play" is send, when bus logging and Yampp3 control is disabled */
+			usart_putc(Play);
+#endif
+#if defined(LED_OUT)
+			PORTD |= _BV(d_LED2);													// turn ON LED2
+#endif	
+#if defined(RELAIS_OUT)
+#if defined(YAMPP3)
+			// test if Yampp is still powered on, if yes, send a play command
+			if(bit_is_set(PORTD, d_RELAIS)) usart_putc(Play);
+#endif
+			PORTD |= _BV(d_RELAIS);													// turn ON relais
+#endif	
+			unilink_status = 0x00;                        // set PLAY status
+			unsigned char msg1[13] = SEEK_MSG;						// Seeking "0.00"
+			unilink_tx(msg1);
+			break;
+		// 0x24 Fast Forward
+		case 0x24:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(FFWD);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x25 Fast Reverse
+		case 0x25:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(FRVS);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x26 Next Track
+		case 0x26:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(Track_up);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x27 Previous Track
+		case 0x27:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(Track_down);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x28 Next Disc
+		case 0x28:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(Disc_up);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x29 Previous Disc
+		case 0x29:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(Disc_down);
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+		// 0x34 Repeat mode change
+		case 0x34:
+			repeat_mode();
+			break;
+		// 0x35 Shuffle mode change
+		case 0x35:
+			shuffle_mode();
+			break;
+		// 0x36 Intro mode change
+		case 0x36:
+			intro_mode();
+			break;
+		// 0x37 Bank mode change
+		case 0x37:
+			bank_mode();
+			break;
+		// 0x84 request for extented text fields
+		case 0x84:
+			if(unilink_rxdata[cmd2] == 0xDD)
+			{
+				update_display.discname = true;  								// update disc name field 2
+				unilink_field.disc = unilink_rxdata[data+1];// store requested name field				
+			}
+			if(unilink_rxdata[cmd2] == 0xD9)
+			{
+				update_display.trackname = true;  								// update track name field 2
+				unilink_field.track = unilink_rxdata[data+1];// store requested name field				
+			}
+			if( unilink_field.disc > 5)
+			{
+				update_display.discname = false;									// stop discname update
+				unilink_field.disc = 0x0E;                  // and reset field count
+			}
+			if( unilink_field.track > 5)
+			{				
+				update_display.trackname = false; 								// stop trackname update
+				unilink_field.track = 0x0E;									// and reset field count
+			};
+			break;
+		// 0xB0 Direct Disc keys
+		case 0xB0:
+#ifndef BUS_LOGGING
+			usart_putc(Start_Tag);
+			usart_putc(Direct_Disc);
+			usart_putc(0x30 + (unilink_rxdata[cmd2]-1));// make ASCII from disc number
+			usart_putc(CR);		        		// CR
+#endif
+			break;
+	}; // end switch CMD 1
+}; // end of Command handler
+
+
+//*** Screen handler
+void unilink_screenid_cmd(void)
+{
+	unsigned char loc_temp = 0;        // local byte counter
+	if(unilink_rxdata[destaddr] == 0x70)
+	{
+#ifdef nothing
+		usart_putc(CR);
+		usart_puts("Screen DATA below");
+#endif
+		switch(unilink_rxdata[cmd1])
+		{
+			case 0xC0:
+				switch(unilink_rxdata[cmd2])
+				{
+					case 0x00:
+					case 0x01:
+						//usart_putc(bin2ascii(unilink_rxdata[d6] >> 4)); 	//high nibble
+						usart_putc(bin2ascii(unilink_rxdata[d6])); 			//low nibble
+						usart_putc(bin2ascii(unilink_rxdata[d7] >> 4)); 	//high nibble
+						usart_putc('.');
+						usart_putc(bin2ascii(unilink_rxdata[d7])); 			//low nibble
+						usart_putc(bin2ascii(unilink_rxdata[d8] >> 4)); 	//high nibble
+						usart_puts(" Mhz");
+						usart_putc(CR);
+						break;
+					default:
+						break;
+				}
+				break;
+			case 0xC1: // seeking
+				if(!flags.my_input_selected)
+				{
+					switch(unilink_rxdata[cmd2])
+					{
+						//seeking?
+						case 0x2d: //2d='-' seek!
+							if(!flags.seeking)
+							{
+//#ifdef BUS_LOGGING
+//								usart_putc(Screen_Update);
+								usart_puts("Seeking on -0xC1-0x2D");
+								usart_putc(CR);
+//#endif
+								flags.seeking = 1;
+							}
+							else
+							{
+//#ifdef BUS_LOGGING
+//								usart_putc(Screen_Update);
+								usart_puts("Seeking off -0xC1-0x2D");
+								usart_putc(CR);
+//#endif
+								flags.seeking = 0;
+							}
+							break;
+						case 0x21: //2d='-'
+//#ifdef BUS_LOGGING
+//							usart_putc(Screen_Update);
+							usart_puts("Seek-0xC1-0x21");
+							usart_putc(CR);
+//#endif
+							break;
+						default:
+							break;
+					}
+				}
+				break;
+			case 0xCD:
+/*
+				usart_putc(Start_Tag);
+				usart_putc(Screen_Update);
+*/
+//				usart_puts("Screen-0xCD ");
+/*
+				usart_puts(" unilink_rxdata[destaddr] - ");
+				usart_byte2ascii(unilink_rxdata[destaddr]);
+				usart_puts(" unilink_rxdata[cmd1] - ");
+				usart_byte2ascii(unilink_rxdata[cmd1]);
+				usart_puts(" unilink_rxdata[cmd2] - ");
+				usart_byte2ascii(unilink_rxdata[cmd2]);
+*/				
+//				usart_putc(CR);
+				if(!flags.seeking && !flags.my_input_selected)
+				{
+					for (loc_temp = 3; loc_temp <= unilink_rxsize-3; loc_temp++)           	// for a whole packet do:
+					{
+						if((unilink_rxdata[loc_temp]<=0x7D)&&(unilink_rxdata[loc_temp]>=0x20)&&!(loc_temp==4||loc_temp==14))
+						{
+						    usart_putc(unilink_rxdata[loc_temp]);
+						}
+/*
+						else
+						{
+							usart_putc('z');
+							usart_putc(loc_temp);
+							usart_putc(unilink_rxdata[loc_temp]);
+						}
+*/
+					
+	        		}; // end for loop
+	        		usart_putc(CR);		        		// CR
+				}
+				if(flags.seeking)
+				{
+//					usart_puts("seeking so not valid");
+//					usart_putc(CR);		        		// CR
+				}
+				if(flags.my_input_selected)
+				{
+//					usart_puts("my_input_selected");
+//					usart_putc(CR);		        		// CR
+				}
+				
+				break;
+			default:
+				break;
+		}
+	}
+	return;
+}; // end of screen hanndler
+
+
+//*** Appoint handler ***
+void unilink_appoint(void)
+{   // respond to ID appoint
+	unilink_slaveserial = unilink_rxdata[cmd2];	 								// store request poll ID
+	
+	if( (unilink_rxdata[cmd1] == 0x02) && flags.unilink_anyone ) 
+	{ // check for Anyone command
+		if ((unilink_rxdata[destaddr]&0xF0) == unilink_groupid)// check if packet is for my group
+		{ // if packet is for my group
+#ifdef UPDATE_JUMPER
+			if (bit_is_clear(PINB, b_JUMPER))               	// check which mode is selected
+			{   // CD mode
+				if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+				{ // I have no ID and packet is for my group
+					unilink_ownaddr = unilink_rxdata[destaddr];   // save my new ID
+					#if defined(LED_OUT)
+						PORTD |= _BV(d_LED1);													// turn ON LED1 since we now have the ID
+					#endif	
+					unsigned char msg[8] = CD_DEVICE_MSG;
+					unilink_tx(msg);                        			// send my device info string
+				}
+			 }
+			 else
+			 {   // MD mode
+				if(unilink_ownaddr == C_UNILINK_OWNADDR_MD)
+				{ // I have no ID and packet is for my group
+					unilink_ownaddr = unilink_rxdata[destaddr]; // save my new ID
+#if defined(LED_OUT)
+					PORTD |= _BV(d_LED1);												// turn ON LED1 since we now have the ID
+#endif	
+					unsigned char msg[8] = MD_DEVICE_MSG;
+					unilink_tx(msg);                    				// send my device info string
+				};
+			 }; // end jumper check
+#else
+#ifdef REMOTE
+			if(unilink_ownaddr == C_UNILINK_OWNADDR_REMOTE)
+			{ // I have no ID and packet is for my group
+				unilink_ownaddr = unilink_rxdata[destaddr]; // save my new ID
+#if defined(LED_OUT)
+				PORTD |= _BV(d_LED1);												// turn ON LED1 since we now have the ID
+#endif	
+				unsigned char msg[8] = REMOTE_DEVICE_MSG;
+				unilink_tx(msg);                    				// send my device info string
+			};
+#endif
+#ifdef CD
+			if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+			{ // I have no ID and packet is for my group
+				unilink_ownaddr = unilink_rxdata[destaddr]; // save my new ID
+#if defined(LED_OUT)
+				PORTD |= _BV(d_LED1);												// turn ON LED1 since we now have the ID
+#endif	
+				unsigned char msg[8] = CD_DEVICE_MSG;
+				unilink_tx(msg);                    				// send my device info string
+			};
+#endif
+#ifdef MD
+			if(unilink_ownaddr == C_UNILINK_OWNADDR_MD)
+			{ // I have no ID and packet is for my group
+				unilink_ownaddr = unilink_rxdata[destaddr]; // save my new ID
+#if defined(LED_OUT)
+				PORTD |= _BV(d_LED1);												// turn ON LED1 since we now have the ID
+#endif	
+				unsigned char msg[8] = MD_DEVICE_MSG;
+				unilink_tx(msg);                    				// send my device info string
+			};
+#endif
+#endif
+		}// end group check
+	}// end of anyone check
+}; // end of appoint handler
+
+
+void repeat_mode(void)
+{
+	unilink_playmodes.repeat++;                   // change do new repeat mode
+#ifndef BUS_LOGGING
+	usart_putc(Start_Tag);
+	usart_putc(Repeat);                          	// send event letter followed by
+	usart_putc(0x30 + unilink_playmodes.repeat);  // mode number
+	usart_putc(CR);		        		// CR
+#endif
+	change_mode(0x08, 0x00, 0x00);
+} ; // end repeat_mode
+
+
+void shuffle_mode(void)
+{
+	unilink_playmodes.shuffle++;
+#ifndef BUS_LOGGING
+	usart_putc(Start_Tag);
+	usart_putc(Shuffle);                         	// send event letter followed by
+	usart_putc(unilink_playmodes.shuffle+0x30);   // mode number
+	usart_putc(CR);		        		// CR
+#endif
+	change_mode(0x00, 0x80, 0x00);
+}; // end shuffle_mode
+
+
+void intro_mode(void)
+{
+	unilink_playmodes.intro++;
+#ifndef BUS_LOGGING
+	usart_putc(Start_Tag);
+	usart_putc(Intro);                           	// send event letter followed by
+	usart_putc(CR);		        		// CR
+#endif
+	change_mode(0x20, 0x00, 0x00);
+}; // end of intro_mode
+
+
+void dscan_mode(void)
+{
+	unilink_playmodes.dscan++;
+#ifndef BUS_LOGGING
+	usart_putc(Start_Tag);
+	usart_putc(DScan);                           	// send event letter followed by
+	usart_putc(CR);		        		// CR
+#endif
+	change_mode(0x80, 0x00, 0x00);
+}; // end of dscan_mode
+
+
+void bank_mode(void)
+{
+	unilink_playmodes.bank++;
+	if(unilink_playmodes.bank > 2) unilink_playmodes.bank = 0x00;// wrap count, only 0-2 needed
+#ifndef BUS_LOGGING
+	usart_putc(Start_Tag);
+	usart_putc(Bank);                            	// send event letter followed by
+	usart_putc(unilink_playmodes.bank+0x30);        // mode number
+	usart_putc(CR);		        		// CR
+#endif
+	change_mode(0x00, 0x00, 0xA0);
+}; // end of bank_mode
+
+
+void change_mode(unsigned char loc_d1, unsigned char loc_d2, unsigned char loc_d3)
+{
+	switch(unilink_playmodes.repeat)
+	{                                               // display little mode indicators
+		case 1: loc_d1 += 0x01; break;              // REPEAT 1
+		case 2: loc_d1 += 0x02; break;              // REPEAT 2
+	case 3: loc_d1 += 0x04; break;              // REPEAT 3
+	};
+	if(unilink_playmodes.intro) loc_d1 += 0x10;     // INTRO
+	if(unilink_playmodes.dscan) loc_d1 += 0x40;     // D.SCAN
+	switch(unilink_playmodes.shuffle)
+	{                                               // display little mode indicators
+		case 1: loc_d2 += 0x10; break;              // SHUFFLE 1
+		case 2: loc_d2 += 0x20; break;              // SHUFFLE 2
+		case 3: loc_d2 += 0x02; break;              // SHUFFLE 3
+	};
+    switch(unilink_playmodes.bank)
+    {                                               // display little mode indicators
+        case 1: loc_d3 += 0x10; break;              // BANK on
+        case 2: loc_d3 += 0xA0; break;              // BANK blinking
+    }
+	unilink_pm_d1 = loc_d1;														// store playmodes
+	unilink_pm_d2 = loc_d2;
+	unilink_pm_d3 = loc_d3;
+	update_display.playmode = true;									// update display
+}; // end change_mode
+
+
+void create_message_and_tx(unsigned char release_key, unsigned char cmas_dad, unsigned char cmas_sad, unsigned char cmas_cmd1, unsigned char cmas_cmd2)
+{
+	if(!release_key)  //Add send command to release key buffer
+	{
+		if(cmas_dad==0)
+			pressed_key_packet[0] = C_UNILINK_MADDR;
+		else
+			pressed_key_packet[0] = cmas_dad;
+		if(cmas_sad==0)
+			pressed_key_packet[1] = unilink_ownaddr;
+		else
+			pressed_key_packet[1] = cmas_sad;
+		pressed_key_packet[2] = cmas_cmd1;
+		pressed_key_packet[3] = cmas_cmd2;
+//		unilink_tx(pressed_key_packet);
+		flags.pressed_key_required = true;
+	}
+	else if(release_key)
+	{
+		if(cmas_dad==0)
+			release_key_packet[0] = C_UNILINK_MADDR;
+		else
+			release_key_packet[0] = cmas_dad;
+		if(cmas_sad==0)
+			release_key_packet[1] = unilink_ownaddr;
+		else
+			release_key_packet[1] = cmas_sad;
+		release_key_packet[2] = cmas_cmd1;
+		release_key_packet[3] = cmas_cmd2;
+		flags.release_key_required = true;
+	}
+	else
+	{
+		return;
+	}
+}
+
+
+void display_update(void)
+{
+	unsigned char loc_offset = 0;                       // local offset for name array
+	unsigned char loc_cmd1 = 0;                         // local command 1 for extented text
+	
+	// time info update
+	if (update_display.time)
+	{
+		unilink_tx(unilink_timeinfo);                 	// send time info update
+		update_display.time = false;
+		return;
+	}
+
+	// disc name update
+	if (update_display.discname)
+	{
+		if(unilink_field.disc == 0x1E)
+			loc_offset = loc_offset + 8;			   							// generate offset for field 1
+		if(unilink_field.disc < 0x06)                   		// for field 2-5
+			loc_offset = unilink_field.disc * 8;        			// generate offset ( 8 chars/field)
+		if(unilink_field.disc < 0x06)
+			loc_cmd1 = 0xDD;  																// command field 2-5
+    else
+		loc_cmd1 = 0xCD;                       						// command field 0 and 1
+		unsigned char msg1[13] = {C_UNILINK_DISPADDR, unilink_ownaddr, loc_cmd1,
+			unilink_discname[0+loc_offset],unilink_discname[1+loc_offset],
+			unilink_discname[2+loc_offset],unilink_discname[3+loc_offset],
+			unilink_discname[4+loc_offset],unilink_discname[5+loc_offset],
+			unilink_discname[6+loc_offset],unilink_discname[7+loc_offset],
+			0x00, unilink_field.disc};      // make name field
+		unilink_tx(msg1);                           		// send name field
+		if(unilink_field.disc == 0x0E)                  // if field 0 was send
+    	{
+			unilink_field.disc = 0x1E;                  			// set field 1
+			update_display.discname = true;									// and force a second update
+		}
+		else
+		{
+			unilink_field.disc = 0x0E;												// else reset field count and
+			update_display.discname = false;									// stop update
+		}
+		return;
+	}
+	// track name update
+	if(update_display.trackname)
+	{
+		if(unilink_field.track == 0x1E)
+			loc_offset = loc_offset + 8;											// generate offset for field 1
+		if(unilink_field.track < 0x06)                  		// for field 2-5
+			loc_offset = unilink_field.track * 8;       			// generate offset ( 8 chars/field)
+		if(unilink_field.track < 0x06)
+			loc_cmd1 = 0xD9;																	// command field 2-5
+		else
+			loc_cmd1 = 0xC9;	                        				// command field 0 and 1
+		unsigned char msg2[13] = {C_UNILINK_DISPADDR, unilink_ownaddr, loc_cmd1,
+				unilink_trackname[0+loc_offset],unilink_trackname[1+loc_offset],
+				unilink_trackname[2+loc_offset],unilink_trackname[3+loc_offset],
+				unilink_trackname[4+loc_offset],unilink_trackname[5+loc_offset],
+				unilink_trackname[6+loc_offset],unilink_trackname[7+loc_offset],
+				0x00, unilink_field.track};  	// make name field
+		unilink_tx(msg2);                           	// send name field
+		if(unilink_field.track == 0x0E)               // if field 0 was send
+		{
+			unilink_field.track = 0x1E;                 		// set field 1
+			update_display.trackname = true;								// and force second update
+		}
+		else
+		{
+			unilink_field.track = 0x0E;											// else reset field count and
+			update_display.trackname = false;							// stop update
+		}
+		return;
+	}
+	// list update
+	if (unilink_listcount > 0)
+	{
+		unsigned char msg14[13] = {C_UNILINK_DISPADDR, unilink_ownaddr, 0xCE,
+				unilink_list[10-unilink_listcount][0],
+				unilink_list[10-unilink_listcount][1],
+				unilink_list[10-unilink_listcount][2],
+				unilink_list[10-unilink_listcount][3],
+				unilink_list[10-unilink_listcount][4],
+				unilink_list[10-unilink_listcount][5],
+				unilink_list[10-unilink_listcount][6],
+				unilink_list[10-unilink_listcount][7],
+				0x00, ((11-unilink_listcount)<<4)+0x0C};
+		unilink_tx(msg14);
+		--unilink_listcount;
+		return;
+	}	
+	if(update_display.playmode)
+	{
+		unsigned char msg15[8] = {C_UNILINK_DISPADDR, unilink_ownaddr, 0x94, 0x00,
+				unilink_pm_d1, unilink_pm_d2, unilink_pm_d3, 0x00}; // create packet
+		unilink_tx(msg15);
+		update_display.playmode = false;
+		return;
+	}
+}; // end of DISPLAY_UPDATE
+
+
+void checksum_check(void)              							// check parity of complete Unilink packet
+{
+	unsigned char loc_bytecount = 0;      			// local byte counter
+	unsigned char loc_rxsize = unilink_rxsize-2;// local rxsize, minus 1 checksum and 1 end byte
+	unsigned char loc_checksum = 0;							// local checksum
+	for(;loc_bytecount < 4; loc_bytecount++)   	// calculate checksum for byte 1-4
+	{
+		loc_checksum += unilink_rxdata[loc_bytecount];// add to checksum
+	};
+	if (loc_checksum == unilink_rxdata[parity1])// verify the 1st checksum, skip rest if is invalid
+	{
+		if (loc_bytecount==loc_rxsize)         	// check if short packet
+		{
+			if (unilink_rxdata[loc_bytecount+2] == 0x00)
+			{
+				flags.checksum_ok = true;      	// return with true if checksum 1 is ok AND end byte is 0x00 (short)
+			}; // end if end byte
+		}; // end if short packet
+	} // end if parity ok
+	else
+	{
+#ifdef FAIL_CHECK
+		flags.checksum_ok = false;             	// if checksum 1 or end byte is invalid, return false
+#else
+		if (loc_bytecount==loc_rxsize)         	// check if short packet
+		{
+			if (unilink_rxdata[loc_bytecount+2] == 0x00)
+			{
+				flags.checksum_ok = false;      	// return with true if checksum 1 is ok AND end byte is 0x00 (short)
+			}; // end if end byte
+		}; // end if short packet
+#endif
+	}; // end if parity wrong
+	loc_bytecount++;            								// skip byte 4
+	for (;loc_bytecount < loc_rxsize;loc_bytecount++)// calculate checksum for all other bytes
+	{
+		loc_checksum += unilink_rxdata[loc_bytecount];// add to checksum
+	};
+	if (loc_bytecount == loc_rxsize) 						// check for medium or long packet
+	{
+		if (loc_checksum == unilink_rxdata[loc_bytecount])
+		{
+			if (unilink_rxdata[loc_bytecount+1] == 0x00)
+			{
+				flags.checksum_ok = true;  			// return with true if checksum 2 is ok AND end byte is 0x00 (medium or long)
+			}
+		}
+		else
+		{
+#ifdef FAIL_CHECK
+			flags.checksum_ok = false;     			// if checksum 2 or end byte is invalid return false
+#else
+			if (unilink_rxdata[loc_bytecount+1] == 0x00)
+			{
+				flags.checksum_ok = false;  			// return with true if checksum 2 is ok AND end byte is 0x00 (medium or long)
+			}
+#endif
+		}
+	} // end if
+} // end checksum_check
+
+
+// Slavebreak routine
+void slavebreak(void)
+{
+	SPDR = 0xFF;		                                     // force Data low
+	SPCR = 0x00;		                                     // disable SPI
+	TCNT0 = c_7ms;		                                   // load Timer0
+	TCCR0 = c_Timer0_run;		                             // start Timer0
+	TIFR |= _BV(TOV0);                                    // clear timer0 overflow flag
+		// wait for idle time between two packets, then do slave break
+		//
+    	// wait for data line low for minimum of 7ms
+		//
+	while(bit_is_clear(TIFR, TOV0))
+	{
+		if (bit_is_clear(PINB, b_MOSI)) TCNT0 = c_7ms;	  // load Timer0 if MOSI is low == high on bus
+	};
+    // wait until timer0 overflow
+	TIFR |= _BV(TOV0);                                     // clear timer0 overflow flag
+	TCNT0 = c_2ms;		                                    // load Timer0
+		//
+	    // wait for data line high for 2ms
+		//
+	while(bit_is_clear(TIFR, TOV0))
+	{
+		if (bit_is_set(PINB, b_MOSI)) TCNT0 = c_2ms;			// load Timer0  if MOSI is high == low on bus
+	};
+		// wait until timer overflow
+		//
+		// force data line 3ms low
+		//
+	TIFR |= _BV(TOV0);                                     // clear timer0 overflow flag
+	TCNT0 = c_3ms;		                                    // load timer0 for 3ms
+	DDRB |= _BV(b_MISO);                                   // MISO output and high (inverted by hardware to low)
+	PORTB |= _BV(b_MISO);
+	while(bit_is_clear(TIFR, TOV0));
+	DDRB &=~ _BV(b_MISO);                                   // MISO input and data line high
+	PORTB &=~ _BV(b_MISO);
+	TCNT0 = c_Timer0_stop;		                            // stop timer0
+	SPDR = 0x00, SPDR;	
+	SPCR = c_RUN_SPI, SPCR;                               // enable SPI
+//	if(0 < unilink_no_timepoll_req_replies_required)
+//	{
+		flags.timepoll_req = true;
+//	}
+}; // end of slavebreak	
