@@ -74,6 +74,27 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 	- "LogFormat" will split the data frames within brackets, so the data and checksums can be read easier.
 	- "OnlyLog" will disable the slave interface and set the device in sniffer mode.<br>
 	In this mode it can output the dialog between the ICS a CD changer.
+ Example outputs:
+ 
+	- LogFormat=0
+		18 10 01 00 29
+		18 10 01 02 2B
+		10 30 8C 10 DC 24 A8 17 60 1F
+
+	- LogFormat=1
+		[18 10 01 00][29]
+		[18 10 01 02][2B]
+		[10 30 8C 10][DC][24 A8 17 60][1F]
+
+- In documentation, you have an Excel file that will parse this data, "Parse Data". It already has data for the curious.
+  It uses VBA, so you need to enable macros. The function is called "ParseUnilink".
+  The result would be:
+  
+		01 MASTER REQUEST - BUS RESET		18 10 01 00 29 00
+		01 MASTER REQUEST - ANYONE?		18 10 01 02 2B 00
+		8C DEVICE INFO				10 30 8C 11 DD 14 A8 17 60 10 00
+	  
+		
 
 The debugging data is sent by the serial port and also throught the SWO pin.<br>
 I used a logic analyzer to sniff the Unilink and serial data, and view everything in real time.<br>
