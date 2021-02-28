@@ -49,7 +49,7 @@ So, for example, if CD01 has 45 files, it will tell to the ICS that CD01 is pres
 It's able to change tracks, also to tell the ICS when the selected disc is not present, and the communication is pretty stable.<br>
 
 However the audio implementation is not done, I dropped the project at this stage because it was too much for me.<br>
-It still can do something, as-is the ICS will enable the CD audio input, so you can hook an external audio source.
+However, the ICS will enable the CD audio input, so you can hook an external audio source.
 
 <a id="compiling"></a>
 ## Compiling
