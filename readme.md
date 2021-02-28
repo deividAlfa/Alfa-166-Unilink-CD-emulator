@@ -4,13 +4,13 @@
 
 * [Introduction](#intro)
 * [Project description](#description)
-* [compiling](#firmware)
-* [Connections](#connection)
+* [Compiling](#compiling)
+* [Connections](#connections)
 
 <!-- /MarkdownTOC -->
 
-## Introduction
 <a id="intro"></a>
+## Introduction
 First of all, this project is not supported in any way.
 
 I began developing it, but stopped prematurely before finishing. So don't ask me to do "X" or "Y" thing.
@@ -27,8 +27,8 @@ I spend a lot of hours debugging the ICS communications to make it work well.
 
 So I uploaded it for anyone. Maybe someone with further knowledge could set up an MP3 decoder and finish it.
 
-## Project description
 <a id="description"></a>
+## Project description
 This project enables communication with the ICS emulating the presence of the CD changer.
 
 It used a STM32 "blackpill" board with STM32F411 running at 96MHz.
@@ -76,8 +76,8 @@ At this stage it can only work as aux input. The ICS will enable the CD audio in
   
   Check "unilink.h" and "unilink.c". 
 
-<a id="connection"></a>
-## Connection diagram
+<a id="connections"></a>
+## Connections
 
 The ICS connection is as follows:
 ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout.jpg)
