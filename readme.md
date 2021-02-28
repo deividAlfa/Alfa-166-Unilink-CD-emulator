@@ -76,12 +76,14 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 	In this mode it can output the dialog between the ICS a CD changer.
  Example outputs:
  
-	- LogFormat=0
+	- LogFormat=0:
+	
 		18 10 01 00 29
 		18 10 01 02 2B
 		10 30 8C 10 DC 24 A8 17 60 1F
 
-	- LogFormat=1
+	- LogFormat=1:
+	
 		[18 10 01 00][29]
 		[18 10 01 02][2B]
 		[10 30 8C 10][DC][24 A8 17 60][1F]
