@@ -54,7 +54,7 @@ At this stage it can only work as aux input. The ICS will enable the CD audio in
 - Clone or download the repository<br>
 - Open STM32 Cube IDE, import existing project and select the folder where the code is.<br>
 
-  It should recognize it and be ready for compiling or modifying for your own needs.<br>  
+  It should recognize it and be ready for compiling or modifying for your own needs.<br>
   Check "unilink.h" and "unilink.c". 
   
  
