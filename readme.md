@@ -35,7 +35,7 @@ Part of the configuration is done in the .ioc file (CubeMX configuration).<br>
 
 The serial unilink data is handled using interrupts, sampling the I/O lines.<br>
 This is very inefficient, but I started this way for best stability during development.<br>
-As I latter stopped the project, I didn't bother to make a hardware SPI implementation.<br>
+As I later stopped the project, I didn't bother to make a hardware SPI implementation.<br>
 So, it needs a fast STM32. I tried with a 72MHz STM32F103 and I had issues due the lower speed.<br>
 If you modify the code to use hardware SPI, the speed requirements will be much lower.<br>
 
