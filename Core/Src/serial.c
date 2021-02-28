@@ -28,7 +28,7 @@ void initSerial(UART_HandleTypeDef* huart){
 	#elif (DebugLevel==2)
 	serial.uart->Init.BaudRate = 38400;		// Medium speed to not overflow the UART
 	#elif (DebugLevel==3)
-	serial.uart->Init.BaudRate = 38400;		// High speed to not overflow the UART
+	serial.uart->Init.BaudRate = 57600;		// High speed to not overflow the UART
 	#endif
 	HAL_UART_Init(serial.uart);
 #endif

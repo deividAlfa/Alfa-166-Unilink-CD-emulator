@@ -5,6 +5,7 @@
 * [Introduction](#intro)
 * [Project description](#description)
 * [Compiling](#compiling)
+* [Debugging](#debugging)
 * [Connections](#connections)
 
 <!-- /MarkdownTOC -->
@@ -55,7 +56,26 @@ At this stage it can only work as aux input. The ICS will enable the CD audio in
 
   It should recognize it and be ready for compiling or modifying for your own needs.<br>  
   Check "unilink.h" and "unilink.c". 
+  
+ 
+  
+<a id="debugging"></a>
+## Debugging
 
+The firmware has different levels of debugging the Unilink data, see unilink.h.<br>
+- "DebugSpi" enables a 4KB buffer that will store all SPI data as it was received or sent. Useful when debugging.
+- "DebugLevel" will show internal Unilink protocol data. 0 is disabled, 1-3 enable the different verbose levels.
+- "DebugLog" will display the unilink frames in a readable format. It has two additional modifiers:
+	- "LogFormat" will split the data frames within brackets, so the data and checksums can be read easier.
+	- "OnlyLog" will disable the slave interface and set the device in sniffer mode. In this mode it can output the dialog between the ICS a CD changer.
+
+The debugging data is sent by the serial port and also throught the SWO pin.
+As I used a logic analyzer to sniff the Unilink and serial data and view everything in real time, I had to set up the serial in different speeds depending on "Debuglevel".<br>
+This way I could see the data easier.
+- Debuglevel=1: 9600
+- Debuglevel=2: 38400
+- Debuglevel=2: 57600 
+ 
 <a id="connections"></a>
 ## Connections
 
@@ -75,4 +95,5 @@ The ICS connection is as follows:<br>
     - Clk: ICS F11, STM32 PC14
 
 The stm32 pinout is as follows:<br>
+
 ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/stm32_pinout.jpg)
