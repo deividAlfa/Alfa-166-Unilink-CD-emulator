@@ -88,7 +88,7 @@ The ICS connection is as follows:
     - Left input: ICS F19
     - Right input: ICS F20
     
-   - Unilink interface:
+  - Unilink interface:
     - Only Data and Clock are used. Reset and Enable are not implemented, not needed, it works perfectly.
     - Data: ICS F10, STM32 PC15
     - Clk: ICS F11, STM32 PC14
