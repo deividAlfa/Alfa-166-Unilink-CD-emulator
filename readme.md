@@ -73,7 +73,7 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 - "DebugLog" will display the unilink frames in a readable format. It has two additional modifiers:
 	- "LogFormat" will split the data frames within brackets, so the data and checksums can be read easier.
 	- "OnlyLog" will disable the slave interface and set the device in sniffer mode.<br>
-	In this mode it can output the dialog between the ICS a CD changer.
+	In this mode it can output the dialog between the ICS a CD changer.<br>
  Example outputs:
  
 	- LogFormat=0:
