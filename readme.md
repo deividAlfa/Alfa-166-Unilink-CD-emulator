@@ -69,7 +69,7 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 	- "LogFormat" will split the data frames within brackets, so the data and checksums can be read easier.
 	- "OnlyLog" will disable the slave interface and set the device in sniffer mode. In this mode it can output the dialog between the ICS a CD changer.
 
-The debugging data is sent by the serial port and also throught the SWO pin.
+The debugging data is sent by the serial port and also throught the SWO pin.<br>
 As I used a logic analyzer to sniff the Unilink and serial data and view everything in real time, I had to set up the serial in different speeds depending on "Debuglevel".<br>
 This way I could see the data easier.
 - Debuglevel=1: 9600
