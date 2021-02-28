@@ -78,15 +78,15 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
  
 	- LogFormat=0:
 	
-		18 10 01 00 29
-		18 10 01 02 2B
-		10 30 8C 10 DC 24 A8 17 60 1F
+			18 10 01 00 29
+			18 10 01 02 2B
+			10 30 8C 10 DC 24 A8 17 60 1F
 
 	- LogFormat=1:
 	
-		[18 10 01 00][29]
-		[18 10 01 02][2B]
-		[10 30 8C 10][DC][24 A8 17 60][1F]
+			[18 10 01 00][29]
+			[18 10 01 02][2B]
+			[10 30 8C 10][DC][24 A8 17 60][1F]
 
 - In documentation, you have an Excel file that will parse this data, "Parse Data". It already has data for the curious.
   It uses VBA, so you need to enable macros. The function is called "ParseUnilink".
