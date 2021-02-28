@@ -126,3 +126,10 @@ The ICS connection is as follows:<br>
 The stm32 pinout is as follows:<br>
 
 ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/stm32_pinout.jpg)
+
+
+Some STM32F411 boards have an issue with USB OTG not working.<br>
+This is caused by diode, not allowing the power to go from the board to the USB.<br>
+The diode was removed on later revisions of the board. The fix is easy, just replace the diode with a jumper:
+
+![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/411_OTGFIX.jpg)
