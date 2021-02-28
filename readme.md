@@ -54,12 +54,13 @@ However, the ICS will enable the CD audio input, so you can hook an external aud
 <a id="compiling"></a>
 ## Compiling
 
-- Download STM32 Cube IDE
-- Clone or download the repository
+To compile:<br>
+- Download STM32 Cube IDE.
+- Clone or download the repository.
 - Open STM32 Cube IDE, import existing project and select the folder where the code is.
 
-  It should recognize it and be ready for compiling or modifying for your own needs.<br>
-  Check "unilink.h" and "unilink.c". 
+It should recognize it and be ready for compiling or modifying for your own needs.<br>
+Check "unilink.h" and "unilink.c". 
   
  
   
