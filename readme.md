@@ -25,8 +25,8 @@ Maybe someone with further knowledge could set up an MP3 decoder and finish it.
 <a id="description"></a>
 ## Project description
 This project enables communication with the ICS emulating the presence of the CD changer.<br>
-It used a STM32 "blackpill" board with STM32F411 running at 96MHz.<br>
-It uses the STM32 Cube IDE. The pinouts can be seen opening the .ioc file (CubeMX configuration).<br>
+It uses a STM32 "blackpill" board with STM32F411 running at 96MHz.<br>
+The project is done in STM32 Cube IDE and uses ST's HAL Library. The pinouts can be seen opening the .ioc file (CubeMX configuration).<br>
 
 The serial unilink data is handled using interrupts, sampling the I/O lines.<br>
 This is very inefficient, but I started this way for best stability during development.<br>
