@@ -67,11 +67,12 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
 - "DebugLevel" will show internal Unilink protocol data. 0 is disabled, 1-3 enable the different verbose levels.
 - "DebugLog" will display the unilink frames in a readable format. It has two additional modifiers:
 	- "LogFormat" will split the data frames within brackets, so the data and checksums can be read easier.
-	- "OnlyLog" will disable the slave interface and set the device in sniffer mode. In this mode it can output the dialog between the ICS a CD changer.
+	- "OnlyLog" will disable the slave interface and set the device in sniffer mode.<br>
+	In this mode it can output the dialog between the ICS a CD changer.
 
 The debugging data is sent by the serial port and also throught the SWO pin.<br>
-As I used a logic analyzer to sniff the Unilink and serial data, and view everything in real time, I had to set up the serial in different speeds depending on "Debuglevel".<br>
-This way I could see the data easier. You can change that in "serial.c".
+I used a logic analyzer to sniff the Unilink and serial data, and view everything in real time.
+Too see the data easier, I had to set up the serial in different speeds depending on "Debuglevel". You can change that in "serial.c".<br>
 - Debuglevel=1: 9600
 - Debuglevel=2: 38400
 - Debuglevel=2: 57600 
@@ -80,7 +81,8 @@ This way I could see the data easier. You can change that in "serial.c".
 ## Connections
 
 The ICS connection is as follows:<br>
-![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout.jpg) ![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout2.jpg)
+![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout.jpg)
+![IMAGE](https://github.com/deividAlfa/Alfa-166-Unilink-CD-emulator/blob/main/DOCUMENTATION/ICS_pinout2.jpg)
 
   - All "terminal 30" pins = 12V power
   
