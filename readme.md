@@ -35,7 +35,7 @@ So, it needs a fast STM32. I tried with a 72MHz STM32F103 and I had issues due t
 If you modify the code to use hardware SPI, the speed requirements will be much lower.<br>
 
 It also includes the Tape emulator code from my other project: https://github.com/deividAlfa/Alfa166Bluetooth<br>
-Both modes are working at the same time.
+Both modes are working at the same time and don't cause conflicts.
 
 The actual firmare handles almost all the unilink protocol used in the ICS.<br>
 It also uses the USB OTG function. The CDs are stored as CD01 ... CD06 folders in the USB drive.<br>
