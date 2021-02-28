@@ -93,7 +93,7 @@ The firmware has different levels of debugging the Unilink data, see unilink.h.<
   
 		01 MASTER REQUEST - BUS RESET		18 10 01 00 29 00
 		01 MASTER REQUEST - ANYONE?		18 10 01 02 2B 00
-		8C DEVICE INFO				10 30 8C 11 DD 14 A8 17 60 10 00
+		8C DEVICE INFO			10 30 8C 11 DD 14 A8 17 60 10 00
 	  
 		
 
