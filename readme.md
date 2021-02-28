@@ -2,15 +2,15 @@
 
 <!-- MarkdownTOC -->
 
-* [Some words first](#somewords)
+* [Introduction](#intro)
 * [Project description](#description)
 * [compiling](#firmware)
 * [Connections](#connection)
 
 <!-- /MarkdownTOC -->
 
-<a id="somewords"></a>
-## Project description
+## Introduction
+<a id="intro"></a>
 First of all, this project is not supported in any way.
 
 I began developing it, but stopped prematurely before finishing. So don't ask me to do "X" or "Y" thing.
@@ -27,6 +27,7 @@ I spend a lot of hours debugging the ICS communications to make it work well.
 
 So I uploaded it for anyone. Maybe someone with further knowledge could set up an MP3 decoder and finish it.
 
+## Project description
 <a id="description"></a>
 This project enables communication with the ICS emulating the presence of the CD changer.
 
