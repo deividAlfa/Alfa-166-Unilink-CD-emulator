@@ -67,9 +67,7 @@ At this stage it can only work as aux input. The ICS will enable the CD audio in
 ## Compiling
 
 - Download STM32 Cube IDE
-- 
 - Clone or download the repository
-- 
 - Open STM32 Cube IDE, import existing project and select the folder where the code is.
 
   It should recognize it and be ready for compiling or modifying for your own needs.
@@ -87,16 +85,12 @@ The ICS connection is as follows:
   
   Audio:
     Audio gnd: ICS F18
-    
     Left input: ICS F19
-    
     Right input: ICS F20
     
    Unilink interface:
     Only Data and Clock are used. Reset and Enable are not implemented, not needed, it works perfectly.
-    
     Data: ICS F10, STM32 PC15
-    
     Clk: ICS F11, STM32 PC14
 
 The stm32 pinout is as follows:
