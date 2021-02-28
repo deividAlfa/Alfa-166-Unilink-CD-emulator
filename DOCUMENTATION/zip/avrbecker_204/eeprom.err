@@ -1,0 +1,64 @@
+
+avrdude: Version 5.1
+         Copyright (c) 2000-2005 Brian Dean, http://www.bdmicro.com/
+
+         System wide configuration file is "D:\WinAVR\bin\avrdude.conf"
+
+         Using Port            : lpt1
+         Using Programmer      : stk200
+         AVR Part              : ATMEGA8
+         Chip Erase delay      : 10000 us
+         PAGEL                 : PD7
+         BS2                   : PC2
+         RESET disposition     : dedicated
+         RETRY pulse           : SCK
+         serial program mode   : yes
+         parallel program mode : yes
+         Timeout               : 200
+         StabDelay             : 100
+         CmdexeDelay           : 25
+         SyncLoops             : 32
+         ByteDelay             : 0
+         PollIndex             : 3
+         PollValue             : 0x53
+         Memory Detail         :
+
+                                  Block Poll               Page                       Polled
+           Memory Type Mode Delay Size  Indx Paged  Size   Size #Pages MinW  MaxW   ReadBack
+           ----------- ---- ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------
+           eeprom         4    10   128    0 no        512    0      0  9000  9000 0xff 0xff
+           flash         33     6    64    0 yes      8192   64    128  4500  4500 0xff 0x00
+           lfuse          0     0     0    0 no          1    0      0  2000  2000 0x00 0x00
+           hfuse          0     0     0    0 no          1    0      0  2000  2000 0x00 0x00
+           lock           0     0     0    0 no          1    0      0  2000  2000 0x00 0x00
+           calibration    0     0     0    0 no          4    0      0     0     0 0x00 0x00
+           signature      0     0     0    0 no          3    0      0     0     0 0x00 0x00
+
+         Programmer Type : PPI
+         Description     : STK200
+           VCC     = 0x00 (not used)
+           BUFF    = 0x0c = pins 4,5
+           RESET   = 9
+           SCK     = 6
+           MOSI    = 7
+           MISO    = 10
+           ERR LED = 0
+           RDY LED = 0
+           PGM LED = 0
+           VFY LED = 0
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.00s
+
+avrdude: Device signature = 0x1e9307
+avrdude: reading eeprom memory:
+
+Reading | ################################################## | 100% 0.17s
+
+avrdude: writing output file "D:\avrbecker_204\eeprom.hex"
+
+avrdude: safemode: Fuses OK
+
+avrdude done.  Thank you.
+

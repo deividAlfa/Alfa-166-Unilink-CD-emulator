@@ -1,0 +1,47 @@
+div.chcounter_widget_parameters {
+	width: 18em;
+	padding: 0.5em;
+	margin-left: 0;
+	margin-right: 4em;
+	float: left;
+	}
+div.chcounter_widget_parameters h4 {
+	margin: 0;
+	padding: 0.2em 0 0.5em 0;
+	text-align: center;
+}
+div.chcounter_widget_parameters span.handle {
+	border: 1px solid #ccc;
+	background: #fffccf;
+	padding: 0.5em;
+	display: block;
+	}
+	
+ol.chcounter_widget {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	min-height: 30px;
+	}
+ol.chcounter_widget li {
+	padding: 0.5em;
+	margin: 0.2 0.5em;
+	cursor: move;
+	}
+ol.chcounter_widget li.holder {
+	border: none;
+	background: transparent;
+	}
+ol.chcounter_widget li input {
+	margin: 0 1em auto auto;
+	}
+li#chcounter_stats {
+	background-image: none;
+	list-style-type: none;
+	list-style-image: none;
+	text-align: center;
+	}
+li#chcounter_stats img {
+	display: block;
+	margin: auto;
+	}

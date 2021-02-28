@@ -1,0 +1,276 @@
+.:: Becker Monza Logs ::.
+
+Power ON
+
+«18 10 01 00 29 00 						Bus Reset
+«18 10 01 02 2B 00 						Anyone
+#10 30 8C 10 DC 24 A8 17 60 1F 00				Device string
+«18 10 01 03 2C 00 						Anyone special
+«31 10 02 01 44 00 						Appoint
+#10 31 8C 10 DD 24 A8 17 60 20 00				Device string
+«18 10 01 04 2D 00 						Appoint end
+«18 10 01 01 2A 00						???
+«31 11 88 11 DB 00 10 00 00 EB 00				Device config ???
+«18 10 87 89 38 00 00 00 00 38 00				Power status
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00	Source select
+«31 10 84 95 5A 10 00 00 00 6A 00				Request Magazin info
+«18 10 87 89 38 00 00 00 00 38 00				Power status
+«18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00	Source select CD
+«31 10 01 13 55 00						Permission to talk
+«31 10 84 00 C5 10 00 00 00 D5 00				Request command 00 ???
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank mode off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«18 10 01 00 29 00						Bus reset
+«18 10 01 02 2B 00						Anyone?
+#10 30 8C 10 DC 24 A8 17 60 1F 00				Device string
+«18 10 01 03 2C 00						Anyone special?
+«31 10 02 01 44 00						Appoint
+#10 31 8C 10 DD 24 A8 17 60 20 00				Device string
+«18 10 01 04 2D 00						Appoint end
+«18 10 01 01 2A 00						???
+«31 11 88 11 DB 00 10 00 00 EB 00				Device config
+«18 10 87 89 38 00 00 00 00 38 00				Power status
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00	Source select
+«31 10 84 95 5A 10 00 00 00 6A 00				Request Magazin info
+«18 10 87 89 38 00 00 00 00 38 00				Power status
+«18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00	Source select CD
+«31 10 01 13 55 00						Permission to talk
+«31 10 84 00 C5 10 00 00 00 D5 00				Request command 00???
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank mode off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«18 10 87 89 38 00 00 00 00 38 00				Power stats
+«18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00	Source select CD
+«31 11 36 00 78 00						Intro off
+«31 11 21 10 73 00
+«31 10 20 00 61 00						Play
+#70 31 C0 00 61 00 00 00 00 00 00 00 00 08 69 00	Seek to CD and track
+«31 10 01 12 54 00						Ping
+#10 31 00 00 41 00						Pong playing
+«31 10 01 11 53 00						Ping end
+«31 11 34 00 76 00						Repeat off
+«31 11 35 00 77 00						Random off
+«31 10 84 00 C5 10 00 00 00 D5 00				Request command 00 ???
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«31 10 84 97 5C 10 00 00 00 6C 00				Request disc info
+«31 10 84 00 C5 10 00 00 00 D5 00				Request command 00 ???
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«31 10 84 97 5C 10 00 00 00 6C 00				Request disc info
+
+
+
+Change from CD to FM tuner
+
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00	Source change
+
+
+Change from FM tuner to CD
+
+«18 10 87 89 38 00 00 00 00 38 00				Power status
+«18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00	Source change
+«31 11 36 00 78 00						Intro off
+«31 11 21 10 73 00						???
+«31 10 20 00 61 00						Play CD
+#70 31 C0 00 61 00 00 00 00 00 01 00 00 18 7A 00	Seek to CD and track
+«31 10 01 12 54 00						Ping
+#10 31 00 00 41 00						Pong playing
+«31 10 01 11 53 00						Ping end
+«31 11 34 00 76 00						Repeat off
+«31 11 35 00 77 00						Random off
+«31 10 84 00 C5 10 00 00 00 D5 00				Request command 00 ???				
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«31 11 40 20 A2 00						???
+«18 10 80 10 B8 00 00 11 00 C9 00				Display shows
+«31 10 84 CC 91 10 00 00 00 A1 00				Request command CC ???
+«31 11 37 20 99 00						Bank off
+«18 10 80 10 B8 00 00 00 00 B8 00				Display shows
+«31 10 84 97 5C 10 00 00 00 6C 00				Request command 97
+«31 10 01 13 55 00						Permission to talk
+#70 31 97 31 69 01 00 00 0A 74 00				Disc total time
+
+Random toggle
+
+«31 11 35 10 87 00	Random on
+«31 11 35 00 77 00	Random off
+
+Repeat toggle
+
+«31 11 34 10 86 00	Repeat on
+«31 11 34 00 76 00	Repeat off
+
+Fast Rewind key
+
+«31 11 25 01 68 00	Key press
+«18 11 08 00 31 00	Key release
+
+Fast Forward key
+
+«31 11 24 01 67 00	Key press
+«18 11 08 00 31 00  Key release
+
+Previous CD key
+
+«18 11 08 00 31 00	Key press
+«31 11 B0 19 0B 01 00 00 00 0C 00		Change to CD and track
+«31 10 84 97 5C 10 00 00 00 6C 00		Request disc info
+
+Next CD key
+
+«18 11 08 00 31 00	Key press
+«31 11 B0 19 0B 01 00 00 00 0C 00		Change to CD and track
+«31 10 84 97 5C 10 00 00 00 6C 00		Request disc info
+
+Next track knob turn
+
+«31 11 B0 18 0A 49 00 00 00 53 00		Change to CD and track
+
+Previous track knob turn
+
+«31 11 B0 18 0A 48 00 00 00 52 00		Change to CD and track
+
+Scroll CD name list
+
+«31 11 44 00 86 00	Next CD name
+«31 11 44 10 96 00	Previous CD name
+
+CD name edit mode
+
+«31 11 41 20 A3 00	Next character
+«31 11 41 30 B3 00	Previous character
+«31 11 41 10 93 00	Next character place
+«31 11 40 00 82 00	Previous character place
+
+Power off in CD mode
+
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«18 10 01 00 29 00
+«18 10 01 02 2B 00
+#10 30 8C 10 DC 24 A8 17 A0 5F 00
+«18 10 01 03 2C 00
+«31 10 02 01 44 00
+#10 31 8C 10 DD 24 A8 17 A0 60 00
+«18 10 01 04 2D 00
+«18 10 01 01 2A 00
+«31 11 88 11 DB 00 10 00 00 EB 00
+«18 10 87 89 38 00 00 00 00 38 00
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«18 10 87 00 AF 00 00 00 00 AF 00
+
+Power On in CD mode - Loading CD 1 displayed
+
+
+«18 10 01 02 2B 00
+#10 30 8C 10 DC 24 A8 17 A0 5F 00
+«18 10 01 03 2C 00
+«31 10 02 01 44 00
+#10 31 8C 10 DD 24 A8 17 A0 60 00
+«18 10 01 04 2D 00
+«18 10 01 01 2A 00
+«31 11 88 11 DB 00 10 00 00 EB 00
+«18 10 87 89 38 00 00 00 00 38 00
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«31 10 84 95 5A 10 00 00 00 6A 00
+«18 10 01 02 2B 00
+«18 10 01 02 2B 00
+«18 10 01 03 2C 00
+«18 10 01 00 29 00
+«18 10 01 02 2B 00
+#10 30 8C 10 DC 24 A8 17 A0 5F 00
+«18 10 01 03 2C 00
+«31 10 02 01 44 00
+#10 31 8C 10 DD 24 A8 17 A0 60 00
+«18 10 01 04 2D 00
+«18 10 01 01 2A 00
+«31 11 88 11 DB 00 10 00 00 EB 00
+«18 10 87 89 38 00 00 00 00 38 00
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«31 10 84 95 5A 10 00 00 00 6A 00
+«18 10 80 10 B8 00 00 11 00 C9 00
+«31 10 84 CC 91 10 00 00 00 A1 00
+«31 11 37 20 99 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«18 10 87 89 38 00 00 00 00 38 00
+«18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00
+«31 11 36 00 78 00
+«31 11 21 10 73 00
+«31 10 20 00 61 00
+#70 31 C0 00 61 00 00 00 00 00 01 00 00 18 7A 00
+«31 10 01 12 54 00
+#10 31 00 00 41 00
+«31 10 01 11 53 00
+«31 11 34 00 76 00
+«31 11 35 00 77 00
+«31 10 84 00 C5 10 00 00 00 D5 00
+«31 11 40 20 A2 00
+«18 10 80 10 B8 00 00 11 00 C9 00
+«31 10 84 CC 91 10 00 00 00 A1 00
+«31 11 37 20 99 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«31 11 40 20 A2 00
+«18 10 80 10 B8 00 00 11 00 C9 00
+«31 10 84 CC 91 10 00 00 00 A1 00
+«31 11 37 20 99 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«31 10 84 97 5C 10 00 00 00 6C 00
+«31 10 84 00 C5 10 00 00 00 D5 00
+«31 11 40 20 A2 00
+«18 10 80 10 B8 00 00 11 00 C9 00
+«31 10 84 CC 91 10 00 00 00 A1 00
+«31 11 37 20 99 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«31 10 01 13 55 00
+#70 31 95 FF 35 30 00 00 0A 6F 00
+«31 10 84 97 5C 10 00 00 00 6C 00
+«31 10 01 13 55 00
+#70 31 97 31 69 01 00 00 0A 74 00
+
+Power off in Tuner mode
+
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«18 10 01 00 29 00
+«18 10 01 02 2B 00
+#10 30 8C 10 DC 24 A8 17 A0 5F 00
+«18 10 01 03 2C 00
+«31 10 02 01 44 00
+#10 31 8C 10 DD 24 A8 17 A0 60 00
+«18 10 01 04 2D 00
+«18 10 01 01 2A 00
+«31 11 88 11 DB 00 10 00 00 EB 00
+«18 10 87 89 38 00 00 00 00 38 00
+«18 10 F0 FF 17 51 FF FF 31 00 00 00 00 40 D7 00
+«18 10 87 00 AF 00 00 00 00 AF 00
+
+Scan knob pushed
+
+«31 11 40 00 82 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«31 10 84 00 C5 10 00 00 00 D5 00
+«31 11 40 20 A2 00
+«18 10 80 10 B8 00 00 11 00 C9 00
+«31 10 84 CC 91 10 00 00 00 A1 00
+«31 11 37 20 99 00
+«18 10 80 10 B8 00 00 00 00 B8 00
+«31 11 36 10 88 00
+

@@ -1,0 +1,49 @@
+.highslide {
+   cursor: url(../graphics/zoomin.cur), pointer;
+}
+
+.highslide-image {
+	border: 0;
+   
+   /* enable this if you want a border around the image: */
+   /* border: 10px solid white; */ 
+   
+   /* enable this, if you set a border and you show titles under the image: */
+   /* border-bottom: 0; */
+}
+
+.highslide-loading {
+	border: 1px solid black;
+   background-color: white;
+   color: black;
+   font-size: 10px;
+	font-weight: bold;
+   text-decoration: none;
+   display: block;
+   padding: 3px 5px;
+}
+
+.highslide-caption {
+   display: none;
+   height: 35px;
+   padding: 6px;
+   background-color: white;
+	text-align: center;
+	font-weight: bold;
+}
+
+a.highslide-full-expand {
+	background: url(../graphics/fullexpand.gif) no-repeat;
+	display: block;
+	margin: 0 10px 10px 0;
+	width: 34px;
+	height: 34px;
+}
+
+/* These must always be last */
+.highslide-display-block {
+    display: block;
+}
+.highslide-display-none {
+    display: none;
+}

@@ -1,0 +1,4 @@
+avrdude: safemode: lfuse reads as EF
+avrdude: safemode: hfuse reads as C9
+avrdude: safemode: lfuse reads as EF
+avrdude: safemode: hfuse reads as C9

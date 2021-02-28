@@ -1,0 +1,2646 @@
+   1               		.file	"main.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  74               	.global	raw
+  75               	.global	raw
+  76               		.section .bss
+  79               	raw:
+  80 0000 0000 0000 		.skip 13,0
+  80      0000 0000 
+  80      0000 0000 
+  80      00
+  81               	.global	usart_rx_index
+  82               	.global	usart_rx_index
+  85               	usart_rx_index:
+  86 000d 00        		.skip 1,0
+  87               	.global	unilink_bitid
+  88               	.global	unilink_bitid
+  91               	unilink_bitid:
+  92 000e 00        		.skip 1,0
+  93               	.global	unilink_status
+  94               		.data
+  97               	unilink_status:
+  98 0000 80        		.byte	-128
+  99               	.global	unilink_timeinfo
+ 102               	unilink_timeinfo:
+ 103 0001 70        		.byte	112
+ 104 0002 00        		.byte	0
+ 105 0003 90        		.byte	-112
+ 106 0004 50        		.byte	80
+ 107 0005 01        		.byte	1
+ 108 0006 00        		.byte	0
+ 109 0007 00        		.byte	0
+ 110 0008 1E        		.byte	30
+ 111               	.global	unilink_txsize
+ 112               	.global	unilink_txsize
+ 113               		.section .bss
+ 116               	unilink_txsize:
+ 117 000f 00        		.skip 1,0
+ 118               	.global	unilink_rxsize
+ 119               	.global	unilink_rxsize
+ 122               	unilink_rxsize:
+ 123 0010 00        		.skip 1,0
+ 124               	.global	unilink_groupid
+ 125               	.global	unilink_groupid
+ 128               	unilink_groupid:
+ 129 0011 00        		.skip 1,0
+ 130               	.global	unilink_ownaddr
+ 131               	.global	unilink_ownaddr
+ 134               	unilink_ownaddr:
+ 135 0012 00        		.skip 1,0
+ 136               		.text
+ 138               	.global	__vector_11
+ 140               	__vector_11:
+ 142               	.Ltext1:
+   1:usart.c       **** /*************************************************************************
+   2:usart.c       **** **  Becker Unilink Bus Interface (USART Procedures)
+   3:usart.c       **** **  by Michael Wolf
+   4:usart.c       **** **
+   5:usart.c       **** **  Released under GNU GENERAL PUBLIC LICENSE
+   6:usart.c       **** **	See LICENSE.TXT for details
+   7:usart.c       **** **
+   8:usart.c       **** **  Revision History
+   9:usart.c       **** **
+  10:usart.c       **** **  when			what  who	why
+  11:usart.c       **** **	19/03/04	v1.0	MIC	Initial Release  
+  12:usart.c       **** **
+  13:usart.c       **** **************************************************************************/
+  14:usart.c       **** 
+  15:usart.c       **** // UART receive interrupt
+  16:usart.c       **** SIGNAL(SIG_UART_RECV)
+  17:usart.c       **** {
+ 144               	.LM1:
+ 145               	/* prologue: frame size=0 */
+ 146 0000 1F92      		push __zero_reg__
+ 147 0002 0F92      		push __tmp_reg__
+ 148 0004 0FB6      		in __tmp_reg__,__SREG__
+ 149 0006 0F92      		push __tmp_reg__
+ 150 0008 1124      		clr __zero_reg__
+ 151 000a 8F93      		push r24
+ 152 000c 9F93      		push r25
+ 153 000e EF93      		push r30
+ 154 0010 FF93      		push r31
+ 155               	/* prologue end (size=9) */
+  18:usart.c       ****     usart_rx_buffer[usart_rx_index] = UDR;		            // put received char in buffer
+ 157               	.LM2:
+ 158 0012 9091 0000 		lds r25,usart_rx_index
+ 159 0016 E92F      		mov r30,r25
+ 160 0018 FF27      		clr r31
+ 161 001a E050      		subi r30,lo8(-(usart_rx_buffer))
+ 162 001c F040      		sbci r31,hi8(-(usart_rx_buffer))
+ 163 001e 8CB1      		in r24,44-0x20
+ 164 0020 8083      		st Z,r24
+  19:usart.c       ****     if(++usart_rx_index > RX_BUFFER_SIZE)       	        // wrap index pointer
+ 166               	.LM3:
+ 167 0022 892F      		mov r24,r25
+ 168 0024 8F5F      		subi r24,lo8(-(1))
+ 169 0026 8093 0000 		sts usart_rx_index,r24
+ 170 002a 8333      		cpi r24,lo8(51)
+ 171 002c 10F0      		brlo .L1
+  20:usart.c       ****         usart_rx_index = 0;
+ 173               	.LM4:
+ 174 002e 1092 0000 		sts usart_rx_index,__zero_reg__
+ 175               	.L1:
+ 176               	/* epilogue: frame size=0 */
+ 177 0032 FF91      		pop r31
+ 178 0034 EF91      		pop r30
+ 179 0036 9F91      		pop r25
+ 180 0038 8F91      		pop r24
+ 181 003a 0F90      		pop __tmp_reg__
+ 182 003c 0FBE      		out __SREG__,__tmp_reg__
+ 183 003e 0F90      		pop __tmp_reg__
+ 184 0040 1F90      		pop __zero_reg__
+ 185 0042 1895      		reti
+ 186               	/* epilogue end (size=9) */
+ 187               	/* function __vector_11 size 34 (16) */
+ 189               	.Lscope0:
+ 193               	.global	usart_putc
+ 195               	usart_putc:
+  21:usart.c       **** };// end of UART receive interrupt
+  22:usart.c       **** 
+  23:usart.c       **** 
+  24:usart.c       **** 
+  25:usart.c       **** void usart_putc(unsigned char byte)
+  26:usart.c       **** {
+ 197               	.LM5:
+ 198               	/* prologue: frame size=0 */
+ 199               	/* prologue end (size=0) */
+ 200 0044 482F      		mov r20,r24
+ 201 0046 21E0      		ldi r18,lo8(1)
+ 202 0048 30E0      		ldi r19,hi8(1)
+ 203               	.L4:
+  27:usart.c       **** 	#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+  28:usart.c       **** 	while ((UCSRA & _BV(UDRE)) != _BV(UDRE));					// wait for USART to become available
+ 205               	.LM6:
+ 206 004a 8BB1      		in r24,43-0x20
+ 207 004c 9927      		clr r25
+ 208 004e 55E0      		ldi r21,5
+ 209 0050 9695      	1:	lsr r25
+ 210 0052 8795      		ror r24
+ 211 0054 5A95      		dec r21
+ 212 0056 E1F7      		brne 1b
+ 213 0058 8170      		andi r24,lo8(1)
+ 214 005a 9070      		andi r25,hi8(1)
+ 215 005c 8217      		cp r24,r18
+ 216 005e 9307      		cpc r25,r19
+ 217 0060 A1F7      		brne .L4
+  29:usart.c       **** 	#else
+  30:usart.c       **** 	while ((USR & _BV(UDRE)) != _BV(UDRE));        		// wait for USART to become available
+  31:usart.c       **** 	#endif
+  32:usart.c       **** 	UDR = byte;		                                    // send character
+ 219               	.LM7:
+ 220 0062 4CB9      		out 44-0x20,r20
+ 221               	/* epilogue: frame size=0 */
+ 222 0064 0895      		ret
+ 223               	/* epilogue end (size=1) */
+ 224               	/* function usart_putc size 17 (16) */
+ 226               	.Lscope1:
+ 229               	.global	usart_init
+ 231               	usart_init:
+  33:usart.c       **** }; //end usart_putc
+  34:usart.c       **** 
+  35:usart.c       **** 
+  36:usart.c       **** 
+  37:usart.c       **** void usart_init(void)					         		       	// init USART
+  38:usart.c       **** {
+ 233               	.LM8:
+ 234               	/* prologue: frame size=0 */
+ 235               	/* prologue end (size=0) */
+  39:usart.c       **** 	#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+  40:usart.c       **** 	UBRRH = UART_BAUDRATE>>8;		// set baud rate
+ 237               	.LM9:
+ 238 0066 10BC      		out 64-0x20,__zero_reg__
+  41:usart.c       **** 	UBRRL = UART_BAUDRATE;
+ 240               	.LM10:
+ 241 0068 83E0      		ldi r24,lo8(3)
+ 242 006a 89B9      		out 41-0x20,r24
+  42:usart.c       **** 	UCSRB =((1<<RXCIE)|(0<<TXCIE)|(0<<UDRIE)|(1<<RXEN)|(1<<TXEN)|(0<<UCSZ2)|(0<<RXB8)|(0<<TXB8));
+ 244               	.LM11:
+ 245 006c 88E9      		ldi r24,lo8(-104)
+ 246 006e 8AB9      		out 42-0x20,r24
+  43:usart.c       **** 	// enable Rx & Tx, enable Rx interrupt
+  44:usart.c       **** 	UCSRC =((1<<URSEL)|(0<<UMSEL)|(0<<UPM1)|(0<<UPM0)|(0<<USBS)|(1<<UCSZ1)|(1<<UCSZ0)|(0<<UCPOL));
+ 248               	.LM12:
+ 249 0070 86E8      		ldi r24,lo8(-122)
+ 250 0072 80BD      		out 64-0x20,r24
+ 251               	/* epilogue: frame size=0 */
+ 252 0074 0895      		ret
+ 253               	/* epilogue end (size=1) */
+ 254               	/* function usart_init size 8 (7) */
+ 256               	.Lscope2:
+ 259               	.global	slavebreak
+ 261               	slavebreak:
+ 263               	.Ltext2:
+   1:unilink.c     **** /*************************************************************************
+   2:unilink.c     **** **  Becker Unilink Bus Interface (Unilink Command Procedures)
+   3:unilink.c     **** **  by Michael Wolf
+   4:unilink.c     **** **
+   5:unilink.c     **** **  Released under GNU GENERAL PUBLIC LICENSE
+   6:unilink.c     **** **	See LICENSE.TXT for details
+   7:unilink.c     **** **
+   8:unilink.c     **** **  Revision History
+   9:unilink.c     **** **
+  10:unilink.c     **** **  when			what  who	why
+  11:unilink.c     **** **	19/03/04	v1.0	MIC	Initial Release  
+  12:unilink.c     **** **
+  13:unilink.c     **** **************************************************************************/
+  14:unilink.c     **** 
+  15:unilink.c     **** INTERRUPT(SIG_SPI)
+  16:unilink.c     **** {
+  17:unilink.c     ****   if (!(flags.spi_tx))                            		// do SPI Rx routine here
+  18:unilink.c     ****   {
+  19:unilink.c     **** 		#if defined(LED_OUT)
+  20:unilink.c     **** 		sbi(PORTD, d_LED3);																// turn ON LED3
+  21:unilink.c     **** 		#endif
+  22:unilink.c     **** 		unilink_rxdata[unilink_bytecount.rx] = SPDR;			// read byte
+  23:unilink.c     ****     reset_spi();                                  		// reset SPI
+  24:unilink.c     ****     if ((unilink_rxdata[0] == 0x00) && (unilink_bytecount.rx == 0))
+  25:unilink.c     **** 			return;																				// skip if 1st byte of packet is 0x00
+  26:unilink.c     ****     unilink_rxsize = 6;                           		// set packet size to short
+  27:unilink.c     ****     if (unilink_rxdata[2] >= 0x80)
+  28:unilink.c     **** 			unilink_rxsize = 11;     												// set packet size to medium
+  29:unilink.c     ****     if (unilink_rxdata[2] >= 0xC0)
+  30:unilink.c     **** 			unilink_rxsize = 16;    												// set packet size to long
+  31:unilink.c     ****     unilink_bytecount.rx++;
+  32:unilink.c     ****     if (unilink_bytecount.rx >= unilink_rxsize)     	// if a packet is complete
+  33:unilink.c     ****     {
+  34:unilink.c     **** 			#if defined(LED_OUT)
+  35:unilink.c     **** 			cbi(PORTD, d_LED3);															// turn OFF LED3
+  36:unilink.c     **** 			#endif
+  37:unilink.c     **** 			unilink_bytecount.rx = 0;                  			// reset byte counter
+  38:unilink.c     ****             flags.unilink_rx_compl = true;          	// set status flag
+  39:unilink.c     ****     }
+  40:unilink.c     ****   } // end of SPI Rx routine
+  41:unilink.c     ****   else                                            		// do SPI Tx routine here
+  42:unilink.c     ****   {
+  43:unilink.c     ****     if (unilink_bytecount.tx <= unilink_txsize)     	// check if bytes left
+  44:unilink.c     ****     {
+  45:unilink.c     ****       SPDR = unilink_txdata[unilink_bytecount.tx];		// output next byte
+  46:unilink.c     ****       unilink_bytecount.tx++;
+  47:unilink.c     ****     }
+  48:unilink.c     ****     else
+  49:unilink.c     ****     {
+  50:unilink.c     ****       reset_spi();
+  51:unilink.c     ****       SPDR = 0x00;          		        	    				// output last end byte 0x00
+  52:unilink.c     ****       flags.spi_tx = false;       		        				// disable Tx mode
+  53:unilink.c     **** 			#ifdef BUS_LOGGING
+  54:unilink.c     ****         flags.unilink_tx_log = true;                	// enable Tx packet logging
+  55:unilink.c     ****         bus_logging();                              	// send Tx packet via UART
+  56:unilink.c     **** 			#endif
+  57:unilink.c     **** 			#if defined(LED_OUT)
+  58:unilink.c     **** 				PORTD &=~ _BV(d_LED3);														// turn OFF LED3
+  59:unilink.c     **** 			#endif
+  60:unilink.c     **** 			DDRB &=~ _BV(b_MISO);         		        				// disable SPI output
+  61:unilink.c     ****       asm volatile ("nop");
+  62:unilink.c     **** 		}
+  63:unilink.c     ****   } // end SPI Tx routine
+  64:unilink.c     **** } //end of SPI interrupt routine
+  65:unilink.c     **** 
+  66:unilink.c     **** 
+  67:unilink.c     **** void reset_spi(void)  // reset SPI
+  68:unilink.c     **** {
+  69:unilink.c     ****   // inp (SPSR);
+  70:unilink.c     ****   SPDR = 0x00;				// force MISO low
+  71:unilink.c     ****   SPCR = 0x00;				// reset SPI interrupt flag
+  72:unilink.c     ****   SPCR = c_RUN_SPI;		// reconfig SPI
+  73:unilink.c     **** }; //end RESET_SPI
+  74:unilink.c     **** 
+  75:unilink.c     **** 
+  76:unilink.c     **** void unilink_tx(unsigned char *msg)
+  77:unilink.c     **** {
+  78:unilink.c     ****   unsigned char loc_checksum = 0;                   // local checksum
+  79:unilink.c     ****   unsigned char loc_index = 0;                      // local index
+  80:unilink.c     **** 
+  81:unilink.c     **** 	if (msg[2] >= 0xC0) unilink_txsize = 14;          	// 16 byte command
+  82:unilink.c     **** 	else if (msg[2] >= 0x80) unilink_txsize = 9;      // 11 byte command
+  83:unilink.c     **** 	else unilink_txsize = 4;         			        		//  6 byte command
+  84:unilink.c     **** 
+  85:unilink.c     ****   loc_checksum += msg[destaddr];                     // copy the 1st 4 bytes from msg to Tx buffer
+  86:unilink.c     ****   unilink_txdata[destaddr]=msg[destaddr];            // and calculate checksum for it
+  87:unilink.c     ****   loc_checksum += msg[srcaddr];
+  88:unilink.c     ****   unilink_txdata[srcaddr]=msg[srcaddr];
+  89:unilink.c     ****   loc_checksum += msg[cmd1];
+  90:unilink.c     ****   unilink_txdata[cmd1]=msg[cmd1];
+  91:unilink.c     ****   loc_checksum += msg[cmd2];
+  92:unilink.c     ****   unilink_txdata[cmd2]=msg[cmd2];
+  93:unilink.c     ****   unilink_txdata[parity1] = loc_checksum;             // store calculated checksum
+  94:unilink.c     ****   loc_index = 4;                                      // start with 1st databyte in packet
+  95:unilink.c     **** 
+  96:unilink.c     **** 	do   // copy msg to Tx buffer and calculate checksum
+  97:unilink.c     ****   {
+  98:unilink.c     ****     unilink_txdata[loc_index+1] = msg[loc_index];   	// copy one byte from msg to Tx data buffer
+  99:unilink.c     ****     loc_checksum += msg[loc_index];                 	// add each byte to checksum
+ 100:unilink.c     ****     loc_index++;
+ 101:unilink.c     ****   }while(loc_index < unilink_txsize-1);
+ 102:unilink.c     **** 
+ 103:unilink.c     **** 	unilink_txdata[loc_index+1] = loc_checksum;         // store 2nd checksum in Tx buffer
+ 104:unilink.c     **** 	#if defined(LED_OUT)
+ 105:unilink.c     **** 		sbi(PORTD, d_LED3);																// turn ON LED3
+ 106:unilink.c     **** 	#endif
+ 107:unilink.c     **** 	SPDR = 0x00;
+ 108:unilink.c     ****   SPCR = 0x00;	                                    	// reset SPI
+ 109:unilink.c     ****   DDRB |= _BV(b_MISO);                                 // MISO as output
+ 110:unilink.c     ****   asm volatile ("nop");
+ 111:unilink.c     ****   SPCR = c_RUN_SPI;		                            		// reconfig SPI
+ 112:unilink.c     ****   flags.spi_tx = true;                               // enable Tx mode
+ 113:unilink.c     ****   unilink_bytecount.tx = 1;                           // set bytecount to 1 cause one byte is send 
+ 114:unilink.c     ****   SPDR = unilink_txdata[destaddr];		            		// send 1st byte to SPI, rest via SPI interrupt r
+ 115:unilink.c     **** }; // end of unilink_tx
+ 116:unilink.c     **** 
+ 117:unilink.c     **** 
+ 118:unilink.c     **** 
+ 119:unilink.c     **** // start Unilink packet evaluation
+ 120:unilink.c     **** void unilink_parse(void)
+ 121:unilink.c     **** {
+ 122:unilink.c     **** 	if(unilink_rxdata[destaddr] == 0x18)
+ 123:unilink.c     **** 	{
+ 124:unilink.c     **** 		unilink_broadcast();                			// parse broadcast packets
+ 125:unilink.c     **** 		return;
+ 126:unilink.c     **** 	}	
+ 127:unilink.c     **** 
+ 128:unilink.c     **** 	if(unilink_rxdata[destaddr] == unilink_ownaddr)
+ 129:unilink.c     **** 	{
+ 130:unilink.c     **** 		unilink_myid_cmd();			        					// parse packets for my ID
+ 131:unilink.c     **** 		return;
+ 132:unilink.c     **** 	}
+ 133:unilink.c     **** 
+ 134:unilink.c     **** 	if(unilink_ownaddr == unilink_groupid)
+ 135:unilink.c     **** 	{
+ 136:unilink.c     **** 		unilink_appoint();												// do ID appoint procedure
+ 137:unilink.c     **** 		return;
+ 138:unilink.c     **** 	}
+ 139:unilink.c     **** }; // end UNILINK_RXPROC
+ 140:unilink.c     **** 
+ 141:unilink.c     **** 
+ 142:unilink.c     **** 
+ 143:unilink.c     **** //*** Broadcast handler
+ 144:unilink.c     **** void unilink_broadcast(void)
+ 145:unilink.c     **** {
+ 146:unilink.c     ****   switch(unilink_rxdata[cmd1]) 												// Switch on CMD1
+ 147:unilink.c     ****   {
+ 148:unilink.c     ****     case 0x01:  // 0x01 Bus requests (Broadcast)
+ 149:unilink.c     ****         switch(unilink_rxdata[cmd2])  									// Switch on CMD2
+ 150:unilink.c     ****         {
+ 151:unilink.c     **** 
+ 152:unilink.c     **** 				// 0x01 0x00 Bus reset
+ 153:unilink.c     ****           case 0x00:
+ 154:unilink.c     ****               unilink_ownaddr = C_UNILINK_OWNADDR_CD; // clear my old ID
+ 155:unilink.c     **** 							flags.unilink_anyone = false;
+ 156:unilink.c     ****               break;
+ 157:unilink.c     **** 
+ 158:unilink.c     **** 				// 0x01 0x02 Anyone?
+ 159:unilink.c     ****           case 0x02:  
+ 160:unilink.c     ****                 if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+ 161:unilink.c     ****                 {
+ 162:unilink.c     **** 									flags.unilink_anyone = true;
+ 163:unilink.c     ****                   unsigned char msg[8] = CD_DEVICE_MSG;
+ 164:unilink.c     **** 									unilink_tx(msg);                    	// send my device info string
+ 165:unilink.c     ****                 };
+ 166:unilink.c     ****               break;
+ 167:unilink.c     **** 				}; // end of switch CMD 2
+ 168:unilink.c     **** 				
+ 169:unilink.c     **** 		// 0xF0 SRC Source select
+ 170:unilink.c     ****     case 0xF0:
+ 171:unilink.c     **** 				if (unilink_rxdata[cmd2] != unilink_ownaddr)		// check if interface is deselected
+ 172:unilink.c     **** 				{
+ 173:unilink.c     ****           unilink_status = 0x80;                        // set idle status on deselect
+ 174:unilink.c     **** 					#ifndef BUS_LOGGING
+ 175:unilink.c     ****             usart_putc(Stop);
+ 176:unilink.c     **** 					#endif
+ 177:unilink.c     **** 					#if defined(LED_OUT)
+ 178:unilink.c     **** 						cbi(PORTD, d_LED2);													// turn OFF LED2
+ 179:unilink.c     **** 					#endif		
+ 180:unilink.c     **** 				}
+ 181:unilink.c     ****         break;
+ 182:unilink.c     **** 
+ 183:unilink.c     **** 		// 0x87 Power Event
+ 184:unilink.c     ****     case 0x87:
+ 185:unilink.c     ****         if(unilink_rxdata[cmd2] == 0x00)								// Power off
+ 186:unilink.c     **** 				{	// power off events
+ 187:unilink.c     **** 					unilink_status = 0x80;                 				// set idle status on power off
+ 188:unilink.c     **** 					#if defined(RELAIS_OUT)
+ 189:unilink.c     **** 						PORTD &=~ _BV(d_RELAIS);												// turn OFF relais
+ 190:unilink.c     **** 					#else
+ 191:unilink.c     **** 						usart_putc(Stop); 													// or send a Stop 
+ 192:unilink.c     **** 					#endif
+ 193:unilink.c     **** 					#ifndef BUS_LOGGING
+ 194:unilink.c     ****             usart_putc(Power_Off);
+ 195:unilink.c     **** 					#endif
+ 196:unilink.c     **** 					#if defined(LED_OUT)
+ 197:unilink.c     **** 						PORTD &=~ _BV(d_LED2);													// turn OFF LED2 and LED3
+ 198:unilink.c     **** 					#endif
+ 199:unilink.c     **** 				}
+ 200:unilink.c     ****         break;
+ 201:unilink.c     **** 
+ 202:unilink.c     ****   }; // end switch on CMD 1
+ 203:unilink.c     **** }; // end of Broadcast handler
+ 204:unilink.c     **** 
+ 205:unilink.c     **** 
+ 206:unilink.c     **** //*** Command handler ***
+ 207:unilink.c     **** void unilink_myid_cmd(void)
+ 208:unilink.c     **** {
+ 209:unilink.c     **** 	switch(unilink_rxdata[cmd1]) 													// Switch on CMD1
+ 210:unilink.c     ****   {
+ 211:unilink.c     **** 		// 0x01 Bus requests (for my ID)
+ 212:unilink.c     **** 			case 0x01:  
+ 213:unilink.c     ****           switch(unilink_rxdata[cmd2])
+ 214:unilink.c     ****           {
+ 215:unilink.c     **** 
+ 216:unilink.c     **** 						// 0x01 0x12 Respond to time poll (PONG)
+ 217:unilink.c     ****               case 0x12:
+ 218:unilink.c     ****                   asm volatile ("nop");               // without this, an parse error occurs, no id
+ 219:unilink.c     **** 									flags.bus_sleep = false;
+ 220:unilink.c     **** 									unsigned char msg[4] = STATUS_MSG;
+ 221:unilink.c     ****                   unilink_tx(msg);
+ 222:unilink.c     **** 									break;
+ 223:unilink.c     ****                 
+ 224:unilink.c     **** 						// 0x01 0x13 permission to talk after poll request
+ 225:unilink.c     ****               case 0x13:
+ 226:unilink.c     ****                   send_command();                   	 // send unilink command
+ 227:unilink.c     ****                   break;
+ 228:unilink.c     **** 					}; // end switch CMD2
+ 229:unilink.c     ****           break;
+ 230:unilink.c     ****         
+ 231:unilink.c     **** 		// 0x20 PLAY
+ 232:unilink.c     ****       case 0x20:
+ 233:unilink.c     **** 					#if !defined(BUS_LOGGING) && !defined(YAMPP3)
+ 234:unilink.c     **** 						/* This "Play" is send, when bus logging and Yampp3 control is disabled */
+ 235:unilink.c     ****             usart_putc(Play);
+ 236:unilink.c     **** 					#endif
+ 237:unilink.c     **** 					#if defined(LED_OUT)
+ 238:unilink.c     **** 						PORTD |= _BV(d_LED2);													// turn ON LED2
+ 239:unilink.c     **** 					#endif	
+ 240:unilink.c     **** 					#if defined(RELAIS_OUT)
+ 241:unilink.c     **** 						#if defined(YAMPP3)
+ 242:unilink.c     **** 							// test if Yampp is still powered on, if yes, send a play command
+ 243:unilink.c     **** 							if(bit_is_set(PORTD, d_RELAIS)) usart_putc(Play);
+ 244:unilink.c     **** 						#endif
+ 245:unilink.c     **** 					PORTD |= _BV(d_RELAIS);													// turn ON relais
+ 246:unilink.c     **** 					#endif	
+ 247:unilink.c     **** 					unilink_status = 0x00;                        // set PLAY status
+ 248:unilink.c     **** 					unsigned char msg5[13] = SEEK_MSG;					// send seek to disc and track
+ 249:unilink.c     **** 					unilink_tx(msg5);
+ 250:unilink.c     ****           break;
+ 251:unilink.c     **** 			
+ 252:unilink.c     **** 		// 0x21 TA message start
+ 253:unilink.c     ****       case 0x21:
+ 254:unilink.c     **** 					if(unilink_rxdata[cmd2] == 0x20)
+ 255:unilink.c     **** 					{
+ 256:unilink.c     **** 						unilink_status = 0x80;                      // set idle status
+ 257:unilink.c     **** 						#ifndef BUS_LOGGING
+ 258:unilink.c     **** 							usart_putc(Play);													// send "play" to put Yampp in pause mode
+ 259:unilink.c     **** 						#endif
+ 260:unilink.c     **** 						#if defined(LED_OUT)
+ 261:unilink.c     **** 							cbi(PORTD, d_LED2);												// turn OFF LED2
+ 262:unilink.c     **** 						#endif
+ 263:unilink.c     **** 					}
+ 264:unilink.c     ****           break;
+ 265:unilink.c     **** 
+ 266:unilink.c     **** 		// 0x24 Fast Forward
+ 267:unilink.c     ****       case 0x24:
+ 268:unilink.c     **** 					#ifndef BUS_LOGGING
+ 269:unilink.c     ****             usart_putc(FFWD);
+ 270:unilink.c     **** 					#endif
+ 271:unilink.c     ****           break;
+ 272:unilink.c     ****         
+ 273:unilink.c     **** 		// 0x25 Fast Reverse
+ 274:unilink.c     ****       case 0x25:
+ 275:unilink.c     **** 					#ifndef BUS_LOGGING
+ 276:unilink.c     ****             usart_putc(FRVS);
+ 277:unilink.c     **** 					#endif
+ 278:unilink.c     ****           break;
+ 279:unilink.c     ****         
+ 280:unilink.c     **** 		// 0x34 Repeat mode change
+ 281:unilink.c     ****       case 0x34:
+ 282:unilink.c     **** 					#ifndef BUS_LOGGING
+ 283:unilink.c     **** 						usart_putc(Repeat);
+ 284:unilink.c     **** 					#endif
+ 285:unilink.c     ****           break;
+ 286:unilink.c     ****         
+ 287:unilink.c     **** 		// 0x35 Shuffle mode change
+ 288:unilink.c     ****       case 0x35:
+ 289:unilink.c     **** 					#ifndef BUS_LOGGING
+ 290:unilink.c     **** 						usart_putc(Shuffle);
+ 291:unilink.c     **** 					#endif
+ 292:unilink.c     ****           break;
+ 293:unilink.c     ****         
+ 294:unilink.c     **** 		// 0x84 request for command
+ 295:unilink.c     ****       case 0x84:
+ 296:unilink.c     **** 					switch(unilink_rxdata[cmd2])
+ 297:unilink.c     ****           {
+ 298:unilink.c     **** 						// request magazine info
+ 299:unilink.c     **** 						case 0x95:																	// send magazine info on request
+ 300:unilink.c     **** 							slavebreak();
+ 301:unilink.c     **** 							unilink_command.magazine = true;
+ 302:unilink.c     **** 							break;
+ 303:unilink.c     **** 						
+ 304:unilink.c     **** 						// request disc total time and tracks
+ 305:unilink.c     **** 						case 0x97:
+ 306:unilink.c     **** 							slavebreak();															// send disc info on request
+ 307:unilink.c     **** 							unilink_command.disc = true;
+ 308:unilink.c     **** 							break;
+ 309:unilink.c     **** 					}
+ 310:unilink.c     ****           break;
+ 311:unilink.c     ****  
+ 312:unilink.c     **** 		// 0xB0 Direct Disc keys
+ 313:unilink.c     ****       case 0xB0:
+ 314:unilink.c     **** 					if( unilink_lastdisc > unilink_rxdata[cmd2] ) // check for disc change
+ 315:unilink.c     **** 					{
+ 316:unilink.c     **** 						unilink_lastdisc = unilink_rxdata[cmd2];	// store new disc#
+ 317:unilink.c     **** 						#ifndef BUS_LOGGING
+ 318:unilink.c     **** 							usart_putc(Disc_up);										// serial command out
+ 319:unilink.c     ****             #endif
+ 320:unilink.c     **** 					}
+ 321:unilink.c     **** 					else if( unilink_lastdisc < unilink_rxdata[cmd2] )
+ 322:unilink.c     **** 					{
+ 323:unilink.c     **** 						unilink_lastdisc = unilink_rxdata[cmd2];	// store new disc#
+ 324:unilink.c     **** 						#ifndef BUS_LOGGING
+ 325:unilink.c     **** 							usart_putc(Disc_down);									// serial command out
+ 326:unilink.c     ****             #endif
+ 327:unilink.c     **** 					}
+ 328:unilink.c     **** 
+ 329:unilink.c     **** 					if( unilink_lasttrack > unilink_rxdata[d1] ) // check for track change
+ 330:unilink.c     **** 					{
+ 331:unilink.c     **** 						unilink_lasttrack = unilink_rxdata[d1];			// store new track#
+ 332:unilink.c     **** 						#ifndef BUS_LOGGING
+ 333:unilink.c     **** 							usart_putc(Track_up);											// serial command out
+ 334:unilink.c     ****             #endif
+ 335:unilink.c     **** 					}
+ 336:unilink.c     **** 					else if( unilink_lasttrack < unilink_rxdata[d1] )
+ 337:unilink.c     **** 					{
+ 338:unilink.c     **** 						unilink_lasttrack = unilink_rxdata[d1];			// store new disc#
+ 339:unilink.c     **** 						#ifndef BUS_LOGGING
+ 340:unilink.c     **** 							usart_putc(Track_down);										// serial command out
+ 341:unilink.c     ****             #endif
+ 342:unilink.c     **** 					}
+ 343:unilink.c     **** 			    break;
+ 344:unilink.c     ****     }; // end switch CMD 1
+ 345:unilink.c     **** }; // end of Command handler
+ 346:unilink.c     **** 
+ 347:unilink.c     **** 
+ 348:unilink.c     **** 
+ 349:unilink.c     **** //*** Appoint handler ***
+ 350:unilink.c     **** void unilink_appoint(void)
+ 351:unilink.c     **** {   // respond to ID appoint
+ 352:unilink.c     **** 	unilink_bitid = unilink_rxdata[cmd2];	 								// store request poll ID
+ 353:unilink.c     **** 	
+ 354:unilink.c     **** 	if( (unilink_rxdata[cmd1] == 0x02) && flags.unilink_anyone ) 
+ 355:unilink.c     **** 	{ // check for Anyone command
+ 356:unilink.c     **** 		if ((unilink_rxdata[destaddr]&0xF0) == unilink_groupid)// check if packet is for my group
+ 357:unilink.c     **** 		{ // if packet is for my group
+ 358:unilink.c     **** 				if(unilink_ownaddr == C_UNILINK_OWNADDR_CD)
+ 359:unilink.c     **** 				{ // I have no ID and packet is for my group
+ 360:unilink.c     **** 					unilink_ownaddr = unilink_rxdata[destaddr];   // save my new ID
+ 361:unilink.c     **** 					#if defined(LED_OUT)
+ 362:unilink.c     **** 						sbi(PORTD, d_LED1);													// turn ON LED1 since we now have the ID
+ 363:unilink.c     **** 					#endif	
+ 364:unilink.c     **** 					unsigned char msg[8] = CD_DEVICE_MSG;
+ 365:unilink.c     **** 					unilink_tx(msg);                        			// send my device info string
+ 366:unilink.c     **** 				}
+ 367:unilink.c     **** 		}// end group check
+ 368:unilink.c     **** 	}// end of anyone check
+ 369:unilink.c     **** }; // end of appoint handler
+ 370:unilink.c     **** 
+ 371:unilink.c     **** 
+ 372:unilink.c     **** 
+ 373:unilink.c     **** void send_command(void)
+ 374:unilink.c     **** {
+ 375:unilink.c     **** 	// magazine info
+ 376:unilink.c     ****   if (unilink_command.magazine)							// send magazine info
+ 377:unilink.c     **** 	{
+ 378:unilink.c     **** 		unsigned char msg2[8] = MAG_MSG;
+ 379:unilink.c     ****     unilink_tx(msg2);
+ 380:unilink.c     **** 		unilink_command.magazine = false;
+ 381:unilink.c     **** 		return;
+ 382:unilink.c     **** 	}
+ 383:unilink.c     **** 
+ 384:unilink.c     **** 	// disc total time and tracks
+ 385:unilink.c     ****   if (unilink_command.disc)									// send disc info
+ 386:unilink.c     **** 	{
+ 387:unilink.c     **** 		unsigned char msg3[8] = DISC_MSG;
+ 388:unilink.c     ****     unilink_tx(msg3);
+ 389:unilink.c     **** 		unilink_command.disc = false;
+ 390:unilink.c     **** 		return;
+ 391:unilink.c     **** 	}
+ 392:unilink.c     **** 	
+ 393:unilink.c     **** 	// time info update
+ 394:unilink.c     ****   if (unilink_command.time)									// send time info
+ 395:unilink.c     **** 	{
+ 396:unilink.c     ****     unilink_tx(unilink_timeinfo);
+ 397:unilink.c     **** 		unilink_command.time = false;
+ 398:unilink.c     **** 		return;
+ 399:unilink.c     **** 	}
+ 400:unilink.c     **** 
+ 401:unilink.c     **** 	// disc name update
+ 402:unilink.c     **** 	if (unilink_command.discname)							// send disc name
+ 403:unilink.c     **** 	{
+ 404:unilink.c     **** 		unsigned char msg4[13] = {C_UNILINK_DISPADDR, unilink_ownaddr, 0xCD,
+ 405:unilink.c     ****                         unilink_discname[0],unilink_discname[1],
+ 406:unilink.c     ****                         unilink_discname[2],unilink_discname[3],
+ 407:unilink.c     ****                         unilink_discname[4],unilink_discname[5],
+ 408:unilink.c     ****                         unilink_discname[6],unilink_discname[7],
+ 409:unilink.c     ****                         0x00,0x0E};
+ 410:unilink.c     ****     unilink_tx(msg4);              
+ 411:unilink.c     **** 		unilink_command.discname = false;
+ 412:unilink.c     **** 		return;
+ 413:unilink.c     **** 	}
+ 414:unilink.c     **** 
+ 415:unilink.c     **** 	// RAW unilink command
+ 416:unilink.c     ****   if (unilink_command.raw)									// send RAW command
+ 417:unilink.c     **** 	{
+ 418:unilink.c     **** 		unilink_tx(raw);
+ 419:unilink.c     **** 		unilink_command.raw = false;
+ 420:unilink.c     **** 		return;
+ 421:unilink.c     **** 	}
+ 422:unilink.c     **** }; // end of send_command
+ 423:unilink.c     **** 
+ 424:unilink.c     **** 
+ 425:unilink.c     **** 
+ 426:unilink.c     **** void checksum_check(void)              							// check parity of complete Unilink packet
+ 427:unilink.c     **** {
+ 428:unilink.c     ****         unsigned char loc_bytecount = 0;      			// local byte counter
+ 429:unilink.c     ****         unsigned char loc_rxsize = unilink_rxsize-2;// local rxsize, minus 1 checksum and 1 end byt
+ 430:unilink.c     ****         unsigned char loc_checksum = 0;							// local checksum
+ 431:unilink.c     **** 
+ 432:unilink.c     ****         for(;loc_bytecount < 4; loc_bytecount++)   	// calculate checksum for byte 1-4
+ 433:unilink.c     ****         {
+ 434:unilink.c     ****             loc_checksum += unilink_rxdata[loc_bytecount];// add to checksum
+ 435:unilink.c     ****         };
+ 436:unilink.c     **** 
+ 437:unilink.c     ****         if (loc_checksum == unilink_rxdata[parity1])// verify the 1st checksum, skip rest if is inv
+ 438:unilink.c     ****         {
+ 439:unilink.c     ****             if (loc_bytecount==loc_rxsize)         	// check if short packet
+ 440:unilink.c     ****             {
+ 441:unilink.c     ****                 if (unilink_rxdata[loc_bytecount+2] == 0x00)
+ 442:unilink.c     ****                 {
+ 443:unilink.c     ****                     flags.checksum_ok = true;      	// return with true if checksum 1 is ok AND end
+ 444:unilink.c     ****                 }; // end if end byte
+ 445:unilink.c     ****             }; // end if short packet
+ 446:unilink.c     ****         } // end if parity ok
+ 447:unilink.c     ****         else
+ 448:unilink.c     ****         {
+ 449:unilink.c     ****             flags.checksum_ok = false;             	// if checksum 1 or end byte is invalid, return
+ 450:unilink.c     ****         }; // end if parity wrong
+ 451:unilink.c     **** 
+ 452:unilink.c     ****         loc_bytecount++;            								// skip byte 4
+ 453:unilink.c     **** 
+ 454:unilink.c     ****         for (;loc_bytecount < loc_rxsize;loc_bytecount++)// calculate checksum for all other bytes
+ 455:unilink.c     ****         {
+ 456:unilink.c     ****             loc_checksum += unilink_rxdata[loc_bytecount];// add to checksum
+ 457:unilink.c     ****         };
+ 458:unilink.c     **** 
+ 459:unilink.c     ****         if (loc_bytecount == loc_rxsize) 						// check for medium or long packet
+ 460:unilink.c     ****         {
+ 461:unilink.c     ****             if (loc_checksum == unilink_rxdata[loc_bytecount])
+ 462:unilink.c     ****             {
+ 463:unilink.c     ****                 if (unilink_rxdata[loc_bytecount+1] == 0x00)
+ 464:unilink.c     ****                 {
+ 465:unilink.c     ****                     flags.checksum_ok = true;  			// return with true if checksum 2 is ok AND end b
+ 466:unilink.c     ****                 }
+ 467:unilink.c     ****             }
+ 468:unilink.c     ****             else
+ 469:unilink.c     ****             {
+ 470:unilink.c     ****                 flags.checksum_ok = false;     			// if checksum 2 or end byte is invalid return fa
+ 471:unilink.c     ****             }
+ 472:unilink.c     ****         } // end if
+ 473:unilink.c     **** } // end checksum_check
+ 474:unilink.c     **** 
+ 475:unilink.c     **** 
+ 476:unilink.c     **** // Slavebreak routine
+ 477:unilink.c     **** void slavebreak(void)
+ 478:unilink.c     **** {
+ 265               	.LM13:
+ 266               	/* prologue: frame size=0 */
+ 267               	/* prologue end (size=0) */
+ 479:unilink.c     ****     SPDR = 0xFF;		                                     // force Data low
+ 269               	.LM14:
+ 270 0076 8FEF      		ldi r24,lo8(-1)
+ 271 0078 8FB9      		out 47-0x20,r24
+ 480:unilink.c     ****     SPCR = 0x00;		                                     // disable SPI
+ 273               	.LM15:
+ 274 007a 1DB8      		out 45-0x20,__zero_reg__
+ 481:unilink.c     **** 
+ 482:unilink.c     ****     TCNT0 = c_7ms;		                                   // load Timer0
+ 276               	.LM16:
+ 277 007c 97E3      		ldi r25,lo8(55)
+ 278 007e 92BF      		out 82-0x20,r25
+ 483:unilink.c     ****     TCCR0 = c_Timer0_run;		                             // start Timer0
+ 280               	.LM17:
+ 281 0080 84E0      		ldi r24,lo8(4)
+ 282 0082 83BF      		out 83-0x20,r24
+ 484:unilink.c     ****     TIFR |= _BV(TOV0);                                    // clear timer0 overflow flag
+ 284               	.LM18:
+ 285 0084 88B7      		in r24,88-0x20
+ 286 0086 8160      		ori r24,lo8(1)
+ 287 0088 88BF      		out 88-0x20,r24
+ 485:unilink.c     **** 
+ 486:unilink.c     **** 		// wait for idle time between two packets, then do slave break
+ 487:unilink.c     **** 		//
+ 488:unilink.c     ****     // wait for data line low for minimum of 7ms
+ 489:unilink.c     **** 		//
+ 490:unilink.c     **** 		while(bit_is_clear(TIFR, TOV0))
+ 491:unilink.c     ****     {
+ 492:unilink.c     ****         if (bit_is_clear(PINB, b_MOSI)) TCNT0 = c_7ms;	  // load Timer0 if MOSI is low == high on b
+ 289               	.LM19:
+ 290 008a 08B6      		in __tmp_reg__,88-0x20
+ 291 008c 00FC      		sbrc __tmp_reg__,0
+ 292 008e 06C0      		rjmp .L21
+ 293 0090 892F      		mov r24,r25
+ 294               	.L12:
+ 296               	.LM20:
+ 297 0092 B39B      		sbis 54-0x20,3
+ 298 0094 82BF      		out 82-0x20,r24
+ 299               	.L9:
+ 300 0096 08B6      		in __tmp_reg__,88-0x20
+ 301 0098 00FE      		sbrs __tmp_reg__,0
+ 302 009a FBCF      		rjmp .L12
+ 303               	.L21:
+ 493:unilink.c     ****     };
+ 494:unilink.c     ****     // wait until timer0 overflow
+ 495:unilink.c     **** 
+ 496:unilink.c     ****     TIFR |= _BV(TOV0);                                     // clear timer0 overflow flag
+ 305               	.LM21:
+ 306 009c 88B7      		in r24,88-0x20
+ 307 009e 8160      		ori r24,lo8(1)
+ 308 00a0 88BF      		out 88-0x20,r24
+ 497:unilink.c     ****     TCNT0 = c_2ms;		                                    // load Timer0
+ 310               	.LM22:
+ 311 00a2 87EC      		ldi r24,lo8(-57)
+ 312 00a4 82BF      		out 82-0x20,r24
+ 498:unilink.c     **** 
+ 499:unilink.c     **** 		//
+ 500:unilink.c     ****     // wait for data line high for 2ms
+ 501:unilink.c     **** 		//
+ 502:unilink.c     ****     while(bit_is_clear(TIFR, TOV0))
+ 503:unilink.c     ****     {
+ 504:unilink.c     ****         if (bit_is_set(PINB, b_MOSI)) TCNT0 = c_2ms;			// load Timer0  if MOSI is high == low on bu
+ 314               	.LM23:
+ 315 00a6 08B6      		in __tmp_reg__,88-0x20
+ 316 00a8 00FC      		sbrc __tmp_reg__,0
+ 317 00aa 05C0      		rjmp .L23
+ 318               	.L16:
+ 319 00ac B399      		sbic 54-0x20,3
+ 320 00ae 82BF      		out 82-0x20,r24
+ 321               	.L13:
+ 322 00b0 08B6      		in __tmp_reg__,88-0x20
+ 323 00b2 00FE      		sbrs __tmp_reg__,0
+ 324 00b4 FBCF      		rjmp .L16
+ 325               	.L23:
+ 505:unilink.c     ****     };
+ 506:unilink.c     ****     // wait until timer overflow
+ 507:unilink.c     **** 
+ 508:unilink.c     **** 		//
+ 509:unilink.c     ****     // force data line 3ms low
+ 510:unilink.c     **** 		//
+ 511:unilink.c     ****     TIFR |= _BV(TOV0);                                     // clear timer0 overflow flag
+ 327               	.LM24:
+ 328 00b6 88B7      		in r24,88-0x20
+ 329 00b8 8160      		ori r24,lo8(1)
+ 330 00ba 88BF      		out 88-0x20,r24
+ 512:unilink.c     ****     TCNT0 = c_3ms;		                                     // load timer0 for 3ms
+ 332               	.LM25:
+ 333 00bc 8AEA      		ldi r24,lo8(-86)
+ 334 00be 82BF      		out 82-0x20,r24
+ 513:unilink.c     ****     DDRB |= _BV(b_MISO);                                   // MISO output and high (inverted by har
+ 336               	.LM26:
+ 337 00c0 BC9A      		sbi 55-0x20,4
+ 514:unilink.c     ****     PORTB |= _BV(b_MISO);
+ 339               	.LM27:
+ 340 00c2 C49A      		sbi 56-0x20,4
+ 341               	.L17:
+ 515:unilink.c     ****     while(bit_is_clear(TIFR, TOV0));
+ 343               	.LM28:
+ 344 00c4 08B6      		in __tmp_reg__,88-0x20
+ 345 00c6 00FE      		sbrs __tmp_reg__,0
+ 346 00c8 FDCF      		rjmp .L17
+ 516:unilink.c     **** 
+ 517:unilink.c     ****     DDRB &=~ _BV(b_MISO);                                   // MISO input and data line high
+ 348               	.LM29:
+ 349 00ca BC98      		cbi 55-0x20,4
+ 518:unilink.c     ****     PORTB &=~ _BV(b_MISO);
+ 351               	.LM30:
+ 352 00cc C498      		cbi 56-0x20,4
+ 519:unilink.c     ****     TCNT0 = c_Timer0_stop;		                            // stop timer0
+ 354               	.LM31:
+ 355 00ce 12BE      		out 82-0x20,__zero_reg__
+ 520:unilink.c     ****     SPDR = 0x00, SPDR;	
+ 357               	.LM32:
+ 358 00d0 1FB8      		out 47-0x20,__zero_reg__
+ 359 00d2 8FB1      		in r24,47-0x20
+ 521:unilink.c     ****     SPCR = c_RUN_SPI, SPCR;                               // enable SPI
+ 361               	.LM33:
+ 362 00d4 8CEC      		ldi r24,lo8(-52)
+ 363 00d6 8DB9      		out 45-0x20,r24
+ 364 00d8 8DB1      		in r24,45-0x20
+ 522:unilink.c     **** 		flags.timepoll_req = true;
+ 366               	.LM34:
+ 367 00da 8091 0000 		lds r24,flags
+ 368 00de 8061      		ori r24,lo8(16)
+ 369 00e0 8093 0000 		sts flags,r24
+ 370               	/* epilogue: frame size=0 */
+ 371 00e4 0895      		ret
+ 372               	/* epilogue end (size=1) */
+ 373               	/* function slavebreak size 58 (57) */
+ 375               	.Lscope3:
+ 378               	.global	usart_rx_proc
+ 380               	usart_rx_proc:
+ 382               	.Ltext3:
+  45:usart.c       **** 	// config USART; 8N1
+  46:usart.c       **** 	#else
+  47:usart.c       **** 	UCR = 0x98;			            							// enable Rx & Tx, enable Rx interrupt
+  48:usart.c       ****   UBRR = (unsigned char)UART_BAUDRATE;	  // set baud rate
+  49:usart.c       **** 	#endif
+  50:usart.c       **** }; // end UART_INIT
+  51:usart.c       **** 
+  52:usart.c       **** 
+  53:usart.c       **** 
+  54:usart.c       **** void usart_rx_proc(void)
+  55:usart.c       **** {
+ 384               	.LM35:
+ 385               	/* prologue: frame size=0 */
+ 386               	/* prologue end (size=0) */
+  56:usart.c       **** 	#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+  57:usart.c       **** 	UCSRB = 0x88;	                                        // disable UART Rx
+ 388               	.LM36:
+ 389 00e6 88E8      		ldi r24,lo8(-120)
+ 390 00e8 8AB9      		out 42-0x20,r24
+  58:usart.c       **** 	#else
+  59:usart.c       **** 	UCR = 0x88;		                                        // disable UART Rx
+  60:usart.c       **** 	#endif
+  61:usart.c       **** 	unsigned char loc_temp = 0;
+ 392               	.LM37:
+ 393 00ea 20E0      		ldi r18,lo8(0)
+  62:usart.c       ****     switch(usart_rx_buffer[0])
+ 395               	.LM38:
+ 396 00ec 8091 0000 		lds r24,usart_rx_buffer
+ 397 00f0 9927      		clr r25
+ 398 00f2 8434      		cpi r24,68
+ 399 00f4 9105      		cpc r25,__zero_reg__
+ 400 00f6 09F4      		brne .+2
+ 401 00f8 47C0      		rjmp .L27
+ 403               	.LM39:
+ 404 00fa 8437      		cpi r24,116
+ 405 00fc 9105      		cpc r25,__zero_reg__
+ 406 00fe 09F0      		breq .+2
+ 407 0100 63C0      		rjmp .L25
+  63:usart.c       ****     {
+  64:usart.c       ****         case 't':
+  65:usart.c       ****             // Disc number
+  66:usart.c       ****             unilink_timeinfo[7] = ((((usart_rx_buffer[1])+1)&0x0F)<<4) | 0x0E;
+ 409               	.LM40:
+ 410 0102 8091 0000 		lds r24,usart_rx_buffer+1
+ 411 0106 9927      		clr r25
+ 412 0108 0196      		adiw r24,1
+ 413 010a 8F70      		andi r24,lo8(15)
+ 414 010c 9070      		andi r25,hi8(15)
+ 415 010e F4E0      		ldi r31,4
+ 416 0110 880F      	1:	lsl r24
+ 417 0112 991F      		rol r25
+ 418 0114 FA95      		dec r31
+ 419 0116 E1F7      		brne 1b
+ 420 0118 8E60      		ori r24,lo8(14)
+ 421 011a 8093 0000 		sts unilink_timeinfo+7,r24
+  67:usart.c       **** 
+  68:usart.c       ****             // for track number, make 1 byte BCD from two byte ASCII
+  69:usart.c       ****             unilink_timeinfo[4] = ((usart_rx_buffer[2] - 0x30) << 4 |
+ 423               	.LM41:
+ 424 011e 8091 0000 		lds r24,usart_rx_buffer+2
+ 425 0122 9927      		clr r25
+ 426 0124 C097      		sbiw r24,48
+ 427 0126 E4E0      		ldi r30,4
+ 428 0128 880F      	1:	lsl r24
+ 429 012a 991F      		rol r25
+ 430 012c EA95      		dec r30
+ 431 012e E1F7      		brne 1b
+ 432 0130 2091 0000 		lds r18,usart_rx_buffer+3
+ 433 0134 2053      		subi r18,lo8(-(-48))
+ 434 0136 282B      		or r18,r24
+ 435 0138 2093 0000 		sts unilink_timeinfo+4,r18
+  70:usart.c       **** 								(usart_rx_buffer[3] - 0x30)); // one byte track number from 2 byte ASCII
+  71:usart.c       **** 				
+  72:usart.c       ****             // its the same for minutes
+  73:usart.c       ****             unilink_timeinfo[5] = ((usart_rx_buffer[4]-0x30) << 4 | 
+ 437               	.LM42:
+ 438 013c 8091 0000 		lds r24,usart_rx_buffer+4
+ 439 0140 9927      		clr r25
+ 440 0142 C097      		sbiw r24,48
+ 441 0144 74E0      		ldi r23,4
+ 442 0146 880F      	1:	lsl r24
+ 443 0148 991F      		rol r25
+ 444 014a 7A95      		dec r23
+ 445 014c E1F7      		brne 1b
+ 446 014e 2091 0000 		lds r18,usart_rx_buffer+5
+ 447 0152 2053      		subi r18,lo8(-(-48))
+ 448 0154 282B      		or r18,r24
+ 449 0156 2093 0000 		sts unilink_timeinfo+5,r18
+  74:usart.c       **** 							(usart_rx_buffer[5] - 0x30));// one byte minutes from 2 byte ASCII
+  75:usart.c       **** 
+  76:usart.c       ****             // seconds
+  77:usart.c       ****             unilink_timeinfo[6] = ((usart_rx_buffer[6] - 0x30) << 4 | 
+ 451               	.LM43:
+ 452 015a 8091 0000 		lds r24,usart_rx_buffer+6
+ 453 015e 9927      		clr r25
+ 454 0160 C097      		sbiw r24,48
+ 455 0162 64E0      		ldi r22,4
+ 456 0164 880F      	1:	lsl r24
+ 457 0166 991F      		rol r25
+ 458 0168 6A95      		dec r22
+ 459 016a E1F7      		brne 1b
+ 460 016c 2091 0000 		lds r18,usart_rx_buffer+7
+ 461 0170 2053      		subi r18,lo8(-(-48))
+ 462 0172 282B      		or r18,r24
+ 463 0174 2093 0000 		sts unilink_timeinfo+6,r18
+  78:usart.c       **** 								(usart_rx_buffer[7]-0x30));	// one byte seconds from 2 byte ASCII
+  79:usart.c       ****             unilink_timeinfo[1] = unilink_ownaddr;              // set TAD
+ 465               	.LM44:
+ 466 0178 8091 0000 		lds r24,unilink_ownaddr
+ 467 017c 8093 0000 		sts unilink_timeinfo+1,r24
+  80:usart.c       **** 
+  81:usart.c       **** 						unilink_command.time = true;												// set flag to force a time update						
+ 469               	.LM45:
+ 470 0180 8091 0000 		lds r24,unilink_command
+ 471 0184 8260      		ori r24,lo8(2)
+ 472 0186 1DC0      		rjmp .L40
+ 473               	.L27:
+ 474 0188 80E0      		ldi r24,lo8(0)
+ 475 018a 90E0      		ldi r25,hi8(0)
+ 476 018c DC01      		movw r26,r24
+ 477 018e A050      		subi r26,lo8(-(unilink_discname))
+ 478 0190 B040      		sbci r27,hi8(-(unilink_discname))
+ 479 0192 FC01      		movw r30,r24
+ 480 0194 E050      		subi r30,lo8(-(usart_rx_buffer+1))
+ 481 0196 F040      		sbci r31,hi8(-(usart_rx_buffer+1))
+ 482               	.L32:
+  82:usart.c       **** 						slavebreak();	  																		// do slavebreak for display update
+  83:usart.c       **** 						break;
+  84:usart.c       **** 
+  85:usart.c       ****         case 'D':
+  86:usart.c       **** 						// disc name
+  87:usart.c       **** 						for(loc_temp = 0; (loc_temp < 8) ; loc_temp++ )// copy disc name to name buffer
+  88:usart.c       **** 						{
+  89:usart.c       **** 							if(usart_rx_buffer[loc_temp +1] == '~') break;
+ 484               	.LM46:
+ 485 0198 8191      		ld r24,Z+
+ 486 019a 8E37      		cpi r24,lo8(126)
+ 487 019c 21F0      		breq .L29
+  90:usart.c       **** 							unilink_discname[loc_temp] = usart_rx_buffer[loc_temp +1];
+ 489               	.LM47:
+ 490 019e 8D93      		st X+,r24
+ 492               	.LM48:
+ 493 01a0 2F5F      		subi r18,lo8(-(1))
+ 494 01a2 2830      		cpi r18,lo8(8)
+ 495 01a4 C8F3      		brlo .L32
+ 496               	.L29:
+  91:usart.c       **** 						};
+  92:usart.c       **** 						for(; loc_temp < 8; loc_temp++)
+ 498               	.LM49:
+ 499 01a6 2830      		cpi r18,lo8(8)
+ 500 01a8 48F4      		brsh .L39
+ 501 01aa 80E2      		ldi r24,lo8(32)
+ 502 01ac E22F      		mov r30,r18
+ 503 01ae FF27      		clr r31
+ 504 01b0 E050      		subi r30,lo8(-(unilink_discname))
+ 505 01b2 F040      		sbci r31,hi8(-(unilink_discname))
+ 506               	.L36:
+  93:usart.c       **** 							unilink_discname[loc_temp] = ' '; 						// clear track name buffer
+ 508               	.LM50:
+ 509 01b4 8193      		st Z+,r24
+ 511               	.LM51:
+ 512 01b6 2F5F      		subi r18,lo8(-(1))
+ 513 01b8 2830      		cpi r18,lo8(8)
+ 514 01ba E0F3      		brlo .L36
+ 515               	.L39:
+  94:usart.c       **** 						unilink_command.discname = true;								// set flag to force a discname update
+ 517               	.LM52:
+ 518 01bc 8091 0000 		lds r24,unilink_command
+ 519 01c0 8160      		ori r24,lo8(1)
+ 520               	.L40:
+ 521 01c2 8093 0000 		sts unilink_command,r24
+  95:usart.c       **** 						slavebreak();		  															// do slavebreak for display update
+ 523               	.LM53:
+ 524 01c6 57DF      		rcall slavebreak
+ 525               	.L25:
+  96:usart.c       **** 						break;
+  97:usart.c       **** 
+  98:usart.c       **** 		#ifdef RAW_COMMAND
+  99:usart.c       ****         case '*':
+ 100:usart.c       ****             // raw command mode
+ 101:usart.c       ****             asm volatile ("nop");
+ 102:usart.c       ****             for(loc_temp = 0; loc_temp < 13; loc_temp++)
+ 103:usart.c       **** 							raw[loc_temp] = usart_rx_buffer[loc_temp +1];
+ 104:usart.c       **** 						unilink_command.raw = true;
+ 105:usart.c       **** 						slavebreak();																		// do slavebreak for display update
+ 106:usart.c       ****             break;
+ 107:usart.c       **** 		#endif
+ 108:usart.c       **** 
+ 109:usart.c       **** 		#if !defined(BUS_LOGGING) && defined(YAMPP3)
+ 110:usart.c       **** 				/* When bus logging is disabled and Yampp3 control is enabled, the interface will wait for
+ 111:usart.c       **** 				   a signal from Yampp to send a "Play" when the Yampp has finished power-up and when 
+ 112:usart.c       **** 				   interface status is in play mode */
+ 113:usart.c       **** 		case '!':
+ 114:usart.c       **** 			if(unilink_status == 0x00) usart_putc(Play);
+ 115:usart.c       **** 			break;
+ 116:usart.c       **** 		#endif
+ 117:usart.c       ****     }; // end switch
+ 118:usart.c       **** 		usart_rx_buffer[0] = 0x00;
+ 527               	.LM54:
+ 528 01c8 1092 0000 		sts usart_rx_buffer,__zero_reg__
+ 119:usart.c       **** 		usart_rx_index = 0;                                   // reset UART Rx buffer index
+ 530               	.LM55:
+ 531 01cc 1092 0000 		sts usart_rx_index,__zero_reg__
+ 120:usart.c       **** 	
+ 121:usart.c       **** 	#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+ 122:usart.c       **** 	UCSRB = 0x98;	                                        	// enable UART Rx
+ 533               	.LM56:
+ 534 01d0 88E9      		ldi r24,lo8(-104)
+ 535 01d2 8AB9      		out 42-0x20,r24
+ 536               	/* epilogue: frame size=0 */
+ 537 01d4 0895      		ret
+ 538               	/* epilogue end (size=1) */
+ 539               	/* function usart_rx_proc size 120 (119) */
+ 542               	.Lscope4:
+ 545               	.global	reset_spi
+ 547               	reset_spi:
+ 549               	.Ltext4:
+ 551               	.LM57:
+ 552               	/* prologue: frame size=0 */
+ 553               	/* prologue end (size=0) */
+ 555               	.LM58:
+ 556 01d6 1FB8      		out 47-0x20,__zero_reg__
+ 558               	.LM59:
+ 559 01d8 1DB8      		out 45-0x20,__zero_reg__
+ 561               	.LM60:
+ 562 01da 8CEC      		ldi r24,lo8(-52)
+ 563 01dc 8DB9      		out 45-0x20,r24
+ 564               	/* epilogue: frame size=0 */
+ 565 01de 0895      		ret
+ 566               	/* epilogue end (size=1) */
+ 567               	/* function reset_spi size 5 (4) */
+ 569               	.Lscope5:
+ 572               	.global	__vector_10
+ 574               	__vector_10:
+ 576               	.LM61:
+ 577               	/* prologue: frame size=0 */
+ 578 01e0 7894      		sei
+ 579 01e2 1F92      		push __zero_reg__
+ 580 01e4 0F92      		push __tmp_reg__
+ 581 01e6 0FB6      		in __tmp_reg__,__SREG__
+ 582 01e8 0F92      		push __tmp_reg__
+ 583 01ea 1124      		clr __zero_reg__
+ 584 01ec 2F93      		push r18
+ 585 01ee 3F93      		push r19
+ 586 01f0 4F93      		push r20
+ 587 01f2 5F93      		push r21
+ 588 01f4 6F93      		push r22
+ 589 01f6 7F93      		push r23
+ 590 01f8 8F93      		push r24
+ 591 01fa 9F93      		push r25
+ 592 01fc AF93      		push r26
+ 593 01fe BF93      		push r27
+ 594 0200 EF93      		push r30
+ 595 0202 FF93      		push r31
+ 596               	/* prologue end (size=18) */
+ 598               	.LM62:
+ 599 0204 8091 0000 		lds r24,flags
+ 600 0208 81FD      		sbrc r24,1
+ 601 020a 42C0      		rjmp .L43
+ 603               	.LM63:
+ 604 020c 8091 0000 		lds r24,unilink_bytecount
+ 605 0210 8F71      		andi r24,lo8(31)
+ 606 0212 E82F      		mov r30,r24
+ 607 0214 FF27      		clr r31
+ 608 0216 E050      		subi r30,lo8(-(unilink_rxdata))
+ 609 0218 F040      		sbci r31,hi8(-(unilink_rxdata))
+ 610 021a 8FB1      		in r24,47-0x20
+ 611 021c 8083      		st Z,r24
+ 613               	.LM64:
+ 614 021e DBDF      		rcall reset_spi
+ 616               	.LM65:
+ 617 0220 8091 0000 		lds r24,unilink_rxdata
+ 618 0224 8823      		tst r24
+ 619 0226 29F4      		brne .L44
+ 620 0228 8091 0000 		lds r24,unilink_bytecount
+ 621 022c 8F71      		andi r24,lo8(31)
+ 622 022e 09F4      		brne .+2
+ 623 0230 80C0      		rjmp .L42
+ 624               	.L44:
+ 626               	.LM66:
+ 627 0232 86E0      		ldi r24,lo8(6)
+ 628 0234 8093 0000 		sts unilink_rxsize,r24
+ 630               	.LM67:
+ 631 0238 9091 0000 		lds r25,unilink_rxdata+2
+ 632 023c 97FF      		sbrs r25,7
+ 633 023e 03C0      		rjmp .L45
+ 635               	.LM68:
+ 636 0240 8BE0      		ldi r24,lo8(11)
+ 637 0242 8093 0000 		sts unilink_rxsize,r24
+ 638               	.L45:
+ 640               	.LM69:
+ 641 0246 903C      		cpi r25,lo8(-64)
+ 642 0248 18F0      		brlo .L46
+ 644               	.LM70:
+ 645 024a 80E1      		ldi r24,lo8(16)
+ 646 024c 8093 0000 		sts unilink_rxsize,r24
+ 647               	.L46:
+ 649               	.LM71:
+ 650 0250 8091 0000 		lds r24,unilink_bytecount
+ 651 0254 8091 0000 		lds r24,unilink_bytecount
+ 652 0258 8F71      		andi r24,lo8(31)
+ 653 025a 8F5F      		subi r24,lo8(-(1))
+ 654 025c 8F71      		andi r24,lo8(31)
+ 655 025e 9091 0000 		lds r25,unilink_bytecount
+ 656 0262 907E      		andi r25,lo8(-32)
+ 657 0264 982B      		or r25,r24
+ 658 0266 9093 0000 		sts unilink_bytecount,r25
+ 660               	.LM72:
+ 661 026a 8091 0000 		lds r24,unilink_bytecount
+ 662 026e 8F71      		andi r24,lo8(31)
+ 663 0270 9091 0000 		lds r25,unilink_rxsize
+ 664 0274 8917      		cp r24,r25
+ 665 0276 08F4      		brsh .+2
+ 666 0278 5CC0      		rjmp .L42
+ 668               	.LM73:
+ 669 027a 8091 0000 		lds r24,unilink_bytecount
+ 670 027e 807E      		andi r24,lo8(-32)
+ 671 0280 8093 0000 		sts unilink_bytecount,r24
+ 673               	.LM74:
+ 674 0284 8091 0000 		lds r24,flags
+ 675 0288 8460      		ori r24,lo8(4)
+ 676 028a 8093 0000 		sts flags,r24
+ 677 028e 51C0      		rjmp .L42
+ 678               	.L43:
+ 680               	.LM75:
+ 681 0290 8091 0000 		lds r24,unilink_bytecount
+ 682 0294 8295      		swap r24
+ 683 0296 8695      		lsr r24
+ 684 0298 8770      		andi r24,0x7
+ 685 029a 9091 0000 		lds r25,unilink_bytecount+1
+ 686 029e 9370      		andi r25,lo8(3)
+ 687 02a0 990F      		lsl r25
+ 688 02a2 990F      		lsl r25
+ 689 02a4 990F      		lsl r25
+ 690 02a6 982B      		or r25,r24
+ 691 02a8 8091 0000 		lds r24,unilink_txsize
+ 692 02ac 8917      		cp r24,r25
+ 693 02ae C0F1      		brlo .L49
+ 695               	.LM76:
+ 696 02b0 9091 0000 		lds r25,unilink_bytecount
+ 697 02b4 9295      		swap r25
+ 698 02b6 9695      		lsr r25
+ 699 02b8 9770      		andi r25,0x7
+ 700 02ba 8091 0000 		lds r24,unilink_bytecount+1
+ 701 02be 8370      		andi r24,lo8(3)
+ 702 02c0 880F      		lsl r24
+ 703 02c2 880F      		lsl r24
+ 704 02c4 880F      		lsl r24
+ 705 02c6 892B      		or r24,r25
+ 706 02c8 E82F      		mov r30,r24
+ 707 02ca FF27      		clr r31
+ 708 02cc E050      		subi r30,lo8(-(unilink_txdata))
+ 709 02ce F040      		sbci r31,hi8(-(unilink_txdata))
+ 710 02d0 8081      		ld r24,Z
+ 711 02d2 8FB9      		out 47-0x20,r24
+ 713               	.LM77:
+ 714 02d4 8091 0000 		lds r24,unilink_bytecount
+ 715 02d8 8091 0000 		lds r24,unilink_bytecount+1
+ 716 02dc 8091 0000 		lds r24,unilink_bytecount
+ 717 02e0 8295      		swap r24
+ 718 02e2 8695      		lsr r24
+ 719 02e4 8770      		andi r24,0x7
+ 720 02e6 9091 0000 		lds r25,unilink_bytecount+1
+ 721 02ea 9370      		andi r25,lo8(3)
+ 722 02ec 990F      		lsl r25
+ 723 02ee 990F      		lsl r25
+ 724 02f0 990F      		lsl r25
+ 725 02f2 982B      		or r25,r24
+ 726 02f4 9F5F      		subi r25,lo8(-(1))
+ 727 02f6 292F      		mov r18,r25
+ 728 02f8 2295      		swap r18
+ 729 02fa 220F      		lsl r18
+ 730 02fc 207E      		andi r18,0xe0
+ 731 02fe 8091 0000 		lds r24,unilink_bytecount
+ 732 0302 8F71      		andi r24,lo8(31)
+ 733 0304 822B      		or r24,r18
+ 734 0306 8093 0000 		sts unilink_bytecount,r24
+ 735 030a 9695      		lsr r25
+ 736 030c 9695      		lsr r25
+ 737 030e 9695      		lsr r25
+ 738 0310 9370      		andi r25,lo8(3)
+ 739 0312 8091 0000 		lds r24,unilink_bytecount+1
+ 740 0316 8C7F      		andi r24,lo8(-4)
+ 741 0318 892B      		or r24,r25
+ 742 031a 8093 0000 		sts unilink_bytecount+1,r24
+ 743 031e 09C0      		rjmp .L42
+ 744               	.L49:
+ 746               	.LM78:
+ 747 0320 5ADF      		rcall reset_spi
+ 749               	.LM79:
+ 750 0322 1FB8      		out 47-0x20,__zero_reg__
+ 752               	.LM80:
+ 753 0324 8091 0000 		lds r24,flags
+ 754 0328 8D7F      		andi r24,lo8(-3)
+ 755 032a 8093 0000 		sts flags,r24
+ 757               	.LM81:
+ 758 032e BC98      		cbi 55-0x20,4
+ 760               	.LM82:
+ 761               	/* #APP */
+ 762 0330 0000      		nop
+ 763               	/* #NOAPP */
+ 764               	.L42:
+ 765               	/* epilogue: frame size=0 */
+ 766 0332 FF91      		pop r31
+ 767 0334 EF91      		pop r30
+ 768 0336 BF91      		pop r27
+ 769 0338 AF91      		pop r26
+ 770 033a 9F91      		pop r25
+ 771 033c 8F91      		pop r24
+ 772 033e 7F91      		pop r23
+ 773 0340 6F91      		pop r22
+ 774 0342 5F91      		pop r21
+ 775 0344 4F91      		pop r20
+ 776 0346 3F91      		pop r19
+ 777 0348 2F91      		pop r18
+ 778 034a 0F90      		pop __tmp_reg__
+ 779 034c 0FBE      		out __SREG__,__tmp_reg__
+ 780 034e 0F90      		pop __tmp_reg__
+ 781 0350 1F90      		pop __zero_reg__
+ 782 0352 1895      		reti
+ 783               	/* epilogue end (size=17) */
+ 784               	/* function __vector_10 size 188 (153) */
+ 786               	.Lscope6:
+ 790               	.global	unilink_tx
+ 792               	unilink_tx:
+ 794               	.LM83:
+ 795               	/* prologue: frame size=0 */
+ 796 0354 CF93      		push r28
+ 797 0356 DF93      		push r29
+ 798               	/* prologue end (size=2) */
+ 799 0358 EC01      		movw r28,r24
+ 801               	.LM84:
+ 802 035a 8A81      		ldd r24,Y+2
+ 803 035c 803C      		cpi r24,lo8(-64)
+ 804 035e 10F0      		brlo .L52
+ 806               	.LM85:
+ 807 0360 8EE0      		ldi r24,lo8(14)
+ 808 0362 05C0      		rjmp .L59
+ 809               	.L52:
+ 811               	.LM86:
+ 812 0364 87FF      		sbrs r24,7
+ 813 0366 02C0      		rjmp .L54
+ 814 0368 89E0      		ldi r24,lo8(9)
+ 815 036a 01C0      		rjmp .L59
+ 816               	.L54:
+ 818               	.LM87:
+ 819 036c 84E0      		ldi r24,lo8(4)
+ 820               	.L59:
+ 821 036e 8093 0000 		sts unilink_txsize,r24
+ 823               	.LM88:
+ 824 0372 9881      		ld r25,Y
+ 826               	.LM89:
+ 827 0374 9093 0000 		sts unilink_txdata,r25
+ 829               	.LM90:
+ 830 0378 8981      		ldd r24,Y+1
+ 831 037a 980F      		add r25,r24
+ 833               	.LM91:
+ 834 037c 8093 0000 		sts unilink_txdata+1,r24
+ 836               	.LM92:
+ 837 0380 8A81      		ldd r24,Y+2
+ 838 0382 980F      		add r25,r24
+ 840               	.LM93:
+ 841 0384 8093 0000 		sts unilink_txdata+2,r24
+ 843               	.LM94:
+ 844 0388 8B81      		ldd r24,Y+3
+ 845 038a 980F      		add r25,r24
+ 847               	.LM95:
+ 848 038c 8093 0000 		sts unilink_txdata+3,r24
+ 850               	.LM96:
+ 851 0390 9093 0000 		sts unilink_txdata+4,r25
+ 853               	.LM97:
+ 854 0394 44E0      		ldi r20,lo8(4)
+ 855 0396 8091 0000 		lds r24,unilink_txsize
+ 856 039a 282F      		mov r18,r24
+ 857 039c 3327      		clr r19
+ 858 039e 2150      		subi r18,lo8(-(-1))
+ 859 03a0 3040      		sbci r19,hi8(-(-1))
+ 860               	.L56:
+ 862               	.LM98:
+ 863 03a2 E42F      		mov r30,r20
+ 864 03a4 FF27      		clr r31
+ 865 03a6 DF01      		movw r26,r30
+ 866 03a8 AC0F      		add r26,r28
+ 867 03aa BD1F      		adc r27,r29
+ 868 03ac 8C91      		ld r24,X
+ 869 03ae E050      		subi r30,lo8(-(unilink_txdata))
+ 870 03b0 F040      		sbci r31,hi8(-(unilink_txdata))
+ 871 03b2 8183      		std Z+1,r24
+ 873               	.LM99:
+ 874 03b4 8C91      		ld r24,X
+ 875 03b6 980F      		add r25,r24
+ 877               	.LM100:
+ 878 03b8 4F5F      		subi r20,lo8(-(1))
+ 880               	.LM101:
+ 881 03ba E42F      		mov r30,r20
+ 882 03bc FF27      		clr r31
+ 883 03be E217      		cp r30,r18
+ 884 03c0 F307      		cpc r31,r19
+ 885 03c2 7CF3      		brlt .L56
+ 886 03c4 40E0      		ldi r20,lo8(0)
+ 888               	.LM102:
+ 889 03c6 E050      		subi r30,lo8(-(unilink_txdata))
+ 890 03c8 F040      		sbci r31,hi8(-(unilink_txdata))
+ 891 03ca 9183      		std Z+1,r25
+ 893               	.LM103:
+ 894 03cc 4FB9      		out 47-0x20,r20
+ 896               	.LM104:
+ 897 03ce 4DB9      		out 45-0x20,r20
+ 899               	.LM105:
+ 900 03d0 BC9A      		sbi 55-0x20,4
+ 902               	.LM106:
+ 903               	/* #APP */
+ 904 03d2 0000      		nop
+ 906               	.LM107:
+ 907               	/* #NOAPP */
+ 908 03d4 8CEC      		ldi r24,lo8(-52)
+ 909 03d6 8DB9      		out 45-0x20,r24
+ 911               	.LM108:
+ 912 03d8 8091 0000 		lds r24,flags
+ 913 03dc 8260      		ori r24,lo8(2)
+ 914 03de 8093 0000 		sts flags,r24
+ 916               	.LM109:
+ 917 03e2 8091 0000 		lds r24,unilink_bytecount
+ 918 03e6 8F71      		andi r24,lo8(31)
+ 919 03e8 8062      		ori r24,lo8(32)
+ 920 03ea 8093 0000 		sts unilink_bytecount,r24
+ 921 03ee 8091 0000 		lds r24,unilink_bytecount+1
+ 922 03f2 8C7F      		andi r24,lo8(-4)
+ 923 03f4 8093 0000 		sts unilink_bytecount+1,r24
+ 925               	.LM110:
+ 926 03f8 8091 0000 		lds r24,unilink_txdata
+ 927 03fc 8FB9      		out 47-0x20,r24
+ 928               	/* epilogue: frame size=0 */
+ 929 03fe DF91      		pop r29
+ 930 0400 CF91      		pop r28
+ 931 0402 0895      		ret
+ 932               	/* epilogue end (size=3) */
+ 933               	/* function unilink_tx size 89 (84) */
+ 937               	.Lscope7:
+ 940               	.global	unilink_broadcast
+ 942               	unilink_broadcast:
+ 944               	.LM111:
+ 945               	/* prologue: frame size=8 */
+ 946 0404 CF93      		push r28
+ 947 0406 DF93      		push r29
+ 948 0408 CDB7      		in r28,__SP_L__
+ 949 040a DEB7      		in r29,__SP_H__
+ 950 040c 2897      		sbiw r28,8
+ 951 040e 0FB6      		in __tmp_reg__,__SREG__
+ 952 0410 F894      		cli
+ 953 0412 DEBF      		out __SP_H__,r29
+ 954 0414 0FBE      		out __SREG__,__tmp_reg__
+ 955 0416 CDBF      		out __SP_L__,r28
+ 956               	/* prologue end (size=10) */
+ 958               	.LM112:
+ 959 0418 8091 0000 		lds r24,unilink_rxdata+2
+ 960 041c 9927      		clr r25
+ 961 041e 8738      		cpi r24,135
+ 962 0420 9105      		cpc r25,__zero_reg__
+ 963 0422 09F4      		brne .+2
+ 964 0424 40C0      		rjmp .L69
+ 966               	.LM113:
+ 967 0426 8838      		cpi r24,136
+ 968 0428 9105      		cpc r25,__zero_reg__
+ 969 042a 1CF4      		brge .L71
+ 970 042c 0197      		sbiw r24,1
+ 971 042e 29F0      		breq .L62
+ 972 0430 44C0      		rjmp .L60
+ 973               	.L71:
+ 974 0432 803F      		cpi r24,240
+ 975 0434 9105      		cpc r25,__zero_reg__
+ 976 0436 61F1      		breq .L67
+ 977 0438 40C0      		rjmp .L60
+ 978               	.L62:
+ 980               	.LM114:
+ 981 043a 8091 0000 		lds r24,unilink_rxdata+3
+ 982 043e 9927      		clr r25
+ 983 0440 0097      		sbiw r24,0
+ 984 0442 19F0      		breq .L64
+ 985 0444 0297      		sbiw r24,2
+ 986 0446 51F0      		breq .L65
+ 987 0448 23C0      		rjmp .L67
+ 988               	.L64:
+ 990               	.LM115:
+ 991 044a 80E3      		ldi r24,lo8(48)
+ 992 044c 8093 0000 		sts unilink_ownaddr,r24
+ 994               	.LM116:
+ 995 0450 8091 0000 		lds r24,flags
+ 996 0454 8F77      		andi r24,lo8(127)
+ 997 0456 8093 0000 		sts flags,r24
+ 999               	.LM117:
+ 1000 045a 1AC0      		rjmp .L67
+ 1001               	.L65:
+ 1003               	.LM118:
+ 1004 045c 2091 0000 		lds r18,unilink_ownaddr
+ 1005 0460 2033      		cpi r18,lo8(48)
+ 1006 0462 B1F4      		brne .L67
+ 1007               	.LBB2:
+ 1009               	.LM119:
+ 1010 0464 8091 0000 		lds r24,flags
+ 1011 0468 8068      		ori r24,lo8(-128)
+ 1012 046a 8093 0000 		sts flags,r24
+ 1014               	.LM120:
+ 1015 046e 90E1      		ldi r25,lo8(16)
+ 1016 0470 9983      		std Y+1,r25
+ 1017 0472 2A83      		std Y+2,r18
+ 1018 0474 8CE8      		ldi r24,lo8(-116)
+ 1019 0476 8B83      		std Y+3,r24
+ 1020 0478 9C83      		std Y+4,r25
+ 1021 047a 84E2      		ldi r24,lo8(36)
+ 1022 047c 8D83      		std Y+5,r24
+ 1023 047e 88EA      		ldi r24,lo8(-88)
+ 1024 0480 8E83      		std Y+6,r24
+ 1025 0482 87E1      		ldi r24,lo8(23)
+ 1026 0484 8F83      		std Y+7,r24
+ 1027 0486 80EA      		ldi r24,lo8(-96)
+ 1028 0488 8887      		std Y+8,r24
+ 1030               	.LM121:
+ 1031 048a CE01      		movw r24,r28
+ 1032 048c 0196      		adiw r24,1
+ 1033 048e 62DF      		rcall unilink_tx
+ 1034               	.L67:
+ 1035               	.LBE2:
+ 1037               	.LM122:
+ 1038 0490 9091 0000 		lds r25,unilink_rxdata+3
+ 1039 0494 8091 0000 		lds r24,unilink_ownaddr
+ 1040 0498 9817      		cp r25,r24
+ 1041 049a 79F0      		breq .L60
+ 1043               	.LM123:
+ 1044 049c 80E8      		ldi r24,lo8(-128)
+ 1045 049e 8093 0000 		sts unilink_status,r24
+ 1047               	.LM124:
+ 1048 04a2 83E5      		ldi r24,lo8(83)
+ 1049 04a4 09C0      		rjmp .L72
+ 1050               	.L69:
+ 1052               	.LM125:
+ 1053 04a6 8091 0000 		lds r24,unilink_rxdata+3
+ 1054 04aa 8823      		tst r24
+ 1055 04ac 31F4      		brne .L60
+ 1057               	.LM126:
+ 1058 04ae 80E8      		ldi r24,lo8(-128)
+ 1059 04b0 8093 0000 		sts unilink_status,r24
+ 1061               	.LM127:
+ 1062 04b4 9798      		cbi 50-0x20,7
+ 1064               	.LM128:
+ 1065 04b6 8FE4      		ldi r24,lo8(79)
+ 1066               	.L72:
+ 1067 04b8 C5DD      		rcall usart_putc
+ 1068               	.L60:
+ 1069               	/* epilogue: frame size=8 */
+ 1070 04ba 2896      		adiw r28,8
+ 1071 04bc 0FB6      		in __tmp_reg__,__SREG__
+ 1072 04be F894      		cli
+ 1073 04c0 DEBF      		out __SP_H__,r29
+ 1074 04c2 0FBE      		out __SREG__,__tmp_reg__
+ 1075 04c4 CDBF      		out __SP_L__,r28
+ 1076 04c6 DF91      		pop r29
+ 1077 04c8 CF91      		pop r28
+ 1078 04ca 0895      		ret
+ 1079               	/* epilogue end (size=9) */
+ 1080               	/* function unilink_broadcast size 102 (83) */
+ 1085               	.Lscope8:
+ 1088               	.global	unilink_appoint
+ 1090               	unilink_appoint:
+ 1092               	.LM129:
+ 1093               	/* prologue: frame size=8 */
+ 1094 04cc CF93      		push r28
+ 1095 04ce DF93      		push r29
+ 1096 04d0 CDB7      		in r28,__SP_L__
+ 1097 04d2 DEB7      		in r29,__SP_H__
+ 1098 04d4 2897      		sbiw r28,8
+ 1099 04d6 0FB6      		in __tmp_reg__,__SREG__
+ 1100 04d8 F894      		cli
+ 1101 04da DEBF      		out __SP_H__,r29
+ 1102 04dc 0FBE      		out __SREG__,__tmp_reg__
+ 1103 04de CDBF      		out __SP_L__,r28
+ 1104               	/* prologue end (size=10) */
+ 1106               	.LM130:
+ 1107 04e0 8091 0000 		lds r24,unilink_rxdata+3
+ 1108 04e4 8093 0000 		sts unilink_bitid,r24
+ 1110               	.LM131:
+ 1111 04e8 8091 0000 		lds r24,unilink_rxdata+2
+ 1112 04ec 8230      		cpi r24,lo8(2)
+ 1113 04ee 39F5      		brne .L73
+ 1115               	.LM132:
+ 1116 04f0 8091 0000 		lds r24,flags
+ 1117 04f4 87FF      		sbrs r24,7
+ 1118 04f6 23C0      		rjmp .L73
+ 1120               	.LM133:
+ 1121 04f8 4091 0000 		lds r20,unilink_rxdata
+ 1122 04fc 842F      		mov r24,r20
+ 1123 04fe 9927      		clr r25
+ 1124 0500 807F      		andi r24,lo8(240)
+ 1125 0502 9070      		andi r25,hi8(240)
+ 1126 0504 2091 0000 		lds r18,unilink_groupid
+ 1127 0508 3327      		clr r19
+ 1128 050a 8217      		cp r24,r18
+ 1129 050c 9307      		cpc r25,r19
+ 1130 050e B9F4      		brne .L73
+ 1132               	.LM134:
+ 1133 0510 8091 0000 		lds r24,unilink_ownaddr
+ 1134 0514 8033      		cpi r24,lo8(48)
+ 1135 0516 99F4      		brne .L73
+ 1136               	.LBB3:
+ 1138               	.LM135:
+ 1139 0518 4093 0000 		sts unilink_ownaddr,r20
+ 1141               	.LM136:
+ 1142 051c 90E1      		ldi r25,lo8(16)
+ 1143 051e 9983      		std Y+1,r25
+ 1144 0520 4A83      		std Y+2,r20
+ 1145 0522 8CE8      		ldi r24,lo8(-116)
+ 1146 0524 8B83      		std Y+3,r24
+ 1147 0526 9C83      		std Y+4,r25
+ 1148 0528 84E2      		ldi r24,lo8(36)
+ 1149 052a 8D83      		std Y+5,r24
+ 1150 052c 88EA      		ldi r24,lo8(-88)
+ 1151 052e 8E83      		std Y+6,r24
+ 1152 0530 87E1      		ldi r24,lo8(23)
+ 1153 0532 8F83      		std Y+7,r24
+ 1154 0534 80EA      		ldi r24,lo8(-96)
+ 1155 0536 8887      		std Y+8,r24
+ 1157               	.LM137:
+ 1158 0538 CE01      		movw r24,r28
+ 1159 053a 0196      		adiw r24,1
+ 1160 053c 0BDF      		rcall unilink_tx
+ 1161               	.L73:
+ 1162               	.LBE3:
+ 1163               	/* epilogue: frame size=8 */
+ 1164 053e 2896      		adiw r28,8
+ 1165 0540 0FB6      		in __tmp_reg__,__SREG__
+ 1166 0542 F894      		cli
+ 1167 0544 DEBF      		out __SP_H__,r29
+ 1168 0546 0FBE      		out __SREG__,__tmp_reg__
+ 1169 0548 CDBF      		out __SP_L__,r28
+ 1170 054a DF91      		pop r29
+ 1171 054c CF91      		pop r28
+ 1172 054e 0895      		ret
+ 1173               	/* epilogue end (size=9) */
+ 1174               	/* function unilink_appoint size 66 (47) */
+ 1179               	.Lscope9:
+ 1182               	.global	send_command
+ 1184               	send_command:
+ 1186               	.LM138:
+ 1187               	/* prologue: frame size=21 */
+ 1188 0550 CF93      		push r28
+ 1189 0552 DF93      		push r29
+ 1190 0554 CDB7      		in r28,__SP_L__
+ 1191 0556 DEB7      		in r29,__SP_H__
+ 1192 0558 6597      		sbiw r28,21
+ 1193 055a 0FB6      		in __tmp_reg__,__SREG__
+ 1194 055c F894      		cli
+ 1195 055e DEBF      		out __SP_H__,r29
+ 1196 0560 0FBE      		out __SREG__,__tmp_reg__
+ 1197 0562 CDBF      		out __SP_L__,r28
+ 1198               	/* prologue end (size=10) */
+ 1200               	.LM139:
+ 1201 0564 8091 0000 		lds r24,unilink_command
+ 1202 0568 82FF      		sbrs r24,2
+ 1203 056a 15C0      		rjmp .L78
+ 1204               	.LBB4:
+ 1206               	.LM140:
+ 1207 056c 80E7      		ldi r24,lo8(112)
+ 1208 056e 8983      		std Y+1,r24
+ 1209 0570 8091 0000 		lds r24,unilink_ownaddr
+ 1210 0574 8A83      		std Y+2,r24
+ 1211 0576 85E9      		ldi r24,lo8(-107)
+ 1212 0578 8B83      		std Y+3,r24
+ 1213 057a 80E1      		ldi r24,lo8(16)
+ 1214 057c 8C83      		std Y+4,r24
+ 1215 057e 1D82      		std Y+5,__zero_reg__
+ 1216 0580 1E82      		std Y+6,__zero_reg__
+ 1217 0582 1F82      		std Y+7,__zero_reg__
+ 1218 0584 8AE0      		ldi r24,lo8(10)
+ 1219 0586 8887      		std Y+8,r24
+ 1221               	.LM141:
+ 1222 0588 CE01      		movw r24,r28
+ 1223 058a 0196      		adiw r24,1
+ 1224 058c E3DE      		rcall unilink_tx
+ 1226               	.LM142:
+ 1227 058e 8091 0000 		lds r24,unilink_command
+ 1228 0592 8B7F      		andi r24,lo8(-5)
+ 1229 0594 5EC0      		rjmp .L83
+ 1230               	.L78:
+ 1231               	.LBE4:
+ 1233               	.LM143:
+ 1234 0596 8091 0000 		lds r24,unilink_command
+ 1235 059a 83FF      		sbrs r24,3
+ 1236 059c 16C0      		rjmp .L79
+ 1237               	.LBB5:
+ 1239               	.LM144:
+ 1240 059e 80E7      		ldi r24,lo8(112)
+ 1241 05a0 8983      		std Y+1,r24
+ 1242 05a2 8091 0000 		lds r24,unilink_ownaddr
+ 1243 05a6 8A83      		std Y+2,r24
+ 1244 05a8 87E9      		ldi r24,lo8(-105)
+ 1245 05aa 8B83      		std Y+3,r24
+ 1246 05ac 81E0      		ldi r24,lo8(1)
+ 1247 05ae 8C83      		std Y+4,r24
+ 1248 05b0 8D83      		std Y+5,r24
+ 1249 05b2 89E9      		ldi r24,lo8(-103)
+ 1250 05b4 8E83      		std Y+6,r24
+ 1251 05b6 8F83      		std Y+7,r24
+ 1252 05b8 8AE0      		ldi r24,lo8(10)
+ 1253 05ba 8887      		std Y+8,r24
+ 1255               	.LM145:
+ 1256 05bc CE01      		movw r24,r28
+ 1257 05be 0196      		adiw r24,1
+ 1258 05c0 C9DE      		rcall unilink_tx
+ 1260               	.LM146:
+ 1261 05c2 8091 0000 		lds r24,unilink_command
+ 1262 05c6 877F      		andi r24,lo8(-9)
+ 1263 05c8 44C0      		rjmp .L83
+ 1264               	.L79:
+ 1265               	.LBE5:
+ 1267               	.LM147:
+ 1268 05ca 8091 0000 		lds r24,unilink_command
+ 1269 05ce 982F      		mov r25,r24
+ 1270 05d0 9270      		andi r25,lo8(2)
+ 1271 05d2 81FF      		sbrs r24,1
+ 1272 05d4 07C0      		rjmp .L80
+ 1274               	.LM148:
+ 1275 05d6 80E0      		ldi r24,lo8(unilink_timeinfo)
+ 1276 05d8 90E0      		ldi r25,hi8(unilink_timeinfo)
+ 1277 05da BCDE      		rcall unilink_tx
+ 1279               	.LM149:
+ 1280 05dc 8091 0000 		lds r24,unilink_command
+ 1281 05e0 8D7F      		andi r24,lo8(-3)
+ 1282 05e2 37C0      		rjmp .L83
+ 1283               	.L80:
+ 1285               	.LM150:
+ 1286 05e4 8091 0000 		lds r24,unilink_command
+ 1287 05e8 80FF      		sbrs r24,0
+ 1288 05ea 29C0      		rjmp .L81
+ 1289               	.LBB6:
+ 1291               	.LM151:
+ 1292 05ec 80E7      		ldi r24,lo8(112)
+ 1293 05ee 8987      		std Y+9,r24
+ 1294 05f0 8091 0000 		lds r24,unilink_ownaddr
+ 1295 05f4 8A87      		std Y+10,r24
+ 1296 05f6 8DEC      		ldi r24,lo8(-51)
+ 1297 05f8 8B87      		std Y+11,r24
+ 1298 05fa 8091 0000 		lds r24,unilink_discname
+ 1299 05fe 8C87      		std Y+12,r24
+ 1300 0600 8091 0000 		lds r24,unilink_discname+1
+ 1301 0604 8D87      		std Y+13,r24
+ 1302 0606 8091 0000 		lds r24,unilink_discname+2
+ 1303 060a 8E87      		std Y+14,r24
+ 1304 060c 8091 0000 		lds r24,unilink_discname+3
+ 1305 0610 8F87      		std Y+15,r24
+ 1306 0612 8091 0000 		lds r24,unilink_discname+4
+ 1307 0616 888B      		std Y+16,r24
+ 1308 0618 8091 0000 		lds r24,unilink_discname+5
+ 1309 061c 898B      		std Y+17,r24
+ 1310 061e 8091 0000 		lds r24,unilink_discname+6
+ 1311 0622 8A8B      		std Y+18,r24
+ 1312 0624 8091 0000 		lds r24,unilink_discname+7
+ 1313 0628 8B8B      		std Y+19,r24
+ 1314 062a 9C8B      		std Y+20,r25
+ 1315 062c 8EE0      		ldi r24,lo8(14)
+ 1316 062e 8D8B      		std Y+21,r24
+ 1318               	.LM152:
+ 1319 0630 CE01      		movw r24,r28
+ 1320 0632 0996      		adiw r24,9
+ 1321 0634 8FDE      		rcall unilink_tx
+ 1323               	.LM153:
+ 1324 0636 8091 0000 		lds r24,unilink_command
+ 1325 063a 8E7F      		andi r24,lo8(-2)
+ 1326 063c 0AC0      		rjmp .L83
+ 1327               	.L81:
+ 1328               	.LBE6:
+ 1330               	.LM154:
+ 1331 063e 8091 0000 		lds r24,unilink_command
+ 1332 0642 84FF      		sbrs r24,4
+ 1333 0644 08C0      		rjmp .L77
+ 1335               	.LM155:
+ 1336 0646 80E0      		ldi r24,lo8(raw)
+ 1337 0648 90E0      		ldi r25,hi8(raw)
+ 1338 064a 84DE      		rcall unilink_tx
+ 1340               	.LM156:
+ 1341 064c 8091 0000 		lds r24,unilink_command
+ 1342 0650 8F7E      		andi r24,lo8(-17)
+ 1343               	.L83:
+ 1344 0652 8093 0000 		sts unilink_command,r24
+ 1345               	.L77:
+ 1346               	/* epilogue: frame size=21 */
+ 1347 0656 6596      		adiw r28,21
+ 1348 0658 0FB6      		in __tmp_reg__,__SREG__
+ 1349 065a F894      		cli
+ 1350 065c DEBF      		out __SP_H__,r29
+ 1351 065e 0FBE      		out __SREG__,__tmp_reg__
+ 1352 0660 CDBF      		out __SP_L__,r28
+ 1353 0662 DF91      		pop r29
+ 1354 0664 CF91      		pop r28
+ 1355 0666 0895      		ret
+ 1356               	/* epilogue end (size=9) */
+ 1357               	/* function send_command size 140 (121) */
+ 1368               	.Lscope10:
+ 1371               	.global	unilink_myid_cmd
+ 1373               	unilink_myid_cmd:
+ 1375               	.LM157:
+ 1376               	/* prologue: frame size=17 */
+ 1377 0668 CF93      		push r28
+ 1378 066a DF93      		push r29
+ 1379 066c CDB7      		in r28,__SP_L__
+ 1380 066e DEB7      		in r29,__SP_H__
+ 1381 0670 6197      		sbiw r28,17
+ 1382 0672 0FB6      		in __tmp_reg__,__SREG__
+ 1383 0674 F894      		cli
+ 1384 0676 DEBF      		out __SP_H__,r29
+ 1385 0678 0FBE      		out __SREG__,__tmp_reg__
+ 1386 067a CDBF      		out __SP_L__,r28
+ 1387               	/* prologue end (size=10) */
+ 1389               	.LM158:
+ 1390 067c 8091 0000 		lds r24,unilink_rxdata+2
+ 1391 0680 9927      		clr r25
+ 1392 0682 8532      		cpi r24,37
+ 1393 0684 9105      		cpc r25,__zero_reg__
+ 1394 0686 09F4      		brne .+2
+ 1395 0688 6EC0      		rjmp .L94
+ 1397               	.LM159:
+ 1398 068a 8632      		cpi r24,38
+ 1399 068c 9105      		cpc r25,__zero_reg__
+ 1400 068e 94F4      		brge .L108
+ 1401 0690 8032      		cpi r24,32
+ 1402 0692 9105      		cpc r25,__zero_reg__
+ 1403 0694 09F4      		brne .+2
+ 1404 0696 3FC0      		rjmp .L90
+ 1405 0698 8132      		cpi r24,33
+ 1406 069a 9105      		cpc r25,__zero_reg__
+ 1407 069c 1CF4      		brge .L109
+ 1408 069e 0197      		sbiw r24,1
+ 1409 06a0 E9F0      		breq .L86
+ 1410 06a2 9DC0      		rjmp .L84
+ 1411               	.L109:
+ 1412 06a4 8132      		cpi r24,33
+ 1413 06a6 9105      		cpc r25,__zero_reg__
+ 1414 06a8 09F4      		brne .+2
+ 1415 06aa 51C0      		rjmp .L91
+ 1416 06ac 8497      		sbiw r24,36
+ 1417 06ae 09F4      		brne .+2
+ 1418 06b0 58C0      		rjmp .L93
+ 1419 06b2 95C0      		rjmp .L84
+ 1420               	.L108:
+ 1421 06b4 8533      		cpi r24,53
+ 1422 06b6 9105      		cpc r25,__zero_reg__
+ 1423 06b8 09F4      		brne .+2
+ 1424 06ba 59C0      		rjmp .L96
+ 1425 06bc 8633      		cpi r24,54
+ 1426 06be 9105      		cpc r25,__zero_reg__
+ 1427 06c0 24F4      		brge .L110
+ 1428 06c2 C497      		sbiw r24,52
+ 1429 06c4 09F4      		brne .+2
+ 1430 06c6 51C0      		rjmp .L95
+ 1431 06c8 8AC0      		rjmp .L84
+ 1432               	.L110:
+ 1433 06ca 8438      		cpi r24,132
+ 1434 06cc 9105      		cpc r25,__zero_reg__
+ 1435 06ce 09F4      		brne .+2
+ 1436 06d0 50C0      		rjmp .L97
+ 1437 06d2 803B      		cpi r24,176
+ 1438 06d4 9105      		cpc r25,__zero_reg__
+ 1439 06d6 09F4      		brne .+2
+ 1440 06d8 62C0      		rjmp .L101
+ 1441 06da 81C0      		rjmp .L84
+ 1442               	.L86:
+ 1443               	.LBB7:
+ 1445               	.LM160:
+ 1446 06dc 8091 0000 		lds r24,unilink_rxdata+3
+ 1447 06e0 9927      		clr r25
+ 1448 06e2 8231      		cpi r24,18
+ 1449 06e4 9105      		cpc r25,__zero_reg__
+ 1450 06e6 19F0      		breq .L88
+ 1451 06e8 4397      		sbiw r24,19
+ 1452 06ea 99F0      		breq .L89
+ 1453 06ec 78C0      		rjmp .L84
+ 1454               	.L88:
+ 1455               	.LBB8:
+ 1457               	.LM161:
+ 1458               	/* #APP */
+ 1459 06ee 0000      		nop
+ 1461               	.LM162:
+ 1462               	/* #NOAPP */
+ 1463 06f0 8091 0000 		lds r24,flags
+ 1464 06f4 8F7B      		andi r24,lo8(-65)
+ 1465 06f6 8093 0000 		sts flags,r24
+ 1467               	.LM163:
+ 1468 06fa 80E1      		ldi r24,lo8(16)
+ 1469 06fc 8E87      		std Y+14,r24
+ 1470 06fe 8091 0000 		lds r24,unilink_ownaddr
+ 1471 0702 8F87      		std Y+15,r24
+ 1472 0704 188A      		std Y+16,__zero_reg__
+ 1473 0706 8091 0000 		lds r24,unilink_status
+ 1474 070a 898B      		std Y+17,r24
+ 1476               	.LM164:
+ 1477 070c CE01      		movw r24,r28
+ 1478 070e 0E96      		adiw r24,14
+ 1479 0710 1CC0      		rjmp .L114
+ 1480               	.L89:
+ 1482               	.LM165:
+ 1483 0712 1EDF      		rcall send_command
+ 1484               	.LBE8:
+ 1486               	.LM166:
+ 1487 0714 64C0      		rjmp .L84
+ 1488               	.L90:
+ 1490               	.LM167:
+ 1491 0716 80E5      		ldi r24,lo8(80)
+ 1492 0718 95DC      		rcall usart_putc
+ 1494               	.LM168:
+ 1495 071a 979A      		sbi 50-0x20,7
+ 1497               	.LM169:
+ 1498 071c 1092 0000 		sts unilink_status,__zero_reg__
+ 1500               	.LM170:
+ 1501 0720 80E7      		ldi r24,lo8(112)
+ 1502 0722 8983      		std Y+1,r24
+ 1503 0724 8091 0000 		lds r24,unilink_ownaddr
+ 1504 0728 8A83      		std Y+2,r24
+ 1505 072a 80EC      		ldi r24,lo8(-64)
+ 1506 072c 8B83      		std Y+3,r24
+ 1507 072e 1C82      		std Y+4,__zero_reg__
+ 1508 0730 1D82      		std Y+5,__zero_reg__
+ 1509 0732 1E82      		std Y+6,__zero_reg__
+ 1510 0734 1F82      		std Y+7,__zero_reg__
+ 1511 0736 1886      		std Y+8,__zero_reg__
+ 1512 0738 1986      		std Y+9,__zero_reg__
+ 1513 073a 81E0      		ldi r24,lo8(1)
+ 1514 073c 8A87      		std Y+10,r24
+ 1515 073e 1B86      		std Y+11,__zero_reg__
+ 1516 0740 1C86      		std Y+12,__zero_reg__
+ 1517 0742 88E1      		ldi r24,lo8(24)
+ 1518 0744 8D87      		std Y+13,r24
+ 1520               	.LM171:
+ 1521 0746 CE01      		movw r24,r28
+ 1522 0748 0196      		adiw r24,1
+ 1523               	.L114:
+ 1524 074a 04DE      		rcall unilink_tx
+ 1526               	.LM172:
+ 1527 074c 48C0      		rjmp .L84
+ 1528               	.L91:
+ 1530               	.LM173:
+ 1531 074e 8091 0000 		lds r24,unilink_rxdata+3
+ 1532 0752 8032      		cpi r24,lo8(32)
+ 1533 0754 09F0      		breq .+2
+ 1534 0756 43C0      		rjmp .L84
+ 1536               	.LM174:
+ 1537 0758 80E8      		ldi r24,lo8(-128)
+ 1538 075a 8093 0000 		sts unilink_status,r24
+ 1540               	.LM175:
+ 1541 075e 80E5      		ldi r24,lo8(80)
+ 1542 0760 3DC0      		rjmp .L112
+ 1543               	.L93:
+ 1545               	.LM176:
+ 1546 0762 86E4      		ldi r24,lo8(70)
+ 1547 0764 3BC0      		rjmp .L112
+ 1548               	.L94:
+ 1550               	.LM177:
+ 1551 0766 82E5      		ldi r24,lo8(82)
+ 1552 0768 39C0      		rjmp .L112
+ 1553               	.L95:
+ 1555               	.LM178:
+ 1556 076a 82E7      		ldi r24,lo8(114)
+ 1557 076c 37C0      		rjmp .L112
+ 1558               	.L96:
+ 1560               	.LM179:
+ 1561 076e 83E7      		ldi r24,lo8(115)
+ 1562 0770 35C0      		rjmp .L112
+ 1563               	.L97:
+ 1565               	.LM180:
+ 1566 0772 8091 0000 		lds r24,unilink_rxdata+3
+ 1567 0776 9927      		clr r25
+ 1568 0778 8539      		cpi r24,149
+ 1569 077a 9105      		cpc r25,__zero_reg__
+ 1570 077c 21F0      		breq .L99
+ 1571 077e 8739      		cpi r24,151
+ 1572 0780 9105      		cpc r25,__zero_reg__
+ 1573 0782 31F0      		breq .L100
+ 1574 0784 2CC0      		rjmp .L84
+ 1575               	.L99:
+ 1577               	.LM181:
+ 1578 0786 77DC      		rcall slavebreak
+ 1580               	.LM182:
+ 1581 0788 8091 0000 		lds r24,unilink_command
+ 1582 078c 8460      		ori r24,lo8(4)
+ 1583 078e 04C0      		rjmp .L113
+ 1584               	.L100:
+ 1586               	.LM183:
+ 1587 0790 72DC      		rcall slavebreak
+ 1589               	.LM184:
+ 1590 0792 8091 0000 		lds r24,unilink_command
+ 1591 0796 8860      		ori r24,lo8(8)
+ 1592               	.L113:
+ 1593 0798 8093 0000 		sts unilink_command,r24
+ 1595               	.LM185:
+ 1596 079c 20C0      		rjmp .L84
+ 1597               	.L101:
+ 1599               	.LM186:
+ 1600 079e 9091 0000 		lds r25,unilink_lastdisc
+ 1601 07a2 8091 0000 		lds r24,unilink_rxdata+3
+ 1602 07a6 8917      		cp r24,r25
+ 1603 07a8 20F4      		brsh .L102
+ 1605               	.LM187:
+ 1606 07aa 8093 0000 		sts unilink_lastdisc,r24
+ 1608               	.LM188:
+ 1609 07ae 84E4      		ldi r24,lo8(68)
+ 1610 07b0 05C0      		rjmp .L111
+ 1611               	.L102:
+ 1613               	.LM189:
+ 1614 07b2 9817      		cp r25,r24
+ 1615 07b4 20F4      		brsh .L103
+ 1617               	.LM190:
+ 1618 07b6 8093 0000 		sts unilink_lastdisc,r24
+ 1620               	.LM191:
+ 1621 07ba 84E6      		ldi r24,lo8(100)
+ 1622               	.L111:
+ 1623 07bc 43DC      		rcall usart_putc
+ 1624               	.L103:
+ 1626               	.LM192:
+ 1627 07be 9091 0000 		lds r25,unilink_lasttrack
+ 1628 07c2 8091 0000 		lds r24,unilink_rxdata+5
+ 1629 07c6 8917      		cp r24,r25
+ 1630 07c8 20F4      		brsh .L105
+ 1632               	.LM193:
+ 1633 07ca 8093 0000 		sts unilink_lasttrack,r24
+ 1635               	.LM194:
+ 1636 07ce 84E5      		ldi r24,lo8(84)
+ 1637 07d0 05C0      		rjmp .L112
+ 1638               	.L105:
+ 1640               	.LM195:
+ 1641 07d2 9817      		cp r25,r24
+ 1642 07d4 20F4      		brsh .L84
+ 1644               	.LM196:
+ 1645 07d6 8093 0000 		sts unilink_lasttrack,r24
+ 1647               	.LM197:
+ 1648 07da 84E7      		ldi r24,lo8(116)
+ 1649               	.L112:
+ 1650 07dc 33DC      		rcall usart_putc
+ 1651               	.L84:
+ 1652               	.LBE7:
+ 1653               	/* epilogue: frame size=17 */
+ 1654 07de 6196      		adiw r28,17
+ 1655 07e0 0FB6      		in __tmp_reg__,__SREG__
+ 1656 07e2 F894      		cli
+ 1657 07e4 DEBF      		out __SP_H__,r29
+ 1658 07e6 0FBE      		out __SREG__,__tmp_reg__
+ 1659 07e8 CDBF      		out __SP_L__,r28
+ 1660 07ea DF91      		pop r29
+ 1661 07ec CF91      		pop r28
+ 1662 07ee 0895      		ret
+ 1663               	/* epilogue end (size=9) */
+ 1664               	/* function unilink_myid_cmd size 201 (182) */
+ 1672               	.Lscope11:
+ 1675               	.global	unilink_parse
+ 1677               	unilink_parse:
+ 1679               	.LM198:
+ 1680               	/* prologue: frame size=0 */
+ 1681               	/* prologue end (size=0) */
+ 1683               	.LM199:
+ 1684 07f0 8091 0000 		lds r24,unilink_rxdata
+ 1685 07f4 8831      		cpi r24,lo8(24)
+ 1686 07f6 11F4      		brne .L116
+ 1688               	.LM200:
+ 1689 07f8 05DE      		rcall unilink_broadcast
+ 1691               	.LM201:
+ 1692 07fa 0895      		ret
+ 1693               	.L116:
+ 1695               	.LM202:
+ 1696 07fc 9091 0000 		lds r25,unilink_ownaddr
+ 1697 0800 8917      		cp r24,r25
+ 1698 0802 11F4      		brne .L117
+ 1700               	.LM203:
+ 1701 0804 31DF      		rcall unilink_myid_cmd
+ 1703               	.LM204:
+ 1704 0806 0895      		ret
+ 1705               	.L117:
+ 1707               	.LM205:
+ 1708 0808 8091 0000 		lds r24,unilink_groupid
+ 1709 080c 9817      		cp r25,r24
+ 1710 080e 09F4      		brne .L115
+ 1712               	.LM206:
+ 1713 0810 5DDE      		rcall unilink_appoint
+ 1714               	.L115:
+ 1715 0812 0895      		ret
+ 1716               	/* epilogue: frame size=0 */
+ 1717 0814 0895      		ret
+ 1718               	/* epilogue end (size=1) */
+ 1719               	/* function unilink_parse size 19 (18) */
+ 1721               	.Lscope12:
+ 1724               	.global	checksum_check
+ 1726               	checksum_check:
+ 1728               	.LM207:
+ 1729               	/* prologue: frame size=0 */
+ 1730               	/* prologue end (size=0) */
+ 1732               	.LM208:
+ 1733 0816 2091 0000 		lds r18,unilink_rxsize
+ 1734 081a 2250      		subi r18,lo8(-(-2))
+ 1736               	.LM209:
+ 1737 081c 30E0      		ldi r19,lo8(0)
+ 1738 081e E0E0      		ldi r30,lo8(unilink_rxdata)
+ 1739 0820 F0E0      		ldi r31,hi8(unilink_rxdata)
+ 1740 0822 93E0      		ldi r25,lo8(3)
+ 1741               	.L123:
+ 1743               	.LM210:
+ 1744 0824 8191      		ld r24,Z+
+ 1745 0826 380F      		add r19,r24
+ 1747               	.LM211:
+ 1748 0828 9150      		subi r25,lo8(-(-1))
+ 1749 082a 97FF      		sbrs r25,7
+ 1750 082c FBCF      		rjmp .L123
+ 1751 082e 94E0      		ldi r25,lo8(4)
+ 1753               	.LM212:
+ 1754 0830 8091 0000 		lds r24,unilink_rxdata+4
+ 1755 0834 3817      		cp r19,r24
+ 1756 0836 51F4      		brne .L124
+ 1758               	.LM213:
+ 1759 0838 9217      		cp r25,r18
+ 1760 083a 69F4      		brne .L127
+ 1762               	.LM214:
+ 1763 083c 8091 0000 		lds r24,unilink_rxdata+6
+ 1764 0840 8823      		tst r24
+ 1765 0842 49F4      		brne .L127
+ 1767               	.LM215:
+ 1768 0844 8091 0000 		lds r24,flags
+ 1769 0848 8160      		ori r24,lo8(1)
+ 1770 084a 03C0      		rjmp .L140
+ 1771               	.L124:
+ 1773               	.LM216:
+ 1774 084c 8091 0000 		lds r24,flags
+ 1775 0850 8E7F      		andi r24,lo8(-2)
+ 1776               	.L140:
+ 1777 0852 8093 0000 		sts flags,r24
+ 1778               	.L127:
+ 1780               	.LM217:
+ 1781 0856 95E0      		ldi r25,lo8(5)
+ 1783               	.LM218:
+ 1784 0858 9217      		cp r25,r18
+ 1785 085a 38F4      		brsh .L139
+ 1786 085c E0E0      		ldi r30,lo8(unilink_rxdata+5)
+ 1787 085e F0E0      		ldi r31,hi8(unilink_rxdata+5)
+ 1788               	.L131:
+ 1790               	.LM219:
+ 1791 0860 8191      		ld r24,Z+
+ 1792 0862 380F      		add r19,r24
+ 1794               	.LM220:
+ 1795 0864 9F5F      		subi r25,lo8(-(1))
+ 1796 0866 9217      		cp r25,r18
+ 1797 0868 D8F3      		brlo .L131
+ 1798               	.L139:
+ 1800               	.LM221:
+ 1801 086a 9217      		cp r25,r18
+ 1802 086c A9F4      		brne .L119
+ 1804               	.LM222:
+ 1805 086e E92F      		mov r30,r25
+ 1806 0870 FF27      		clr r31
+ 1807 0872 E050      		subi r30,lo8(-(unilink_rxdata))
+ 1808 0874 F040      		sbci r31,hi8(-(unilink_rxdata))
+ 1809 0876 8081      		ld r24,Z
+ 1810 0878 3817      		cp r19,r24
+ 1811 087a 49F4      		brne .L133
+ 1813               	.LM223:
+ 1814 087c 8181      		ldd r24,Z+1
+ 1815 087e 8823      		tst r24
+ 1816 0880 59F4      		brne .L119
+ 1818               	.LM224:
+ 1819 0882 8091 0000 		lds r24,flags
+ 1820 0886 8160      		ori r24,lo8(1)
+ 1821 0888 8093 0000 		sts flags,r24
+ 1822 088c 0895      		ret
+ 1823               	.L133:
+ 1825               	.LM225:
+ 1826 088e 8091 0000 		lds r24,flags
+ 1827 0892 8E7F      		andi r24,lo8(-2)
+ 1828 0894 8093 0000 		sts flags,r24
+ 1829               	.L119:
+ 1830 0898 0895      		ret
+ 1831               	/* epilogue: frame size=0 */
+ 1832 089a 0895      		ret
+ 1833               	/* epilogue end (size=1) */
+ 1834               	/* function checksum_check size 67 (66) */
+ 1839               	.Lscope13:
+ 1843               	.global	bcd2hex
+ 1845               	bcd2hex:
+ 1847               	.Ltext5:
+   1:general.c     **** /*************************************************************************
+   2:general.c     **** **  Becker Unilink Bus Interface (General Procedures)
+   3:general.c     **** **  by Michael Wolf
+   4:general.c     **** **
+   5:general.c     **** **  Released under GNU GENERAL PUBLIC LICENSE
+   6:general.c     **** **	See LICENSE.TXT for details
+   7:general.c     **** **
+   8:general.c     **** **  Revision History
+   9:general.c     **** **
+  10:general.c     **** **  when         what  who	why
+  11:general.c     **** **
+  12:general.c     **** **************************************************************************/
+  13:general.c     **** 
+  14:general.c     **** unsigned char bcd2hex(unsigned char bcd)
+  15:general.c     **** {
+ 1849               	.LM226:
+ 1850               	/* prologue: frame size=0 */
+ 1851               	/* prologue end (size=0) */
+  16:general.c     **** 	unsigned char loc_bcd;
+  17:general.c     **** 	loc_bcd = bcd >> 4;
+  18:general.c     **** 	loc_bcd = (bcd & 0x0f) + 10 * loc_bcd;
+ 1853               	.LM227:
+ 1854 089c 282F      		mov r18,r24
+ 1855 089e 2F70      		andi r18,lo8(15)
+ 1856 08a0 8295      		swap r24
+ 1857 08a2 8F70      		andi r24,0x0f
+ 1858 08a4 9AE0      		ldi r25,lo8(10)
+ 1859 08a6 899F      		mul r24,r25
+ 1860 08a8 C001      		movw r24,r0
+ 1861 08aa 1124      		clr r1
+ 1862 08ac 280F      		add r18,r24
+  19:general.c     ****     return(loc_bcd);  
+  20:general.c     **** }
+ 1864               	.LM228:
+ 1865 08ae 822F      		mov r24,r18
+ 1866 08b0 9927      		clr r25
+ 1867               	/* epilogue: frame size=0 */
+ 1868 08b2 0895      		ret
+ 1869               	/* epilogue end (size=1) */
+ 1870               	/* function bcd2hex size 12 (11) */
+ 1872               	.Lscope14:
+ 1876               	.global	bin2ascii
+ 1878               	bin2ascii:
+  21:general.c     **** 
+  22:general.c     **** 
+  23:general.c     **** unsigned char bin2ascii(unsigned char bin)
+  24:general.c     **** {
+ 1880               	.LM229:
+ 1881               	/* prologue: frame size=0 */
+ 1882               	/* prologue end (size=0) */
+  25:general.c     **** 	bin = bin & 0x0f;													// mask lower nibble
+ 1884               	.LM230:
+ 1885 08b4 8F70      		andi r24,lo8(15)
+  26:general.c     ****     if (bin < 10)
+ 1887               	.LM231:
+ 1888 08b6 8A30      		cpi r24,lo8(10)
+ 1889 08b8 18F4      		brsh .L143
+  27:general.c     **** 		return bin + 48;                   			// if lower nibble is lower 10 make 0-9 ASCII char
+ 1891               	.LM232:
+ 1892 08ba 805D      		subi r24,lo8(-(48))
+ 1893 08bc 9927      		clr r25
+ 1894 08be 0895      		ret
+ 1895               	.L143:
+  28:general.c     ****     else
+  29:general.c     ****         return bin + 55;                   	// if lower nibble is greater 10 make A-F ASCII char
+ 1897               	.LM233:
+ 1898 08c0 895C      		subi r24,lo8(-(55))
+ 1899 08c2 9927      		clr r25
+  30:general.c     **** }
+ 1901               	.LM234:
+ 1902 08c4 0895      		ret
+ 1903               	/* epilogue: frame size=0 */
+ 1904 08c6 0895      		ret
+ 1905               	/* epilogue end (size=1) */
+ 1906               	/* function bin2ascii size 10 (9) */
+ 1908               	.Lscope15:
+ 1911               	.global	main
+ 1913               	main:
+ 1915               	.Ltext6:
+   1:main.c        **** /*************************************************************************
+   2:main.c        **** **  Becker Unilink Interface (Main Procedure)
+   3:main.c        **** **  by Michael Wolf
+   4:main.c        **** **
+   5:main.c        **** **  Released under GNU GENERAL PUBLIC LICENSE
+   6:main.c        **** **	See LICENSE.TXT for details
+   7:main.c        **** **
+   8:main.c        **** **	See README.TXT for serial command details
+   9:main.c        **** **
+  10:main.c        **** **  Contact: michael@mictronics.de
+  11:main.c        **** **  homepage: www.mictronics.de
+  12:main.c        **** **
+  13:main.c        **** **  Revision History
+  14:main.c        **** **
+  15:main.c        **** **  when			what  who	why
+  16:main.c        **** **	19/03/04	v1.0	MIC	Initial Release
+  17:main.c        **** **	22/08/04	v1.1	MIC	+ added support for new op-amp hardware
+  18:main.c        **** **
+  19:main.c        **** **  Used develompent tools (download @ www.avrfreaks.net):
+  20:main.c        **** **  Programmers Notepad v2.0.5.32
+  21:main.c        **** **  WinAVR (GCC) 3.4.1
+  22:main.c        **** **  AvrStudio4 for simulating and debugging
+  23:main.c        **** **	Tab Width: 2
+  24:main.c        **** **
+  25:main.c        **** **  [           Legend:          ]
+  26:main.c        **** **  [ + Added feature            ]
+  27:main.c        **** **  [ * Improved/changed feature ]
+  28:main.c        **** **  [ - Bug fixed (I hope)       ]
+  29:main.c        **** **
+  30:main.c        **** **************************************************************************/
+  31:main.c        **** #include <avr/signal.h>
+  32:main.c        **** #include <avr/interrupt.h>
+  33:main.c        **** #include <avr/pgmspace.h>
+  34:main.c        **** #include <avr/io.h>
+  35:main.c        **** #include <avr/wdt.h>
+  36:main.c        **** #include "config.h"
+  37:main.c        **** #include "main.h"
+  38:main.c        **** #include "usart.c"
+  39:main.c        **** #include "unilink.h"
+  40:main.c        **** #include "unilink.c"
+  41:main.c        **** #include "general.c"
+  42:main.c        **** 
+  43:main.c        **** // Main loop
+  44:main.c        **** int main(void)
+  45:main.c        **** {
+ 1917               	.LM235:
+ 1918               	/* prologue: frame size=0 */
+ 1919 08c8 C0E0      		ldi r28,lo8(__stack - 0)
+ 1920 08ca D0E0      		ldi r29,hi8(__stack - 0)
+ 1921 08cc DEBF      		out __SP_H__,r29
+ 1922 08ce CDBF      		out __SP_L__,r28
+ 1923               	/* prologue end (size=4) */
+  46:main.c        **** 	cli();
+ 1925               	.LM236:
+ 1926               	/* #APP */
+ 1927 08d0 F894      		cli
+  47:main.c        **** 	#if defined(WATCHDOG)
+  48:main.c        **** 	wdt_enable(WDTO_2S);					// Watchdog enable with 2 seconds timeout
+ 1929               	.LM237:
+ 1930               	/* #NOAPP */
+ 1931 08d2 88E1      		ldi r24,lo8(24)
+ 1932 08d4 90E0      		ldi r25,hi8(24)
+ 1933 08d6 2FE0      		ldi r18,lo8(15)
+ 1934               	/* #APP */
+ 1935 08d8 0FB6      		in __tmp_reg__,__SREG__
+ 1936 08da F894      		cli
+ 1937 08dc A895      		wdr
+ 1938 08de 81BD      		out 33,r24
+ 1939 08e0 0FBE      		out __SREG__,__tmp_reg__
+ 1940 08e2 21BD      		out 33,r18
+  49:main.c        **** 	#endif
+  50:main.c        **** 	#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__)
+  51:main.c        **** 	GICR = 0x00;     							// disable external interupts
+ 1942               	.LM238:
+ 1943               	/* #NOAPP */
+ 1944 08e4 1BBE      		out 91-0x20,__zero_reg__
+  52:main.c        **** 	#else
+  53:main.c        **** 	GIMSK = 0x00; 		            // disable external interupts
+  54:main.c        **** 	#endif
+  55:main.c        **** 
+  56:main.c        **** 	#if defined(__AVR_AT90S8515__) || defined(__AVR_ATmega8515__)
+  57:main.c        ****   cbi (MCUCR, SRE); 	          // disable external RAM
+  58:main.c        **** 	PORTA = 0x00;		            	// PortA all low
+  59:main.c        **** 	DDRA = 0x00;		            	// PortA all input
+  60:main.c        **** 	#endif
+  61:main.c        **** 	PORTB = 0x00;		            	// PortB all low
+ 1946               	.LM239:
+ 1947 08e6 18BA      		out 56-0x20,__zero_reg__
+  62:main.c        **** 	DDRB = 0x00;		            	// PortB all input
+ 1949               	.LM240:
+ 1950 08e8 17BA      		out 55-0x20,__zero_reg__
+  63:main.c        ****   PORTC = 0x00;			            // PortC all low
+ 1952               	.LM241:
+ 1953 08ea 15BA      		out 53-0x20,__zero_reg__
+  64:main.c        **** 	DDRC = 0x00;		            	// PortC all input
+ 1955               	.LM242:
+ 1956 08ec 14BA      		out 52-0x20,__zero_reg__
+  65:main.c        ****   PORTD = 0x00;			            // PortD all low
+ 1958               	.LM243:
+ 1959 08ee 12BA      		out 50-0x20,__zero_reg__
+  66:main.c        **** 
+  67:main.c        **** 	#if defined(__AVR_ATmega8__)
+  68:main.c        **** 		#if defined(LED_OUT)
+  69:main.c        **** 		DDRD = (1<<d_LED1)|(1<<d_LED2)|(1<<d_LED3);	// set PortD LED output on ATmega8
+  70:main.c        **** 		#elif defined(RELAIS_OUT)
+  71:main.c        **** 		DDRD = (1<<d_RELAIS);												// set PortD relais output on ATmega8
+ 1961               	.LM244:
+ 1962 08f0 80E8      		ldi r24,lo8(-128)
+ 1963 08f2 81BB      		out 49-0x20,r24
+  72:main.c        **** 		#else
+  73:main.c        **** 		DDRD = (0<<d_RELAIS)|(0<<d_LED1)|(0<<d_LED2)|(0<<d_LED3);	// set PortD all input on ATmega8
+  74:main.c        **** 		#endif	
+  75:main.c        **** 	#else
+  76:main.c        **** 	DDRD = 0x00;											// PORTD all input on AT...8515
+  77:main.c        **** 	#endif
+  78:main.c        **** 
+  79:main.c        ****   TIMSK = 1<<TOIE1;	  	            // enable Timer1 overflow interrupt
+ 1965               	.LM245:
+ 1966 08f4 84E0      		ldi r24,lo8(4)
+ 1967 08f6 89BF      		out 89-0x20,r24
+  80:main.c        ****   TCCR0 = 0x00;     	              // Stop Timer0
+ 1969               	.LM246:
+ 1970 08f8 13BE      		out 83-0x20,__zero_reg__
+  81:main.c        **** 	TCCR1A = 0x00;
+ 1972               	.LM247:
+ 1973 08fa 1FBC      		out 79-0x20,__zero_reg__
+  82:main.c        **** 	TCNT1 = c_delay;									// Load Timer1
+ 1975               	.LM248:
+ 1976 08fc 80EC      		ldi r24,lo8(-14144)
+ 1977 08fe 98EC      		ldi r25,hi8(-14144)
+ 1978 0900 9DBD      		out (76)+1-0x20,r25
+ 1979 0902 8CBD      		out 76-0x20,r24
+  83:main.c        ****   TCCR1B = c_Timer1_stop;		        // Stop Timer1
+ 1981               	.LM249:
+ 1982 0904 1EBC      		out 78-0x20,__zero_reg__
+  84:main.c        ****             
+  85:main.c        **** 	SPCR = c_RUN_SPI;	            		/* SPI control register (11000100)
+ 1984               	.LM250:
+ 1985 0906 8CEC      		ldi r24,lo8(-52)
+ 1986 0908 8DB9      		out 45-0x20,r24
+  86:main.c        ****                                     SPI in slave mode, SPI interupt enabled,
+  87:main.c        ****                                     SPI speed = Fclk/64
+  88:main.c        ****                                     */
+  89:main.c        ****   DDRB = 0x40;		            			// MISO as output and low
+ 1988               	.LM251:
+ 1989 090a 80E4      		ldi r24,lo8(64)
+ 1990 090c 87BB      		out 55-0x20,r24
+  90:main.c        ****   SPDR = 0x00;
+ 1992               	.LM252:
+ 1993 090e 1FB8      		out 47-0x20,__zero_reg__
+  91:main.c        **** 
+  92:main.c        ****   usart_init();                   	// init USART
+ 1995               	.LM253:
+ 1996 0910 AADB      		rcall usart_init
+  93:main.c        **** 	
+  94:main.c        ****   unilink_ownaddr = C_UNILINK_OWNADDR_CD;// use CD mode only
+ 1998               	.LM254:
+ 1999 0912 80E3      		ldi r24,lo8(48)
+ 2000 0914 8093 0000 		sts unilink_ownaddr,r24
+  95:main.c        **** 	unilink_groupid = C_UNILINK_OWNADDR_CD;
+ 2002               	.LM255:
+ 2003 0918 8093 0000 		sts unilink_groupid,r24
+  96:main.c        **** 
+  97:main.c        **** 	unilink_lastdisc = 0x00;					// init disc and track reminder
+ 2005               	.LM256:
+ 2006 091c 1092 0000 		sts unilink_lastdisc,__zero_reg__
+  98:main.c        **** 	unilink_lasttrack = 0x00;
+ 2008               	.LM257:
+ 2009 0920 1092 0000 		sts unilink_lasttrack,__zero_reg__
+  99:main.c        **** 	
+ 100:main.c        **** 	flags.unilink_anyone = false;
+ 2011               	.LM258:
+ 2012 0924 8091 0000 		lds r24,flags
+ 2013 0928 8F77      		andi r24,lo8(127)
+ 2014 092a 8093 0000 		sts flags,r24
+ 101:main.c        ****   sei();                    	     	// enable interrupts
+ 2016               	.LM259:
+ 2017               	/* #APP */
+ 2018 092e 7894      		sei
+ 102:main.c        **** 	TCNT0 = c_6ms;		     		       	// load Timer0
+ 2020               	.LM260:
+ 2021               	/* #NOAPP */
+ 2022 0930 94E5      		ldi r25,lo8(84)
+ 2023 0932 92BF      		out 82-0x20,r25
+ 103:main.c        ****   TCCR0 = c_Timer0_run;		    			// start Timer0
+ 2025               	.LM261:
+ 2026 0934 84E0      		ldi r24,lo8(4)
+ 2027 0936 83BF      		out 83-0x20,r24
+ 104:main.c        **** 
+ 105:main.c        ****   // wait for idle time between two packets, then start receiving
+ 106:main.c        ****   while(bit_is_clear(TIFR, TOV0))                             // wait for MOSI high for minimum of 
+ 107:main.c        **** 	{                                
+ 108:main.c        ****     if (bit_is_clear(PINB, b_MOSI)) TCNT0 = c_6ms;		    		// load Timer0 if MOSI is not high
+ 2029               	.LM262:
+ 2030 0938 08B6      		in __tmp_reg__,88-0x20
+ 2031 093a 00FC      		sbrc __tmp_reg__,0
+ 2032 093c 06C0      		rjmp .L175
+ 2033 093e 892F      		mov r24,r25
+ 2034               	.L149:
+ 2036               	.LM263:
+ 2037 0940 B39B      		sbis 54-0x20,3
+ 2038 0942 82BF      		out 82-0x20,r24
+ 2039               	.L146:
+ 2040 0944 08B6      		in __tmp_reg__,88-0x20
+ 2041 0946 00FE      		sbrs __tmp_reg__,0
+ 2042 0948 FBCF      		rjmp .L149
+ 2043               	.L175:
+ 109:main.c        ****   };// wait until timer0 overflow
+ 110:main.c        ****   TIFR |= _BV(TOV0);                                         	// clear timer0 overflow flag
+ 2045               	.LM264:
+ 2046 094a 88B7      		in r24,88-0x20
+ 2047 094c 8160      		ori r24,lo8(1)
+ 2048 094e 88BF      		out 88-0x20,r24
+ 111:main.c        ****   TCNT0 = c_6ms;		                                        	// load Timer0
+ 2050               	.LM265:
+ 2051 0950 84E5      		ldi r24,lo8(84)
+ 2052 0952 82BF      		out 82-0x20,r24
+ 112:main.c        ****   while(bit_is_clear(TIFR, TOV0))                             // wait for MOSI low for minimum of 6
+ 113:main.c        ****   {
+ 114:main.c        ****     if (bit_is_set(PINB, b_MOSI)) TCNT0 = c_6ms;		    			// load Timer0  if MOSI is not low
+ 2054               	.LM266:
+ 2055 0954 08B6      		in __tmp_reg__,88-0x20
+ 2056 0956 00FC      		sbrc __tmp_reg__,0
+ 2057 0958 05C0      		rjmp .L177
+ 2058               	.L153:
+ 2059 095a B399      		sbic 54-0x20,3
+ 2060 095c 82BF      		out 82-0x20,r24
+ 2061               	.L150:
+ 2062 095e 08B6      		in __tmp_reg__,88-0x20
+ 2063 0960 00FE      		sbrs __tmp_reg__,0
+ 2064 0962 FBCF      		rjmp .L153
+ 2065               	.L177:
+ 115:main.c        ****   };// wait until timer overflow
+ 116:main.c        ****   TCNT0 = c_Timer0_stop;		    															// stop timer0
+ 2067               	.LM267:
+ 2068 0964 12BE      		out 82-0x20,__zero_reg__
+ 2069               	.L183:
+ 117:main.c        **** 
+ 118:main.c        **** 
+ 119:main.c        **** 	// now we are going in end endless loop waiting for packets
+ 120:main.c        **** 	while(true)
+ 121:main.c        ****   {
+ 122:main.c        **** 		do
+ 123:main.c        **** 		{
+ 124:main.c        **** 			// the watchdog will be reset if bus is in idle or during data transfer
+ 125:main.c        **** 			if ( bit_is_set(PINB, 3) )	// test data line
+ 2071               	.LM268:
+ 2072 0966 B39B      		sbis 54-0x20,3
+ 2073 0968 01C0      		rjmp .L159
+ 126:main.c        **** 				wdt_reset();
+ 2075               	.LM269:
+ 2076               	/* #APP */
+ 2077 096a A895      		wdr
+ 2078               	/* #NOAPP */
+ 2079               	.L159:
+ 127:main.c        **** 				
+ 128:main.c        **** 			// check for serial commands and parse if we have one
+ 129:main.c        **** 			if( (usart_rx_buffer[0] == 't' ) && ( usart_rx_index >= 8 ) )
+ 2081               	.LM270:
+ 2082 096c 8091 0000 		lds r24,usart_rx_buffer
+ 2083 0970 8437      		cpi r24,lo8(116)
+ 2084 0972 29F4      		brne .L160
+ 2085 0974 8091 0000 		lds r24,usart_rx_index
+ 2086 0978 8830      		cpi r24,lo8(8)
+ 2087 097a 38F1      		brlo .L158
+ 2088 097c 25C0      		rjmp .L170
+ 2089               	.L160:
+ 130:main.c        **** 				usart_rx_proc();
+ 131:main.c        **** 				
+ 132:main.c        **** 			else if( (usart_rx_buffer[0] == 'D' ) && ( (usart_rx_index >= 17) || (usart_rx_buffer[usart_rx_i
+ 2091               	.LM271:
+ 2092 097e 8434      		cpi r24,lo8(68)
+ 2093 0980 11F0      		breq .L182
+ 133:main.c        **** 				usart_rx_proc();
+ 134:main.c        **** 
+ 135:main.c        **** 			else if( (usart_rx_buffer[0] == 'T' ) && ( (usart_rx_index >= 17) || (usart_rx_buffer[usart_rx_i
+ 2095               	.LM272:
+ 2096 0982 8435      		cpi r24,lo8(84)
+ 2097 0984 59F4      		brne .L165
+ 2098               	.L182:
+ 2099 0986 E091 0000 		lds r30,usart_rx_index
+ 2100 098a E131      		cpi r30,lo8(17)
+ 2101 098c E8F4      		brsh .L170
+ 2102 098e FF27      		clr r31
+ 2103 0990 E050      		subi r30,lo8(-(usart_rx_buffer-1))
+ 2104 0992 F040      		sbci r31,hi8(-(usart_rx_buffer-1))
+ 2105 0994 8081      		ld r24,Z
+ 2106 0996 8E37      		cpi r24,lo8(126)
+ 2107 0998 C1F4      		brne .L158
+ 2108 099a 16C0      		rjmp .L170
+ 2109               	.L165:
+ 136:main.c        **** 				usart_rx_proc();
+ 137:main.c        **** 
+ 138:main.c        **** 			else if( usart_rx_buffer[0] == '*' )
+ 2111               	.LM273:
+ 2112 099c 8A32      		cpi r24,lo8(42)
+ 2113 099e A9F4      		brne .L158
+ 139:main.c        **** 			{
+ 140:main.c        **** 				if
+ 2115               	.LM274:
+ 2116 09a0 9091 0000 		lds r25,usart_rx_buffer+3
+ 2117 09a4 97FD      		sbrc r25,7
+ 2118 09a6 04C0      		rjmp .L171
+ 2119 09a8 8091 0000 		lds r24,usart_rx_index
+ 2120 09ac 8530      		cpi r24,lo8(5)
+ 2121 09ae 60F4      		brsh .L170
+ 2122               	.L171:
+ 2123 09b0 903C      		cpi r25,lo8(-64)
+ 2124 09b2 20F4      		brsh .L172
+ 2125 09b4 8091 0000 		lds r24,usart_rx_index
+ 2126 09b8 8930      		cpi r24,lo8(9)
+ 2127 09ba 30F4      		brsh .L170
+ 2128               	.L172:
+ 2129 09bc 903C      		cpi r25,lo8(-64)
+ 2130 09be 28F0      		brlo .L158
+ 2131 09c0 8091 0000 		lds r24,usart_rx_index
+ 2132 09c4 8E30      		cpi r24,lo8(14)
+ 2133 09c6 08F0      		brlo .L158
+ 2134               	.L170:
+ 141:main.c        **** 				(
+ 142:main.c        **** 					((usart_rx_buffer[3] < 0x80 ) && (usart_rx_index >= 5)) ||
+ 143:main.c        **** 					((usart_rx_buffer[3] < 0xC0 ) && (usart_rx_index >= 9)) ||
+ 144:main.c        **** 					((usart_rx_buffer[3] >= 0xC0 ) && (usart_rx_index >= 14))
+ 145:main.c        **** 				)
+ 146:main.c        **** 					usart_rx_proc();
+ 2136               	.LM275:
+ 2137 09c8 8EDB      		rcall usart_rx_proc
+ 2138               	.L158:
+ 147:main.c        **** 			}
+ 148:main.c        **** 		#if defined(YAMPP3)
+ 149:main.c        **** 			else if (usart_rx_buffer[0] == '!')
+ 150:main.c        **** 				usart_rx_proc();
+ 151:main.c        **** 		#endif
+ 152:main.c        **** 
+ 153:main.c        **** 		} while(!flags.unilink_rx_compl);
+ 2140               	.LM276:
+ 2141 09ca 8091 0000 		lds r24,flags
+ 2142 09ce 82FF      		sbrs r24,2
+ 2143 09d0 CACF      		rjmp .L183
+ 154:main.c        **** 		
+ 155:main.c        **** 		flags.unilink_rx_compl = false;				// clear RX complete flag, wait for new packet
+ 2145               	.LM277:
+ 2146 09d2 8091 0000 		lds r24,flags
+ 2147 09d6 8B7F      		andi r24,lo8(-5)
+ 2148 09d8 8093 0000 		sts flags,r24
+ 156:main.c        **** 		checksum_check();
+ 2150               	.LM278:
+ 2151 09dc 1CDF      		rcall checksum_check
+ 157:main.c        ****     if ( flags.checksum_ok )								// do a parity check of received packet and proceed if OK
+ 2153               	.LM279:
+ 2154 09de 8091 0000 		lds r24,flags
+ 2155 09e2 80FF      		sbrs r24,0
+ 2156 09e4 C0CF      		rjmp .L183
+ 158:main.c        ****     {
+ 159:main.c        **** 			unilink_parse();
+ 2158               	.LM280:
+ 2159 09e6 04DF      		rcall unilink_parse
+ 2160 09e8 BECF      		rjmp .L183
+ 2161               	/* epilogue: frame size=0 */
+ 2162               	/* epilogue: noreturn */
+ 2163               	/* epilogue end (size=0) */
+ 2164               	/* function main size 156 (152) */
+ 2166               	.Lscope16:
+ 2169               	.global	__vector_8
+ 2171               	__vector_8:
+ 160:main.c        **** 			
+ 161:main.c        **** 			#ifdef BUS_LOGGING
+ 162:main.c        ****         flags.unilink_tx_log = false;			// disable Tx packet logging
+ 163:main.c        ****         bus_logging();                      // send valid Rx packet via UART
+ 164:main.c        **** 			#endif
+ 165:main.c        ****     }  // end of routine if checksum was ok
+ 166:main.c        **** 	}; // end of endless while loop
+ 167:main.c        **** }; // end of main()
+ 168:main.c        **** 
+ 169:main.c        **** 
+ 170:main.c        **** // Timer1 Overflow interrupt
+ 171:main.c        **** SIGNAL(SIG_OVERFLOW1)
+ 172:main.c        **** {
+ 2173               	.LM281:
+ 2174               	/* prologue: frame size=0 */
+ 2175 09ea 1F92      		push __zero_reg__
+ 2176 09ec 0F92      		push __tmp_reg__
+ 2177 09ee 0FB6      		in __tmp_reg__,__SREG__
+ 2178 09f0 0F92      		push __tmp_reg__
+ 2179 09f2 1124      		clr __zero_reg__
+ 2180 09f4 8F93      		push r24
+ 2181 09f6 9F93      		push r25
+ 2182               	/* prologue end (size=7) */
+ 173:main.c        **** 	flags.timer1_ovf = true;				// set overflow flag
+ 2184               	.LM282:
+ 2185 09f8 8091 0000 		lds r24,flags
+ 2186 09fc 8062      		ori r24,lo8(32)
+ 2187 09fe 8093 0000 		sts flags,r24
+ 174:main.c        **** 	TCNT1 = c_delay;           			// restart Timer1
+ 2189               	.LM283:
+ 2190 0a02 80EC      		ldi r24,lo8(-14144)
+ 2191 0a04 98EC      		ldi r25,hi8(-14144)
+ 2192 0a06 9DBD      		out (76)+1-0x20,r25
+ 2193 0a08 8CBD      		out 76-0x20,r24
+ 2194               	/* epilogue: frame size=0 */
+ 2195 0a0a 9F91      		pop r25
+ 2196 0a0c 8F91      		pop r24
+ 2197 0a0e 0F90      		pop __tmp_reg__
+ 2198 0a10 0FBE      		out __SREG__,__tmp_reg__
+ 2199 0a12 0F90      		pop __tmp_reg__
+ 2200 0a14 1F90      		pop __zero_reg__
+ 2201 0a16 1895      		reti
+ 2202               	/* epilogue end (size=7) */
+ 2203               	/* function __vector_8 size 23 (9) */
+ 2205               	.Lscope17:
+ 2207               		.comm flags,1,1
+ 2208               		.comm unilink_command,1,1
+ 2209               		.comm unilink_bytecount,2,1
+ 2210               		.comm unilink_rxdata,16,1
+ 2211               		.comm unilink_txdata,16,1
+ 2212               		.comm unilink_discname,8,1
+ 2213               		.comm unilink_lastdisc,1,1
+ 2214               		.comm unilink_lasttrack,1,1
+ 2215               		.comm usart_rx_buffer,51,1
+ 2234               		.text
+ 2236               	Letext:
+ 2237               	/* File "main.c": code 1315 = 0x0523 (1154), prologues  80, epilogues  81 */
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+                            *ABS*:0000003f __SREG__
+                            *ABS*:0000003e __SP_H__
+                            *ABS*:0000003d __SP_L__
+                            *ABS*:00000000 __tmp_reg__
+                            *ABS*:00000001 __zero_reg__
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:79     .bss:00000000 raw
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:85     .bss:0000000d usart_rx_index
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:91     .bss:0000000e unilink_bitid
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:97     .data:00000000 unilink_status
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:102    .data:00000001 unilink_timeinfo
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:116    .bss:0000000f unilink_txsize
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:122    .bss:00000010 unilink_rxsize
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:128    .bss:00000011 unilink_groupid
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:134    .bss:00000012 unilink_ownaddr
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:140    .text:00000000 __vector_11
+                            *COM*:00000033 usart_rx_buffer
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:195    .text:00000044 usart_putc
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:231    .text:00000066 usart_init
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:261    .text:00000076 slavebreak
+                            *COM*:00000001 flags
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:380    .text:000000e6 usart_rx_proc
+                            *COM*:00000001 unilink_command
+                            *COM*:00000008 unilink_discname
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:547    .text:000001d6 reset_spi
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:574    .text:000001e0 __vector_10
+                            *COM*:00000002 unilink_bytecount
+                            *COM*:00000010 unilink_rxdata
+                            *COM*:00000010 unilink_txdata
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:792    .text:00000354 unilink_tx
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:942    .text:00000404 unilink_broadcast
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1090   .text:000004cc unilink_appoint
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1184   .text:00000550 send_command
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1373   .text:00000668 unilink_myid_cmd
+                            *COM*:00000001 unilink_lastdisc
+                            *COM*:00000001 unilink_lasttrack
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1677   .text:000007f0 unilink_parse
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1726   .text:00000816 checksum_check
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1845   .text:0000089c bcd2hex
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1878   .text:000008b4 bin2ascii
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:1913   .text:000008c8 main
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:2171   .text:000009ea __vector_8
+C:\DOKUME~1\MIC\LOKALE~1\Temp/ccGuaaaa.s:2236   .text:00000a18 Letext
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__stack

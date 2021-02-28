@@ -1,0 +1,1274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0060)http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>SophWiki | GNUnilink / SomeLogs </title>
+    <link rel="stylesheet" href="./SophWiki _ GNUnilink _ SomeLogs_files/solfegewiki.css" type="text/css">
+<!--HeaderText--><style type="text/css"><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted grey; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  
+  div.markup { border:2px dotted #ccf; 
+    margin-left:30px; margin-right:30px; 
+    padding-left:10px; padding-right:10px; }
+  div.markup pre { border-bottom:1px solid #ccf; 
+    padding-top:10px; padding-bottom:10px; }
+  .editconflict { color:green; font-style:italic; 
+  margin-top:1.33em; margin-bottom:1.33em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name="robots" content="index,follow">
+
+</head>
+<body>
+    <div id="banner"><a href="http://sophana.free.fr/">
+     <div id="banner-line1">Sophana's Wiki</div>
+     <div id="banner-line2"></div></a>
+    </div>
+    <div id="wikihead">
+        <form action="http://sophana.free.fr/pmwiki2/index.php5/Main/SearchWiki">
+            <input type="hidden" name="pagename" value="Main/SearchWiki">
+            <a href="http://sophana.free.fr/pmwiki2/index.php5/Main/SearchWiki">SearchWiki</a>:
+            <input class="searchbox" type="text" name="text" value="">
+            <input class="searchbutton" type="submit" value="Go">
+        </form>
+    </div>
+    <div id="wikileft">
+    <h1> <a class="wikilink" href="http://sophana.free.fr/pmwiki2/index.php5/Main/HomePage">Welcome</a></h1>
+<h1> <a class="wikilink" href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/GNUnilink">GNUnilink</a></h1>
+<p class="vspace"></p>
+</div>
+    <div id="wikibody">
+         <div id="wikicmds">
+           <a href="http://sophana.free.fr/pmwiki2/index.php5/Main/AllRecentChanges">All Recent Changes</a>
+           <a href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/RecentChanges">Recent Changes</a>
+           <a href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=print" target="_blank">Printable View</a>
+           <a href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=diff">Page History</a>
+           <a href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=edit">Edit Page</a>
+         </div>
+       <div id="wikititle">
+         <div class="pagegroup"><a href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink">GNUnilink</a> /</div>
+         <div class="pagetitle">SomeLogs</div>
+       </div>
+<!--PageText-->
+<div id="wikitext">
+<p class="vspace"></p><h1> opeos's sony cdx c880r</h1>
+<p>Here are some waveforms helping me to understand some implementation bugs
+</p><p class="vspace"></p>
+<p>The first line is the clock and the second one is the data.
+BusOn is not in the waveforms, because i had glitches on it. But I haven't noticed any real toggle of the BusOn signal.
+</p><p class="vspace"></p>
+<p>The little pulses you see are byte transfers because of the snapshot scale.
+</p><p class="vspace"></p>
+<ul><li> the First wave shows a normal transmission: there is a 8ms data high window, then the master talks 3ms after le next data low. We can see that there is a 8 bit clock pulse during the data high phase. I think this corresponds the the extra 0 between packets we see in logs.
+</li></ul><p><img src="./SophWiki _ GNUnilink _ SomeLogs_files/wave_normal.gif" border="0" alt="">
+</p><ul><li> the second one show 2 consecutive slave breaks: there is a data low 8ms windows followed by a 8ms data high window. when the slave want to talk, it sends a datalow pulse during this 8ms data high window.
+</li></ul><p><img src="./SophWiki _ GNUnilink _ SomeLogs_files/Wave_slave_break2.gif" border="0" alt="">
+</p><ul><li> the third one shows a case where I think that <a class="wikilink" href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/GNUnilink">GNUnilink</a> did fail to frame correctly. Some slave is talking during the data high phase directly following a transmission. This was not handled by my code. This will be corrected.
+</li></ul><p><img src="./SophWiki _ GNUnilink _ SomeLogs_files/wave2.gif" border="0" alt="">
+</p><p class="vspace"></p>
+<p>What I've learnt from these waveforms, is that I must rethink about how slave break are implemented. The <a class="wikilink" href="http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/GNUnilink">GNUnilink</a> must measure the duration of the 8ms data low window so it cannot conflict with slave breaks from other slaves.
+</p><p class="vspace"></p>
+<p>There also are some packet transmission during data high phases in the cdx-c880r. This is not the case in other HU I had.
+</p><p class="vspace"></p>
+<p>You can download the unilink waveforms in ascii tabular format: 
+</p><ul><li>BusOn connected on 'vert'
+</li><li>Clock connected on 'rouge'
+</li><li>Data connected on 'bleu'
+</li></ul><p class="vspace"></p><p>other signal are not connected. There may be some noise due to crosstalk.
+</p><p class="vspace"></p>
+<p><a class="urllink" href="http://sophana.free.fr/pmwiki2/uploads/GNUnilink/Unilink.txt.bz2">Attach:Unilink.txt.bz2</a>
+<a class="urllink" href="http://sophana.free.fr/pmwiki2/uploads/GNUnilink/Unilink2.txt.bz2">Attach:Unilink2.txt.bz2</a>
+</p><p class="vspace"></p>
+<h1>electrocut connected a Sony CD-MP3 CDX-F5500</h1>
+<p class="vspace"></p><p>it does'nt work correctly.
+</p><p class="vspace"></p>
+<p>here is a log where both cd player init correctly.
+</p><p class="vspace"></p>
+<h2>with a cd inserted</h2>
+<p>there is no cd in the internal cd player.
+</p><p class="vspace"></p>
+<p>when switching to the gnunilink, cd2 start to bedisplayed and the power goes off.
+</p><p class="vspace"></p>
+<p>the ff ff ff bytes are something very strange.
+</p><p class="vspace"></p>
+<pre> 
+00  // skipping unknown bytes
+18 10 01 00 29 00                               // ......          : MASTER    to B-CAST    : Re-initialize bus
+55 00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+10 30 8C 00 CC 04 1C 2B 1E 35 00                // .0.......5.     : CD_0      to MASTER    : Anyone response from slave
+3B 10 02 12 5F 00                               // ......          : MASTER    to CD_11     : ID configuration from Master
+10 3B 8C 00 D7 04 1C 2B 1E 40 00                // ...........     : CD_11     to MASTER    : Anyone response from slave
+3B 10 01 05 51 00                               // ....Q.          : MASTER    to CD_11     : ??UNKNOWN?? cmd1=0x01 cmd2=0x05
+10 3B 8D 0C E4 8C 80 00 00 F0 00                // ...........     : CD_11     to MASTER    : ??UNKNOWN?? cmd1=0x8D cmd2=0x0C
+18 10 01 04 2D 00                               // ......          : MASTER    to B-CAST    : Appoint end
+00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+10 30 8C D0 9C 04 A8 2D A3 18 00                // .0.........     : CD_0      to MASTER    : Anyone response from slave
+31 10 02 14 57 00                               // 1...W.          : MASTER    to CD_1      : ID configuration from Master
+10 31 8C A0 6D 24 A8 3C A0 15 00                // .1..m......     : CD_1      to MASTER    : Anyone response from slave
+18 10 01 04 2D 00                               // ......          : MASTER    to B-CAST    : Appoint end
+00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+00  // skipping unknown bytes
+18 10 01 03 2C 00                               // ......          : MASTER    to B-CAST    : Anyone special?
+00  // skipping unknown bytes
+18 91 8C 00 35 00 0F C8 0C 18 00                // ....5......     : DSP_1     to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+18 21 8C 00 C5 01 0D 00 00 D3 00                // ...........     : KEYCTL    to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+18 71 8C 00 15 80 01 08 01 9F 00                // .q.........     : DISP_1    to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+18 71 8D 8E A4 8E 10 00 00 42 00                // .q.......B.     : DISP_1    to B-CAST    : ??UNKNOWN?? cmd1=0x8D cmd2=0x8E
+00  // skipping unknown bytes
+18 C1 8C 00 65 00 0C 00 00 71 00                // ....e....q.     : CLOCK1    to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+18 51 8C 06 FB 84 C3 88 02 CC 00                // .Q.........     : TUNER1    to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+18 51 8D 10 06 00 00 00 00 06 00                // .Q.........     : TUNER1    to B-CAST    : ??UNKNOWN?? cmd1=0x8D cmd2=0x10
+00  // skipping unknown bytes
+18 10 8C 00 B4 01 00 00 01 B6 00                // ...........     : MASTER    to B-CAST    : Anyone response from slave
+00  // skipping unknown bytes
+20 10 88 C0 78 00 80 00 00 F8 00                // ....x......     : MASTER    to Unknown(20) : Device config
+00  // skipping unknown bytes
+30 10 88 11 D9 7B 11 00 10 75 00                // 0........u.     : MASTER    to CD_0      : Device config
+00  // skipping unknown bytes
+50 10 88 FF E7 FF 26 00 00 0C 00                // P..........     : MASTER    to TUNER0    : Device config
+00  // skipping unknown bytes
+60 10 88 00 F8 00 00 00 00 F8 00                // ...........     : MASTER    to TAPE_0    : Device config
+00  // skipping unknown bytes
+70 10 88 11 19 04 92 00 10 BF 00                // p..........     : MASTER    to DISP_0    : Device config
+00  // skipping unknown bytes
+70 10 89 01 0A 11 00 01 00 1C 00                // p..........     : MASTER    to DISP_0    : ??UNKNOWN?? cmd1=0x89 cmd2=0x01
+00  // skipping unknown bytes
+91 10 88 00 29 2A 0F C8 01 2B 00                // ...........     : MASTER    to DSP_1     : Device config
+00  // skipping unknown bytes
+92 10 88 00 2A 00 00 00 00 2A 00                // ...........     : MASTER    to DSP_2     : Device config
+00  // skipping unknown bytes
+93 10 88 00 2B 00 00 00 00 2B 00                // ...........     : MASTER    to DSP_3     : Device config
+00  // skipping unknown bytes
+94 10 88 00 2C 00 00 00 00 2C 00                // ...........     : MASTER    to DSP_4     : Device config
+00  // skipping unknown bytes
+95 10 88 00 2D 00 00 00 00 2D 00                // ...........     : MASTER    to DSP_5     : Device config
+00  // skipping unknown bytes
+91 10 89 00 2A 00 00 00 00 2A 00                // ...........     : MASTER    to DSP_1     : ??UNKNOWN?? cmd1=0x89 cmd2=0x00
+00  // skipping unknown bytes
+92 10 89 00 2B 00 00 00 00 2B 00                // ...........     : MASTER    to DSP_2     : ??UNKNOWN?? cmd1=0x89 cmd2=0x00
+00  // skipping unknown bytes
+93 10 89 00 2C 00 00 00 00 2C 00                // ...........     : MASTER    to DSP_3     : ??UNKNOWN?? cmd1=0x89 cmd2=0x00
+00  // skipping unknown bytes
+94 10 89 00 2D 00 00 00 00 2D 00                // ...........     : MASTER    to DSP_4     : ??UNKNOWN?? cmd1=0x89 cmd2=0x00
+00  // skipping unknown bytes
+95 10 89 00 2E 00 00 00 00 2E 00                // ...........     : MASTER    to DSP_5     : ??UNKNOWN?? cmd1=0x89 cmd2=0x00
+00  // skipping unknown bytes
+C0 10 88 02 5A 20 00 00 00 7A 00                // ....Z....z.     : MASTER    to CLOCK0    : Device config
+00  // skipping unknown bytes
+D0 10 88 00 68 30 00 00 00 98 00                // ....h0.....     : MASTER    to MD_0      : Device config
+00  // skipping unknown bytes
+E0 10 88 10 88 00 00 00 00 88 00                // ...........     : MASTER    to Unknown(E0) : Device config
+00  // skipping unknown bytes
+18 10 FA 8E B0 8E 00 00 00 00 00 00 00 00 3E 00 // ................: MASTER    to B-CAST    : ??UNKNOWN?? cmd1=0xFA cmd2=0x8E
+00  // skipping unknown bytes
+30 10 F9 12 4B 00 00 00 12 00 00 00 00 22 7F 00 // 0...K...........: MASTER    to CD_0      : ??UNKNOWN?? cmd1=0xF9 cmd2=0x12
+00  // skipping unknown bytes
+18 10 01 01 2A 00                               // ......          : MASTER    to B-CAST    : ??UNKNOWN?? cmd1=0x01 cmd2=0x01
+00  // skipping unknown bytes
+18 10 87 AB 5A 00 00 00 00 5A 00                // ....Z....Z.     : MASTER    to B-CAST    : Power on request? (From keypad)
+00  // skipping unknown bytes
+18 10 87 EB 9A 00 00 00 00 9A 00                // ...........     : MASTER    to B-CAST    : Switched power on (no sleep)
+00  // skipping unknown bytes
+18 10 F0 31 49 51 FF FF FF 00 00 00 00 40 D7 00 // ...1IQ..........: MASTER    to B-CAST    : Switch source from 0x51 to 0x31
+41 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 31 14 20 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00  // skipping unknown bytes
+18 10 01 02 2B 00                               // ......          : MASTER    to B-CAST    : Anyone?
+00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+
+</pre><h3>another log</h3>
+<pre> 
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+18 11 87 AB 5B 00 00 00 00 5B 00                // ...........     : KEYPAD    to B-CAST    : Power on request? (From keypad)
+00  // skipping unknown bytes
+18 10 87 EB 9A 00 00 00 00 9A 00                // ...........     : MASTER    to B-CAST    : Switched power on (no sleep)
+00  // skipping unknown bytes
+18 10 F0 51 69 FF FF FF FF 00 00 00 00 40 A5 00 // ...Qi...........: MASTER    to B-CAST    : Switch source from 0xFF to 0x51
+42 00  // skipping unknown bytes
+18 10 80 18 C0 0A 00 00 00 CA 00                // ...........     : MASTER    to B-CAST    : D1 = ??
+00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+77 10 91 00 18 00 00 00 00 18 00                // w..........     : MASTER    to DISP_7    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+51 10 23 15 99 00                               // Q.....          : MASTER    to TUNER1    : ??UNKNOWN?? cmd1=0x23 cmd2=0x15
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+70 C1 91 F1 B3 45 20 11 C0 E9 00                // p....E.....     : CLOCK1    to DISP_0    : Time is 01:0x45:0x20
+00  // skipping unknown bytes
+10 51 93 03 F7 01 01 00 15 0E 00                // .Q.........     : TUNER1    to MASTER    : ??UNKNOWN?? cmd1=0x93 cmd2=0x03
+00  // skipping unknown bytes
+70 51 C0 00 81 00 00 00 04 11 F8 75 00 F0 F3 00 // pQ.........u....: TUNER1    to DISP_0    : Seeking ... D2_5=0xF0
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 00 53 00 00 00 00 53 00                // pQ..S....S.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x00
+00  // skipping unknown bytes
+70 91 90 10 A1 2A 0D 23 02 FD 00                // p..........     : DSP_1     to DISP_0    : Volume
+00  // skipping unknown bytes
+70 91 94 00 95 00 00 00 00 95 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x94 cmd2=0x00
+00  // skipping unknown bytes
+70 91 9A 06 A1 00 00 04 02 A7 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x06
+00  // skipping unknown bytes
+70 91 9A 0B A6 0A 04 04 12 CA 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x0B
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 00 81 00 00 00 04 11 F8 75 00 F0 F3 00 // pQ.........u....: TUNER1    to DISP_0    : Seeking ... D2_5=0xF0
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 00 53 00 00 00 00 53 00                // pQ..S....S.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+70 51 91 00 52 00 00 00 04 56 00                // pQ..R....V.     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+70 51 C0 00 81 00 00 00 04 11 F8 75 00 F2 F5 00 // pQ.........u....: TUNER1    to DISP_0    : Seeking ... D2_5=0xF2
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 2C 0C 23 00 03 00                // w..........     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 2E 0B 23 00 04 00                // w..........     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 30 0A 23 00 05 00                // w....0.....     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 32 09 23 00 06 00                // w....2.....     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 34 08 23 00 07 00                // w....4.....     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 36 07 23 00 08 00                // w....6.....     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 38 06 23 00 09 00                // w....8.....     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+90 11 22 10 D3 00                               // ......          : KEYPAD    to DSP_0     : Lower Bass/Treble/Fader
+00  // skipping unknown bytes
+77 91 90 10 A8 3C 05 23 00 0C 00                // w..........     : DSP_1     to DISP_7    : Volume
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+51 11 24 00 86 00                               // Q.....          : KEYPAD    to TUNER1    : Fast forward
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+77 51 C0 21 A9 00 00 00 04 11 F8 75 51 F0 6C 00 // wQ.........uQ.l.: TUNER1    to DISP_7    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x21
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 21 74 00 00 00 00 74 00                // pQ..t....t.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x21
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 F0 17 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 91 01 53 00 30 00 04 87 00                // pQ..S.0....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+70 51 91 01 53 00 70 00 04 C7 00                // pQ..S.p....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FC 0F 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0C, Disc name = ..RFM...
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FD 94 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 C1 91 F1 B3 46 00 01 C0 BA 00                // p....F.....     : CLOCK1    to DISP_0    : Time is 01:0x46:0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FE 95 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FE 11 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0E, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 C0 0B 00                               // ......          : CD_11     to MASTER    : Pong-Ejecting
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 11 F0 31 4A 51 FF FF FF 00 00 00 00 40 D8 00 // ...1JQ..........: KEYPAD    to B-CAST    : Switch source from 0x51 to 0x31
+41 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 31 14 20 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14 01 00 FF 00 18 14  // skipping unknown bytes
+01 00 FF FF FF FF FF 00 FF FF FF FF FF 00 FF FF // command not ending with 0, drop all frame
+
+</pre><p class="vspace"></p><h2> with an audio cd inserted</h2>
+<pre> 
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 11 87 AB 5B 00 00 00 00 5B 00                // ...........     : KEYPAD    to B-CAST    : Power on request? (From keypad)
+00  // skipping unknown bytes
+18 10 87 EB 9A 00 00 00 00 9A 00                // ...........     : MASTER    to B-CAST    : Switched power on (no sleep)
+00  // skipping unknown bytes
+18 10 F0 51 69 FF FF FF FF 00 00 00 00 40 A5 00 // ...Qi...........: MASTER    to B-CAST    : Switch source from 0xFF to 0x51
+42 00  // skipping unknown bytes
+18 10 80 18 C0 0A 00 00 00 CA 00                // ...........     : MASTER    to B-CAST    : D1 = ??
+00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+77 10 91 00 18 00 00 00 00 18 00                // w..........     : MASTER    to DISP_7    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+51 10 23 15 99 00                               // Q.....          : MASTER    to TUNER1    : ??UNKNOWN?? cmd1=0x23 cmd2=0x15
+00  // skipping unknown bytes
+70 C1 91 F1 B3 50 06 11 C0 DA 00                // p....P.....     : CLOCK1    to DISP_0    : Time is 01:0x50:0x06
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+10 51 93 03 F7 01 01 00 15 0E 00                // .Q.........     : TUNER1    to MASTER    : ??UNKNOWN?? cmd1=0x93 cmd2=0x03
+00  // skipping unknown bytes
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+70 91 90 10 A1 3C 05 23 02 07 00                // p..........     : DSP_1     to DISP_0    : Volume
+00  // skipping unknown bytes
+70 91 94 00 95 00 00 00 00 95 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x94 cmd2=0x00
+00  // skipping unknown bytes
+70 91 9A 06 A1 00 00 04 02 A7 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x06
+00  // skipping unknown bytes
+70 91 9A 0B A6 0A 04 04 12 CA 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x0B
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+70 51 91 01 53 00 30 00 04 87 00                // pQ..S.0....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+70 51 91 01 53 00 70 00 04 C7 00                // pQ..S.p....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FD 94 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FE 95 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FE 11 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0E, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 11 F0 3B 54 51 FF FF FF 00 00 00 00 40 E2 00 // ....TQ..........: KEYPAD    to B-CAST    : Switch source from 0x51 to 0x3B
+42 00  // skipping unknown bytes
+18 10 80 08 B0 0A 00 00 00 BA 00                // ...........     : MASTER    to B-CAST    : Display shows menu
+00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+3B 10 20 00 6B 00                               // ....k.          : MASTER    to CD_11     : Play
+00  // skipping unknown bytes
+77 10 91 00 18 00 00 00 00 18 00                // w..........     : MASTER    to DISP_7    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+70 91 90 10 A1 3C 05 23 02 07 00                // p..........     : DSP_1     to DISP_0    : Volume
+00  // skipping unknown bytes
+70 51 C0 03 84 00 70 00 04 11 F8 98 00 FE 97 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x03
+00  // skipping unknown bytes
+70 91 94 00 95 00 00 00 00 95 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x94 cmd2=0x00
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FE 11 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0E, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 91 9A 06 A1 00 02 04 02 A9 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x06
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 91 9A 0B A6 0A 04 04 12 CA 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x0B
+00  // skipping unknown bytes
+70 51 92 03 56 00 00 00 00 56 00                // pQ..V....V.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x03
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+77 3B 99 30 7B 00 00 00 00 7B 00                // w..0.......     : CD_11     to DISP_7    : Clock was auto adjusted to 30:0x00
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+10 3B D5 A0 C0 08 42 88 F1 00 00 00 00 F9 7C 00 // ......B.........: CD_11     to MASTER    : D5 Disc Identifier in CMD2-D4 D2_5=0xF9
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 21 8C 00 00 00 00 00 F1 FF FF F9 74 00 // p.............t.: CD_11     to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x21
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 21 6C 00                               // ....l.          : CD_11     to MASTER    : Pong-Seeking
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 21 8C 00 00 00 00 00 F1 FF FF F8 73 00 // p.............s.: CD_11     to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x21
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 01 F8 45 00 // p...k.........E.: CD_11     to DISP_0    : Seeking ... D2_5=0xF8
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 02 F8 16 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x02
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 03 FB 4A 00 // p...k.........J.: CD_11     to DISP_0    : Seeking ... D2_5=0xFB
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 04 FB 1B 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x04
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 05 FA 4B 00 // p...k.........K.: CD_11     to DISP_0    : Seeking ... D2_5=0xFA
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 05 FA 1B 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x05
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 06 FA 1C 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x06
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 07 FA 1D 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x07
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 08 FA 1E 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x08
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 09 FA 1F 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x09
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 10 FA 26 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x10
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 11 FA 27 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x11
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 12 FA 28 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x12
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 13 FA 29 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x13
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 14 FA 2A 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x14
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 15 FA 2B 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x15
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 16 FA 2C 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x16
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 17 FA 2D 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x17
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 18 FA 2E 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x18
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 19 FA 2F 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x19
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 20 FA 36 00                // p........6.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x20
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 21 FA 37 00                // p........7.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x21
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 22 FA 38 00                // p........8.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x22
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 23 FA 39 00                // p........9.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x23
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 24 FA 3A 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x24
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 25 FA 3B 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x25
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 26 FA 3C 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x26
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 27 FA 3D 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x27
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 28 FA 3E 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x28
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 29 FA 3F 00                // p..........     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x29
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 30 FA 46 00                // p......0.F.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x30
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 31 FA 47 00                // p......1.G.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x31
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 32 FA 48 00                // p......2.H.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x32
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 33 FA 49 00                // p......3.I.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x33
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 34 FA 4A 00                // p......4.J.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x34
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 35 FA 4B 00                // p......5.K.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x35
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 36 FA 4C 00                // p......6.L.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x36
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 37 FA 4D 00                // p......7.M.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x37
+C0 51 99 04 AE 0A 0A 00 17 D9 00                // .Q.........     : TUNER1    to CLOCK0    : Clock was auto adjusted to 04:0x0A
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 38 FA 4E 00                // p......8.N.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x38
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 39 FA 4F 00                // p......9.O.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x39
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 40 FA 56 00                // p........V.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x40
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 41 FA 57 00                // p......A.W.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x41
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 C1 91 F1 B3 51 00 01 C0 C5 00                // p....Q.....     : CLOCK1    to DISP_0    : Time is 01:0x51:0x00
+00  // skipping unknown bytes
+18 11 F0 51 6A FF FF FF FF 00 00 00 00 40 A6 00 // ...Qj...........: KEYPAD    to B-CAST    : Switch source from 0xFF to 0x51
+42 00  // skipping unknown bytes
+18 10 80 18 C0 0A 00 00 00 CA 00                // ...........     : MASTER    to B-CAST    : D1 = ??
+00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+77 10 91 00 18 00 00 00 00 18 00                // w..........     : MASTER    to DISP_7    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+51 10 23 15 99 00                               // Q.....          : MASTER    to TUNER1    : ??UNKNOWN?? cmd1=0x23 cmd2=0x15
+00  // skipping unknown bytes
+10 51 93 03 F7 01 01 00 15 0E 00                // .Q.........     : TUNER1    to MASTER    : ??UNKNOWN?? cmd1=0x93 cmd2=0x03
+00  // skipping unknown bytes
+10 51 93 03 F7 01 01 00 15 0E 00                // .Q.........     : TUNER1    to MASTER    : ??UNKNOWN?? cmd1=0x93 cmd2=0x03
+00  // skipping unknown bytes
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+70 91 90 10 A1 3C 05 23 02 07 00                // p..........     : DSP_1     to DISP_0    : Volume
+00  // skipping unknown bytes
+70 91 94 00 95 00 00 00 00 95 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x94 cmd2=0x00
+00  // skipping unknown bytes
+70 91 9A 06 A1 00 00 04 02 A7 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x06
+00  // skipping unknown bytes
+70 91 9A 0B A6 0A 04 04 12 CA 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x0B
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+70 51 C0 01 82 00 00 00 04 11 F8 98 00 FD 24 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 02 84 00 // pQ..............: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 92 01 54 00 00 00 00 54 00                // pQ..T....T.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x01
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+70 51 91 01 53 00 30 00 04 87 00                // pQ..S.0....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 51 91 01 53 00 70 00 04 C7 00                // pQ..S.p....     : TUNER1    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FD 94 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FD 10 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0D, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+70 51 C0 01 82 00 70 00 04 11 F8 98 00 FE 95 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x01
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FE 11 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0E, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 11 F0 3B 54 51 FF FF FF 00 00 00 00 40 E2 00 // ....TQ..........: KEYPAD    to B-CAST    : Switch source from 0x51 to 0x3B
+42 00  // skipping unknown bytes
+18 10 80 08 B0 0A 00 00 00 BA 00                // ...........     : MASTER    to B-CAST    : Display shows menu
+00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+3B 10 20 00 6B 00                               // ....k.          : MASTER    to CD_11     : Play
+00  // skipping unknown bytes
+77 10 91 00 18 00 00 00 00 18 00                // w..........     : MASTER    to DISP_7    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+70 91 90 10 A1 3C 05 23 02 07 00                // p..........     : DSP_1     to DISP_0    : Volume
+00  // skipping unknown bytes
+70 51 C0 03 84 00 70 00 04 11 F8 98 00 FE 97 00 // pQ....p.........: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x03
+00  // skipping unknown bytes
+70 91 94 00 95 00 00 00 00 95 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x94 cmd2=0x00
+00  // skipping unknown bytes
+70 51 CD 20 AE 20 52 46 4D 20 20 20 00 FE 11 00 // pQ....RFM.......: TUNER1    to DISP_0    : CD/Field=0x0F ctl0x0E, Disc name = ..RFM...
+00  // skipping unknown bytes
+70 91 9A 06 A1 00 02 04 02 A9 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x06
+00  // skipping unknown bytes
+70 51 C1 00 82 00 00 00 00 00 00 00 00 32 B4 00 // pQ...........2..: TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0xC1 cmd2=0x00
+00  // skipping unknown bytes
+70 91 9A 0B A6 0A 04 04 12 CA 00                // p..........     : DSP_1     to DISP_0    : ??UNKNOWN?? cmd1=0x9A cmd2=0x0B
+00  // skipping unknown bytes
+70 51 92 03 56 00 00 00 00 56 00                // pQ..V....V.     : TUNER1    to DISP_0    : ??UNKNOWN?? cmd1=0x92 cmd2=0x03
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+77 3B 99 30 7B 00 00 00 00 7B 00                // w..0.......     : CD_11     to DISP_7    : Clock was auto adjusted to 30:0x00
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+10 3B D5 A0 C0 08 42 88 F1 00 00 00 00 F9 7C 00 // ......B.........: CD_11     to MASTER    : D5 Disc Identifier in CMD2-D4 D2_5=0xF9
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 21 8C 00 00 00 00 00 F1 FF FF F9 74 00 // p.............t.: CD_11     to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x21
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 21 6C 00                               // ....l.          : CD_11     to MASTER    : Pong-Seeking
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 21 8C 00 00 00 00 00 F1 FF FF F8 73 00 // p.............s.: CD_11     to DISP_0    : ??UNKNOWN?? cmd1=0xC0 cmd2=0x21
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 41 F8 85 00 // p...k.......A...: CD_11     to DISP_0    : Seeking ... D2_5=0xF8
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 42 F8 56 00                // p......B.V.     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x42
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 43 FB 8A 00 // p...k.......C...: CD_11     to DISP_0    : Seeking ... D2_5=0xFB
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 44 FB 5B 00                // p......D...     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x44
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B C0 00 6B 00 00 00 00 00 F1 F0 45 FA 8B 00 // p...k.......E...: CD_11     to DISP_0    : Seeking ... D2_5=0xFA
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 45 FA 5B 00                // p......E...     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x45
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 46 FA 5C 00                // p......F...     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x46
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 47 FA 5D 00                // p......G...     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x47
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 00 4B 00                               // ....K.          : CD_11     to MASTER    : Pong-Playing
+18 10 01 15 3E 00                               // ......          : MASTER    to B-CAST    : Who wants to talk?
+10 18 82 02 AC 00 00 00 00 AC 00                // ...........     : B-CAST    to MASTER    : Request to talk
+3B 10 01 13 5F 00                               // ......          : MASTER    to CD_11     : Permission to talk-Device 0x3B
+70 3B 90 00 3B F1 F0 48 FA 5E 00                // p......H...     : CD_11     to DISP_0    : Current play position CD Track=01 Playtime=00:0x48
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 87 6B 1A 00 00 00 00 1A 00                // ...k.......     : MASTER    to B-CAST    : Switched power on (no sleep)
+42 00  // skipping unknown bytes
+18 10 81 00 A9 00 00 00 00 A9 00                // ...........     : MASTER    to B-CAST    : Enter/Leave Setup menu;
+00  // skipping unknown bytes
+70 10 91 00 11 00 00 00 00 11 00                // p..........     : MASTER    to DISP_0    : Time is ??? settings changed?
+00  // skipping unknown bytes
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+70 C1 91 F1 B3 51 17 01 C0 DC 00                // p....Q.....     : CLOCK1    to DISP_0    : Time is 01:0x51:0x17
+00  // skipping unknown bytes
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+00  // skipping unknown bytes
+18 10 87 2A D9 00 00 00 00 D9 00                // ...........     : MASTER    to B-CAST    : Bus on
+42 00  // skipping unknown bytes
+70 C1 91 F1 B3 51 22 11 C0 F7 00                // p....Q.....     : CLOCK1    to DISP_0    : Time is 01:0x51:0x22
+00  // skipping unknown bytes
+3B 10 01 12 5E 00                               // ......          : MASTER    to CD_11     : Ping
+10 3B 00 80 CB 00                               // ......          : CD_11     to MASTER    : Pong-Idle
+18 10 08 00 30 00                               // ....0.          : MASTER    to B-CAST    : Key off, after FFWD and FRWD
+00  // skipping unknown bytes
+31 10 01 12 54 00                               // 1...T.          : MASTER    to CD_1      : Ping
+10 31 00 80 C1 00                               // .1....          : CD_1      to MASTER    : Pong-Idle
+18 10 01 11 3A 00                               // ......          : MASTER    to B-CAST    : Ping end
+
+</pre><p class="vspace"></p>
+</div>
+<!--PageRightFmt-
+  <div id='wikifoot'>
+    <div class='footnav'>
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=edit'>Edit Page</a> -
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=diff'>Page History</a> -
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/SomeLogs?action=print' target='_blank'>Printable View</a> -
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/GNUnilink/RecentChanges'>Recent Changes</a> -
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/PmWiki/WikiHelp'>WikiHelp</a> -
+      <a href='http://sophana.free.fr/pmwiki2/index.php5/Main/SearchWiki'>SearchWiki</a>
+    </div>
+    </div>
+->
+<!--PageFooterFmt-->
+  <div class="lastmod">Page last modified on October 17, 2005, at 10:23 AM</div>
+</div>
+       
+
+
+</body></html>

@@ -1,0 +1,1941 @@
+   1               		.file	"main.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  17               	.Ltext0:
+  18               	.global	raw
+  19               	.global	raw
+  20               		.section .bss
+  23               	raw:
+  24 0000 0000 0000 		.skip 13,0
+  24      0000 0000 
+  24      0000 0000 
+  24      00
+  25               	.global	usart_rx_index
+  26               	.global	usart_rx_index
+  29               	usart_rx_index:
+  30 000d 00        		.skip 1,0
+  31               	.global	unilink_lastdisc
+  32               	.global	unilink_lastdisc
+  35               	unilink_lastdisc:
+  36 000e 00        		.skip 1,0
+  37               	.global	tracknbr
+  38               		.data
+  41               	tracknbr:
+  42 0000 01        		.byte	1
+  43               	.global	unilink_bitid
+  44               	.global	unilink_bitid
+  45               		.section .bss
+  48               	unilink_bitid:
+  49 000f 00        		.skip 1,0
+  50               	.global	unilink_status
+  51               		.data
+  54               	unilink_status:
+  55 0001 80        		.byte	-128
+  56               	.global	unilink_timeinfo
+  59               	unilink_timeinfo:
+  60 0002 70        		.byte	112
+  61 0003 00        		.byte	0
+  62 0004 90        		.byte	-112
+  63 0005 50        		.byte	80
+  64 0006 01        		.byte	1
+  65 0007 00        		.byte	0
+  66 0008 00        		.byte	0
+  67 0009 1E        		.byte	30
+  68               	.global	unilink_txsize
+  69               	.global	unilink_txsize
+  70               		.section .bss
+  73               	unilink_txsize:
+  74 0010 00        		.skip 1,0
+  75               	.global	unilink_rxsize
+  76               	.global	unilink_rxsize
+  79               	unilink_rxsize:
+  80 0011 00        		.skip 1,0
+  81               	.global	unilink_groupid
+  82               	.global	unilink_groupid
+  85               	unilink_groupid:
+  86 0012 00        		.skip 1,0
+  87               	.global	unilink_ownaddr
+  88               	.global	unilink_ownaddr
+  91               	unilink_ownaddr:
+  92 0013 00        		.skip 1,0
+  93               		.text
+  94               	.global	__vector_11
+  96               	__vector_11:
+  97               	.LFB3:
+  98               	.LM1:
+  99               	/* prologue: frame size=0 */
+ 100 0000 1F92      		push __zero_reg__
+ 101 0002 0F92      		push __tmp_reg__
+ 102 0004 0FB6      		in __tmp_reg__,__SREG__
+ 103 0006 0F92      		push __tmp_reg__
+ 104 0008 1124      		clr __zero_reg__
+ 105 000a 8F93      		push r24
+ 106 000c 9F93      		push r25
+ 107 000e EF93      		push r30
+ 108 0010 FF93      		push r31
+ 109               	/* prologue end (size=9) */
+ 110               	.LM2:
+ 111 0012 9091 0000 		lds r25,usart_rx_index
+ 112 0016 E92F      		mov r30,r25
+ 113 0018 FF27      		clr r31
+ 114 001a E050      		subi r30,lo8(-(usart_rx_buffer))
+ 115 001c F040      		sbci r31,hi8(-(usart_rx_buffer))
+ 116 001e 8CB1      		in r24,44-0x20
+ 117 0020 8083      		st Z,r24
+ 118               	.LM3:
+ 119 0022 892F      		mov r24,r25
+ 120 0024 8F5F      		subi r24,lo8(-(1))
+ 121 0026 8093 0000 		sts usart_rx_index,r24
+ 122 002a 8333      		cpi r24,lo8(51)
+ 123 002c 10F0      		brlo .L1
+ 124               	.LM4:
+ 125 002e 1092 0000 		sts usart_rx_index,__zero_reg__
+ 126               	.L1:
+ 127               	/* epilogue: frame size=0 */
+ 128 0032 FF91      		pop r31
+ 129 0034 EF91      		pop r30
+ 130 0036 9F91      		pop r25
+ 131 0038 8F91      		pop r24
+ 132 003a 0F90      		pop __tmp_reg__
+ 133 003c 0FBE      		out __SREG__,__tmp_reg__
+ 134 003e 0F90      		pop __tmp_reg__
+ 135 0040 1F90      		pop __zero_reg__
+ 136 0042 1895      		reti
+ 137               	/* epilogue end (size=9) */
+ 138               	/* function __vector_11 size 34 (16) */
+ 139               	.LFE3:
+ 141               	.global	usart_putc
+ 143               	usart_putc:
+ 144               	.LFB4:
+ 145               	.LM5:
+ 146               	/* prologue: frame size=0 */
+ 147               	/* prologue end (size=0) */
+ 148               	.L4:
+ 149               	.LM6:
+ 150 0044 5D9B      		sbis 43-0x20,5
+ 151 0046 FECF      		rjmp .L4
+ 152               	.LM7:
+ 153 0048 8CB9      		out 44-0x20,r24
+ 154               	/* epilogue: frame size=0 */
+ 155 004a 0895      		ret
+ 156               	/* epilogue end (size=1) */
+ 157               	/* function usart_putc size 4 (3) */
+ 158               	.LFE4:
+ 160               	.global	usart_init
+ 162               	usart_init:
+ 163               	.LFB5:
+ 164               	.LM8:
+ 165               	/* prologue: frame size=0 */
+ 166               	/* prologue end (size=0) */
+ 167               	.LM9:
+ 168 004c 10BC      		out 64-0x20,__zero_reg__
+ 169               	.LM10:
+ 170 004e 83E0      		ldi r24,lo8(3)
+ 171 0050 89B9      		out 41-0x20,r24
+ 172               	.LM11:
+ 173 0052 88E9      		ldi r24,lo8(-104)
+ 174 0054 8AB9      		out 42-0x20,r24
+ 175               	.LM12:
+ 176 0056 86E8      		ldi r24,lo8(-122)
+ 177 0058 80BD      		out 64-0x20,r24
+ 178               	/* epilogue: frame size=0 */
+ 179 005a 0895      		ret
+ 180               	/* epilogue end (size=1) */
+ 181               	/* function usart_init size 8 (7) */
+ 182               	.LFE5:
+ 184               	.global	slavebreak
+ 186               	slavebreak:
+ 187               	.LFB16:
+ 188               	.LM13:
+ 189               	/* prologue: frame size=0 */
+ 190               	/* prologue end (size=0) */
+ 191               	.LM14:
+ 192 005c 8FEF      		ldi r24,lo8(-1)
+ 193 005e 8FB9      		out 47-0x20,r24
+ 194               	.LM15:
+ 195 0060 1DB8      		out 45-0x20,__zero_reg__
+ 196               	.LM16:
+ 197 0062 97E3      		ldi r25,lo8(55)
+ 198 0064 92BF      		out 82-0x20,r25
+ 199               	.LM17:
+ 200 0066 84E0      		ldi r24,lo8(4)
+ 201 0068 83BF      		out 83-0x20,r24
+ 202               	.LM18:
+ 203 006a 88B7      		in r24,88-0x20
+ 204 006c 8160      		ori r24,lo8(1)
+ 205 006e 88BF      		out 88-0x20,r24
+ 206               	.LM19:
+ 207 0070 08B6      		in __tmp_reg__,88-0x20
+ 208 0072 00FC      		sbrc __tmp_reg__,0
+ 209 0074 06C0      		rjmp .L21
+ 210 0076 892F      		mov r24,r25
+ 211               	.L12:
+ 212               	.LM20:
+ 213 0078 B39B      		sbis 54-0x20,3
+ 214 007a 82BF      		out 82-0x20,r24
+ 215               	.L9:
+ 216 007c 08B6      		in __tmp_reg__,88-0x20
+ 217 007e 00FE      		sbrs __tmp_reg__,0
+ 218 0080 FBCF      		rjmp .L12
+ 219               	.L21:
+ 220               	.LM21:
+ 221 0082 88B7      		in r24,88-0x20
+ 222 0084 8160      		ori r24,lo8(1)
+ 223 0086 88BF      		out 88-0x20,r24
+ 224               	.LM22:
+ 225 0088 87EC      		ldi r24,lo8(-57)
+ 226 008a 82BF      		out 82-0x20,r24
+ 227               	.LM23:
+ 228 008c 08B6      		in __tmp_reg__,88-0x20
+ 229 008e 00FC      		sbrc __tmp_reg__,0
+ 230 0090 05C0      		rjmp .L23
+ 231               	.L16:
+ 232 0092 B399      		sbic 54-0x20,3
+ 233 0094 82BF      		out 82-0x20,r24
+ 234               	.L13:
+ 235 0096 08B6      		in __tmp_reg__,88-0x20
+ 236 0098 00FE      		sbrs __tmp_reg__,0
+ 237 009a FBCF      		rjmp .L16
+ 238               	.L23:
+ 239               	.LM24:
+ 240 009c 88B7      		in r24,88-0x20
+ 241 009e 8160      		ori r24,lo8(1)
+ 242 00a0 88BF      		out 88-0x20,r24
+ 243               	.LM25:
+ 244 00a2 8AEA      		ldi r24,lo8(-86)
+ 245 00a4 82BF      		out 82-0x20,r24
+ 246               	.LM26:
+ 247 00a6 BC9A      		sbi 55-0x20,4
+ 248               	.LM27:
+ 249 00a8 C49A      		sbi 56-0x20,4
+ 250               	.L17:
+ 251               	.LM28:
+ 252 00aa 08B6      		in __tmp_reg__,88-0x20
+ 253 00ac 00FE      		sbrs __tmp_reg__,0
+ 254 00ae FDCF      		rjmp .L17
+ 255               	.LM29:
+ 256 00b0 BC98      		cbi 55-0x20,4
+ 257               	.LM30:
+ 258 00b2 C498      		cbi 56-0x20,4
+ 259               	.LM31:
+ 260 00b4 12BE      		out 82-0x20,__zero_reg__
+ 261               	.LM32:
+ 262 00b6 1FB8      		out 47-0x20,__zero_reg__
+ 263 00b8 8FB1      		in r24,47-0x20
+ 264               	.LM33:
+ 265 00ba 84EC      		ldi r24,lo8(-60)
+ 266 00bc 8DB9      		out 45-0x20,r24
+ 267 00be 8DB1      		in r24,45-0x20
+ 268               	.LM34:
+ 269 00c0 8091 0000 		lds r24,flags
+ 270 00c4 8061      		ori r24,lo8(16)
+ 271 00c6 8093 0000 		sts flags,r24
+ 272               	/* epilogue: frame size=0 */
+ 273 00ca 0895      		ret
+ 274               	/* epilogue end (size=1) */
+ 275               	/* function slavebreak size 58 (57) */
+ 276               	.LFE16:
+ 278               	.global	usart_rx_proc
+ 280               	usart_rx_proc:
+ 281               	.LFB6:
+ 282               	.LM35:
+ 283               	/* prologue: frame size=0 */
+ 284               	/* prologue end (size=0) */
+ 285               	.LM36:
+ 286 00cc 88E8      		ldi r24,lo8(-120)
+ 287 00ce 8AB9      		out 42-0x20,r24
+ 288               	.LM37:
+ 289 00d0 20E0      		ldi r18,lo8(0)
+ 290               	.LM38:
+ 291 00d2 8091 0000 		lds r24,usart_rx_buffer
+ 292 00d6 9927      		clr r25
+ 293 00d8 8434      		cpi r24,68
+ 294 00da 9105      		cpc r25,__zero_reg__
+ 295 00dc 09F4      		brne .+2
+ 296 00de 47C0      		rjmp .L27
+ 297               	.LM39:
+ 298 00e0 8437      		cpi r24,116
+ 299 00e2 9105      		cpc r25,__zero_reg__
+ 300 00e4 09F0      		breq .+2
+ 301 00e6 63C0      		rjmp .L25
+ 302               	.LM40:
+ 303 00e8 8091 0000 		lds r24,usart_rx_buffer+1
+ 304 00ec 9927      		clr r25
+ 305 00ee 0196      		adiw r24,1
+ 306 00f0 8F70      		andi r24,lo8(15)
+ 307 00f2 9070      		andi r25,hi8(15)
+ 308 00f4 54E0      		ldi r21,4
+ 309 00f6 880F      	1:	lsl r24
+ 310 00f8 991F      		rol r25
+ 311 00fa 5A95      		dec r21
+ 312 00fc E1F7      		brne 1b
+ 313 00fe 8E60      		ori r24,lo8(14)
+ 314 0100 8093 0000 		sts unilink_timeinfo+7,r24
+ 315               	.LM41:
+ 316 0104 8091 0000 		lds r24,usart_rx_buffer+2
+ 317 0108 9927      		clr r25
+ 318 010a C097      		sbiw r24,48
+ 319 010c 44E0      		ldi r20,4
+ 320 010e 880F      	1:	lsl r24
+ 321 0110 991F      		rol r25
+ 322 0112 4A95      		dec r20
+ 323 0114 E1F7      		brne 1b
+ 324 0116 2091 0000 		lds r18,usart_rx_buffer+3
+ 325 011a 2053      		subi r18,lo8(-(-48))
+ 326 011c 282B      		or r18,r24
+ 327 011e 2093 0000 		sts unilink_timeinfo+4,r18
+ 328               	.LM42:
+ 329 0122 8091 0000 		lds r24,usart_rx_buffer+4
+ 330 0126 9927      		clr r25
+ 331 0128 C097      		sbiw r24,48
+ 332 012a 34E0      		ldi r19,4
+ 333 012c 880F      	1:	lsl r24
+ 334 012e 991F      		rol r25
+ 335 0130 3A95      		dec r19
+ 336 0132 E1F7      		brne 1b
+ 337 0134 2091 0000 		lds r18,usart_rx_buffer+5
+ 338 0138 2053      		subi r18,lo8(-(-48))
+ 339 013a 282B      		or r18,r24
+ 340 013c 2093 0000 		sts unilink_timeinfo+5,r18
+ 341               	.LM43:
+ 342 0140 8091 0000 		lds r24,usart_rx_buffer+6
+ 343 0144 9927      		clr r25
+ 344 0146 C097      		sbiw r24,48
+ 345 0148 24E0      		ldi r18,4
+ 346 014a 880F      	1:	lsl r24
+ 347 014c 991F      		rol r25
+ 348 014e 2A95      		dec r18
+ 349 0150 E1F7      		brne 1b
+ 350 0152 2091 0000 		lds r18,usart_rx_buffer+7
+ 351 0156 2053      		subi r18,lo8(-(-48))
+ 352 0158 282B      		or r18,r24
+ 353 015a 2093 0000 		sts unilink_timeinfo+6,r18
+ 354               	.LM44:
+ 355 015e 8091 0000 		lds r24,unilink_ownaddr
+ 356 0162 8093 0000 		sts unilink_timeinfo+1,r24
+ 357               	.LM45:
+ 358 0166 8091 0000 		lds r24,unilink_command
+ 359 016a 8260      		ori r24,lo8(2)
+ 360 016c 1DC0      		rjmp .L40
+ 361               	.L27:
+ 362 016e 80E0      		ldi r24,lo8(0)
+ 363 0170 90E0      		ldi r25,hi8(0)
+ 364 0172 DC01      		movw r26,r24
+ 365 0174 A050      		subi r26,lo8(-(unilink_discname))
+ 366 0176 B040      		sbci r27,hi8(-(unilink_discname))
+ 367 0178 FC01      		movw r30,r24
+ 368 017a E050      		subi r30,lo8(-(usart_rx_buffer+1))
+ 369 017c F040      		sbci r31,hi8(-(usart_rx_buffer+1))
+ 370               	.L32:
+ 371               	.LM46:
+ 372 017e 8191      		ld r24,Z+
+ 373 0180 8E37      		cpi r24,lo8(126)
+ 374 0182 21F0      		breq .L29
+ 375               	.LM47:
+ 376 0184 8D93      		st X+,r24
+ 377               	.LM48:
+ 378 0186 2F5F      		subi r18,lo8(-(1))
+ 379 0188 2830      		cpi r18,lo8(8)
+ 380 018a C8F3      		brlo .L32
+ 381               	.L29:
+ 382               	.LM49:
+ 383 018c 2830      		cpi r18,lo8(8)
+ 384 018e 48F4      		brsh .L39
+ 385 0190 80E2      		ldi r24,lo8(32)
+ 386 0192 E22F      		mov r30,r18
+ 387 0194 FF27      		clr r31
+ 388 0196 E050      		subi r30,lo8(-(unilink_discname))
+ 389 0198 F040      		sbci r31,hi8(-(unilink_discname))
+ 390               	.L36:
+ 391               	.LM50:
+ 392 019a 8193      		st Z+,r24
+ 393               	.LM51:
+ 394 019c 2F5F      		subi r18,lo8(-(1))
+ 395 019e 2830      		cpi r18,lo8(8)
+ 396 01a0 E0F3      		brlo .L36
+ 397               	.L39:
+ 398               	.LM52:
+ 399 01a2 8091 0000 		lds r24,unilink_command
+ 400 01a6 8160      		ori r24,lo8(1)
+ 401               	.L40:
+ 402 01a8 8093 0000 		sts unilink_command,r24
+ 403               	.LM53:
+ 404 01ac 57DF      		rcall slavebreak
+ 405               	.L25:
+ 406               	.LM54:
+ 407 01ae 1092 0000 		sts usart_rx_buffer,__zero_reg__
+ 408               	.LM55:
+ 409 01b2 1092 0000 		sts usart_rx_index,__zero_reg__
+ 410               	.LM56:
+ 411 01b6 88E9      		ldi r24,lo8(-104)
+ 412 01b8 8AB9      		out 42-0x20,r24
+ 413               	/* epilogue: frame size=0 */
+ 414 01ba 0895      		ret
+ 415               	/* epilogue end (size=1) */
+ 416               	/* function usart_rx_proc size 120 (119) */
+ 417               	.LFE6:
+ 419               	.global	reset_spi
+ 421               	reset_spi:
+ 422               	.LFB8:
+ 423               	.LM57:
+ 424               	/* prologue: frame size=0 */
+ 425               	/* prologue end (size=0) */
+ 426               	.LM58:
+ 427 01bc 1FB8      		out 47-0x20,__zero_reg__
+ 428               	.LM59:
+ 429 01be 1DB8      		out 45-0x20,__zero_reg__
+ 430               	.LM60:
+ 431 01c0 84EC      		ldi r24,lo8(-60)
+ 432 01c2 8DB9      		out 45-0x20,r24
+ 433               	/* epilogue: frame size=0 */
+ 434 01c4 0895      		ret
+ 435               	/* epilogue end (size=1) */
+ 436               	/* function reset_spi size 5 (4) */
+ 437               	.LFE8:
+ 439               	.global	unilink_tx
+ 441               	unilink_tx:
+ 442               	.LFB9:
+ 443               	.LM61:
+ 444               	/* prologue: frame size=0 */
+ 445 01c6 CF93      		push r28
+ 446 01c8 DF93      		push r29
+ 447               	/* prologue end (size=2) */
+ 448 01ca EC01      		movw r28,r24
+ 449               	.LM62:
+ 450 01cc 8A81      		ldd r24,Y+2
+ 451 01ce 803C      		cpi r24,lo8(-64)
+ 452 01d0 10F0      		brlo .L43
+ 453               	.LM63:
+ 454 01d2 8EE0      		ldi r24,lo8(14)
+ 455 01d4 05C0      		rjmp .L50
+ 456               	.L43:
+ 457               	.LM64:
+ 458 01d6 87FF      		sbrs r24,7
+ 459 01d8 02C0      		rjmp .L45
+ 460 01da 89E0      		ldi r24,lo8(9)
+ 461 01dc 01C0      		rjmp .L50
+ 462               	.L45:
+ 463               	.LM65:
+ 464 01de 84E0      		ldi r24,lo8(4)
+ 465               	.L50:
+ 466 01e0 8093 0000 		sts unilink_txsize,r24
+ 467               	.LM66:
+ 468 01e4 9881      		ld r25,Y
+ 469               	.LM67:
+ 470 01e6 9093 0000 		sts unilink_txdata,r25
+ 471               	.LM68:
+ 472 01ea 8981      		ldd r24,Y+1
+ 473 01ec 980F      		add r25,r24
+ 474               	.LM69:
+ 475 01ee 8093 0000 		sts unilink_txdata+1,r24
+ 476               	.LM70:
+ 477 01f2 8A81      		ldd r24,Y+2
+ 478 01f4 980F      		add r25,r24
+ 479               	.LM71:
+ 480 01f6 8093 0000 		sts unilink_txdata+2,r24
+ 481               	.LM72:
+ 482 01fa 8B81      		ldd r24,Y+3
+ 483 01fc 980F      		add r25,r24
+ 484               	.LM73:
+ 485 01fe 8093 0000 		sts unilink_txdata+3,r24
+ 486               	.LM74:
+ 487 0202 9093 0000 		sts unilink_txdata+4,r25
+ 488               	.LM75:
+ 489 0206 44E0      		ldi r20,lo8(4)
+ 490 0208 8091 0000 		lds r24,unilink_txsize
+ 491 020c 282F      		mov r18,r24
+ 492 020e 3327      		clr r19
+ 493 0210 2150      		subi r18,lo8(-(-1))
+ 494 0212 3040      		sbci r19,hi8(-(-1))
+ 495               	.L47:
+ 496               	.LM76:
+ 497 0214 E42F      		mov r30,r20
+ 498 0216 FF27      		clr r31
+ 499 0218 DF01      		movw r26,r30
+ 500 021a AC0F      		add r26,r28
+ 501 021c BD1F      		adc r27,r29
+ 502 021e 8C91      		ld r24,X
+ 503 0220 E050      		subi r30,lo8(-(unilink_txdata))
+ 504 0222 F040      		sbci r31,hi8(-(unilink_txdata))
+ 505 0224 8183      		std Z+1,r24
+ 506               	.LM77:
+ 507 0226 8C91      		ld r24,X
+ 508 0228 980F      		add r25,r24
+ 509               	.LM78:
+ 510 022a 4F5F      		subi r20,lo8(-(1))
+ 511               	.LM79:
+ 512 022c E42F      		mov r30,r20
+ 513 022e FF27      		clr r31
+ 514 0230 E217      		cp r30,r18
+ 515 0232 F307      		cpc r31,r19
+ 516 0234 7CF3      		brlt .L47
+ 517 0236 40E0      		ldi r20,lo8(0)
+ 518               	.LM80:
+ 519 0238 E050      		subi r30,lo8(-(unilink_txdata))
+ 520 023a F040      		sbci r31,hi8(-(unilink_txdata))
+ 521 023c 9183      		std Z+1,r25
+ 522               	.LM81:
+ 523 023e 949A      		sbi 50-0x20,4
+ 524               	.LM82:
+ 525 0240 4FB9      		out 47-0x20,r20
+ 526               	.LM83:
+ 527 0242 4DB9      		out 45-0x20,r20
+ 528               	.LM84:
+ 529 0244 BC9A      		sbi 55-0x20,4
+ 530               	.LM85:
+ 531               	/* #APP */
+ 532 0246 0000      		nop
+ 533               	.LM86:
+ 534               	/* #NOAPP */
+ 535 0248 84EC      		ldi r24,lo8(-60)
+ 536 024a 8DB9      		out 45-0x20,r24
+ 537               	.LM87:
+ 538 024c 8091 0000 		lds r24,flags
+ 539 0250 8260      		ori r24,lo8(2)
+ 540 0252 8093 0000 		sts flags,r24
+ 541               	.LM88:
+ 542 0256 8091 0000 		lds r24,unilink_bytecount
+ 543 025a 8F71      		andi r24,lo8(31)
+ 544 025c 8062      		ori r24,lo8(32)
+ 545 025e 8093 0000 		sts unilink_bytecount,r24
+ 546 0262 8091 0000 		lds r24,unilink_bytecount+1
+ 547 0266 8C7F      		andi r24,lo8(-4)
+ 548 0268 8093 0000 		sts unilink_bytecount+1,r24
+ 549               	.LM89:
+ 550 026c 8091 0000 		lds r24,unilink_txdata
+ 551 0270 8FB9      		out 47-0x20,r24
+ 552               	/* epilogue: frame size=0 */
+ 553 0272 DF91      		pop r29
+ 554 0274 CF91      		pop r28
+ 555 0276 0895      		ret
+ 556               	/* epilogue end (size=3) */
+ 557               	/* function unilink_tx size 90 (85) */
+ 558               	.LFE9:
+ 560               	.global	unilink_broadcast
+ 562               	unilink_broadcast:
+ 563               	.LFB11:
+ 564               	.LM90:
+ 565               	/* prologue: frame size=8 */
+ 566 0278 CF93      		push r28
+ 567 027a DF93      		push r29
+ 568 027c CDB7      		in r28,__SP_L__
+ 569 027e DEB7      		in r29,__SP_H__
+ 570 0280 2897      		sbiw r28,8
+ 571 0282 0FB6      		in __tmp_reg__,__SREG__
+ 572 0284 F894      		cli
+ 573 0286 DEBF      		out __SP_H__,r29
+ 574 0288 0FBE      		out __SREG__,__tmp_reg__
+ 575 028a CDBF      		out __SP_L__,r28
+ 576               	/* prologue end (size=10) */
+ 577               	.LM91:
+ 578 028c 8091 0000 		lds r24,unilink_rxdata+2
+ 579 0290 9927      		clr r25
+ 580 0292 8738      		cpi r24,135
+ 581 0294 9105      		cpc r25,__zero_reg__
+ 582 0296 09F4      		brne .+2
+ 583 0298 3FC0      		rjmp .L60
+ 584               	.LM92:
+ 585 029a 8838      		cpi r24,136
+ 586 029c 9105      		cpc r25,__zero_reg__
+ 587 029e 1CF4      		brge .L62
+ 588 02a0 0197      		sbiw r24,1
+ 589 02a2 29F0      		breq .L53
+ 590 02a4 42C0      		rjmp .L51
+ 591               	.L62:
+ 592 02a6 803F      		cpi r24,240
+ 593 02a8 9105      		cpc r25,__zero_reg__
+ 594 02aa 61F1      		breq .L58
+ 595 02ac 3EC0      		rjmp .L51
+ 596               	.L53:
+ 597               	.LM93:
+ 598 02ae 8091 0000 		lds r24,unilink_rxdata+3
+ 599 02b2 9927      		clr r25
+ 600 02b4 0097      		sbiw r24,0
+ 601 02b6 19F0      		breq .L55
+ 602 02b8 0297      		sbiw r24,2
+ 603 02ba 51F0      		breq .L56
+ 604 02bc 23C0      		rjmp .L58
+ 605               	.L55:
+ 606               	.LM94:
+ 607 02be 80E3      		ldi r24,lo8(48)
+ 608 02c0 8093 0000 		sts unilink_ownaddr,r24
+ 609               	.LM95:
+ 610 02c4 8091 0000 		lds r24,flags
+ 611 02c8 8F77      		andi r24,lo8(127)
+ 612 02ca 8093 0000 		sts flags,r24
+ 613               	.LM96:
+ 614 02ce 1AC0      		rjmp .L58
+ 615               	.L56:
+ 616               	.LM97:
+ 617 02d0 2091 0000 		lds r18,unilink_ownaddr
+ 618 02d4 2033      		cpi r18,lo8(48)
+ 619 02d6 B1F4      		brne .L58
+ 620               	.LBB2:
+ 621               	.LM98:
+ 622 02d8 8091 0000 		lds r24,flags
+ 623 02dc 8068      		ori r24,lo8(-128)
+ 624 02de 8093 0000 		sts flags,r24
+ 625               	.LM99:
+ 626 02e2 90E1      		ldi r25,lo8(16)
+ 627 02e4 9983      		std Y+1,r25
+ 628 02e6 2A83      		std Y+2,r18
+ 629 02e8 8CE8      		ldi r24,lo8(-116)
+ 630 02ea 8B83      		std Y+3,r24
+ 631 02ec 9C83      		std Y+4,r25
+ 632 02ee 84E2      		ldi r24,lo8(36)
+ 633 02f0 8D83      		std Y+5,r24
+ 634 02f2 88EA      		ldi r24,lo8(-88)
+ 635 02f4 8E83      		std Y+6,r24
+ 636 02f6 87E1      		ldi r24,lo8(23)
+ 637 02f8 8F83      		std Y+7,r24
+ 638 02fa 80EA      		ldi r24,lo8(-96)
+ 639 02fc 8887      		std Y+8,r24
+ 640               	.LM100:
+ 641 02fe CE01      		movw r24,r28
+ 642 0300 0196      		adiw r24,1
+ 643 0302 61DF      		rcall unilink_tx
+ 644               	.L58:
+ 645               	.LBE2:
+ 646               	.LM101:
+ 647 0304 9091 0000 		lds r25,unilink_rxdata+3
+ 648 0308 8091 0000 		lds r24,unilink_ownaddr
+ 649 030c 9817      		cp r25,r24
+ 650 030e 69F0      		breq .L51
+ 651               	.LM102:
+ 652 0310 80E8      		ldi r24,lo8(-128)
+ 653 0312 8093 0000 		sts unilink_status,r24
+ 654 0316 08C0      		rjmp .L63
+ 655               	.L60:
+ 656               	.LM103:
+ 657 0318 8091 0000 		lds r24,unilink_rxdata+3
+ 658 031c 8823      		tst r24
+ 659 031e 29F4      		brne .L51
+ 660               	.LM104:
+ 661 0320 80E8      		ldi r24,lo8(-128)
+ 662 0322 8093 0000 		sts unilink_status,r24
+ 663               	.LM105:
+ 664 0326 9798      		cbi 50-0x20,7
+ 665               	.L63:
+ 666               	.LM106:
+ 667 0328 9398      		cbi 50-0x20,3
+ 668               	.L51:
+ 669               	/* epilogue: frame size=8 */
+ 670 032a 2896      		adiw r28,8
+ 671 032c 0FB6      		in __tmp_reg__,__SREG__
+ 672 032e F894      		cli
+ 673 0330 DEBF      		out __SP_H__,r29
+ 674 0332 0FBE      		out __SREG__,__tmp_reg__
+ 675 0334 CDBF      		out __SP_L__,r28
+ 676 0336 DF91      		pop r29
+ 677 0338 CF91      		pop r28
+ 678 033a 0895      		ret
+ 679               	/* epilogue end (size=9) */
+ 680               	/* function unilink_broadcast size 100 (81) */
+ 681               	.LFE11:
+ 683               	.global	unilink_appoint
+ 685               	unilink_appoint:
+ 686               	.LFB13:
+ 687               	.LM107:
+ 688               	/* prologue: frame size=8 */
+ 689 033c CF93      		push r28
+ 690 033e DF93      		push r29
+ 691 0340 CDB7      		in r28,__SP_L__
+ 692 0342 DEB7      		in r29,__SP_H__
+ 693 0344 2897      		sbiw r28,8
+ 694 0346 0FB6      		in __tmp_reg__,__SREG__
+ 695 0348 F894      		cli
+ 696 034a DEBF      		out __SP_H__,r29
+ 697 034c 0FBE      		out __SREG__,__tmp_reg__
+ 698 034e CDBF      		out __SP_L__,r28
+ 699               	/* prologue end (size=10) */
+ 700               	.LM108:
+ 701 0350 8091 0000 		lds r24,unilink_rxdata+3
+ 702 0354 8093 0000 		sts unilink_bitid,r24
+ 703               	.LM109:
+ 704 0358 8091 0000 		lds r24,unilink_rxdata+2
+ 705 035c 8230      		cpi r24,lo8(2)
+ 706 035e 41F5      		brne .L64
+ 707               	.LM110:
+ 708 0360 8091 0000 		lds r24,flags
+ 709 0364 87FF      		sbrs r24,7
+ 710 0366 24C0      		rjmp .L64
+ 711               	.LM111:
+ 712 0368 4091 0000 		lds r20,unilink_rxdata
+ 713 036c 842F      		mov r24,r20
+ 714 036e 9927      		clr r25
+ 715 0370 807F      		andi r24,lo8(240)
+ 716 0372 9070      		andi r25,hi8(240)
+ 717 0374 2091 0000 		lds r18,unilink_groupid
+ 718 0378 3327      		clr r19
+ 719 037a 8217      		cp r24,r18
+ 720 037c 9307      		cpc r25,r19
+ 721 037e C1F4      		brne .L64
+ 722               	.LM112:
+ 723 0380 8091 0000 		lds r24,unilink_ownaddr
+ 724 0384 8033      		cpi r24,lo8(48)
+ 725 0386 A1F4      		brne .L64
+ 726               	.LBB3:
+ 727               	.LM113:
+ 728 0388 4093 0000 		sts unilink_ownaddr,r20
+ 729               	.LM114:
+ 730 038c 929A      		sbi 50-0x20,2
+ 731               	.LM115:
+ 732 038e 90E1      		ldi r25,lo8(16)
+ 733 0390 9983      		std Y+1,r25
+ 734 0392 4A83      		std Y+2,r20
+ 735 0394 8CE8      		ldi r24,lo8(-116)
+ 736 0396 8B83      		std Y+3,r24
+ 737 0398 9C83      		std Y+4,r25
+ 738 039a 84E2      		ldi r24,lo8(36)
+ 739 039c 8D83      		std Y+5,r24
+ 740 039e 88EA      		ldi r24,lo8(-88)
+ 741 03a0 8E83      		std Y+6,r24
+ 742 03a2 87E1      		ldi r24,lo8(23)
+ 743 03a4 8F83      		std Y+7,r24
+ 744 03a6 80EA      		ldi r24,lo8(-96)
+ 745 03a8 8887      		std Y+8,r24
+ 746               	.LM116:
+ 747 03aa CE01      		movw r24,r28
+ 748 03ac 0196      		adiw r24,1
+ 749 03ae 0BDF      		rcall unilink_tx
+ 750               	.L64:
+ 751               	.LBE3:
+ 752               	/* epilogue: frame size=8 */
+ 753 03b0 2896      		adiw r28,8
+ 754 03b2 0FB6      		in __tmp_reg__,__SREG__
+ 755 03b4 F894      		cli
+ 756 03b6 DEBF      		out __SP_H__,r29
+ 757 03b8 0FBE      		out __SREG__,__tmp_reg__
+ 758 03ba CDBF      		out __SP_L__,r28
+ 759 03bc DF91      		pop r29
+ 760 03be CF91      		pop r28
+ 761 03c0 0895      		ret
+ 762               	/* epilogue end (size=9) */
+ 763               	/* function unilink_appoint size 67 (48) */
+ 764               	.LFE13:
+ 766               	.global	send_command
+ 768               	send_command:
+ 769               	.LFB14:
+ 770               	.LM117:
+ 771               	/* prologue: frame size=21 */
+ 772 03c2 CF93      		push r28
+ 773 03c4 DF93      		push r29
+ 774 03c6 CDB7      		in r28,__SP_L__
+ 775 03c8 DEB7      		in r29,__SP_H__
+ 776 03ca 6597      		sbiw r28,21
+ 777 03cc 0FB6      		in __tmp_reg__,__SREG__
+ 778 03ce F894      		cli
+ 779 03d0 DEBF      		out __SP_H__,r29
+ 780 03d2 0FBE      		out __SREG__,__tmp_reg__
+ 781 03d4 CDBF      		out __SP_L__,r28
+ 782               	/* prologue end (size=10) */
+ 783               	.LM118:
+ 784 03d6 8091 0000 		lds r24,unilink_command
+ 785 03da 82FF      		sbrs r24,2
+ 786 03dc 14C0      		rjmp .L69
+ 787               	.LBB4:
+ 788               	.LM119:
+ 789 03de FE01      		movw r30,r28
+ 790 03e0 3196      		adiw r30,1
+ 791 03e2 88E0      		ldi r24,lo8(8)
+ 792 03e4 DF01      		movw r26,r30
+ 793 03e6 1D92      		st X+,__zero_reg__
+ 794 03e8 8A95      	        dec r24
+ 795 03ea E9F7      		brne .-6
+ 796 03ec 80E7      		ldi r24,lo8(112)
+ 797 03ee 8983      		std Y+1,r24
+ 798 03f0 8091 0000 		lds r24,unilink_ownaddr
+ 799 03f4 8A83      		std Y+2,r24
+ 800 03f6 80E4      		ldi r24,lo8(64)
+ 801 03f8 8C83      		std Y+4,r24
+ 802               	.LM120:
+ 803 03fa CF01      		movw r24,r30
+ 804 03fc E4DE      		rcall unilink_tx
+ 805               	.LM121:
+ 806 03fe 8091 0000 		lds r24,unilink_command
+ 807 0402 8B7F      		andi r24,lo8(-5)
+ 808 0404 84C0      		rjmp .L75
+ 809               	.L69:
+ 810               	.LBE4:
+ 811               	.LM122:
+ 812 0406 8091 0000 		lds r24,unilink_command
+ 813 040a 982F      		mov r25,r24
+ 814 040c 9870      		andi r25,lo8(8)
+ 815 040e 83FF      		sbrs r24,3
+ 816 0410 22C0      		rjmp .L70
+ 817               	.LBB5:
+ 818               	.LM123:
+ 819 0412 80E1      		ldi r24,lo8(16)
+ 820 0414 8983      		std Y+1,r24
+ 821 0416 8091 0000 		lds r24,unilink_ownaddr
+ 822 041a 8A83      		std Y+2,r24
+ 823 041c 80E9      		ldi r24,lo8(-112)
+ 824 041e 8B83      		std Y+3,r24
+ 825 0420 80E5      		ldi r24,lo8(80)
+ 826 0422 8C83      		std Y+4,r24
+ 827 0424 8091 0000 		lds r24,tracknbr
+ 828 0428 8D83      		std Y+5,r24
+ 829 042a 86E0      		ldi r24,lo8(6)
+ 830 042c 8E83      		std Y+6,r24
+ 831 042e 8F83      		std Y+7,r24
+ 832 0430 8091 0000 		lds r24,unilink_lastdisc
+ 833 0434 9927      		clr r25
+ 834 0436 64E0      		ldi r22,4
+ 835 0438 880F      	1:	lsl r24
+ 836 043a 991F      		rol r25
+ 837 043c 6A95      		dec r22
+ 838 043e E1F7      		brne 1b
+ 839 0440 8887      		std Y+8,r24
+ 840               	.LM124:
+ 841 0442 CE01      		movw r24,r28
+ 842 0444 0196      		adiw r24,1
+ 843 0446 BFDE      		rcall unilink_tx
+ 844               	.LM125:
+ 845 0448 81E0      		ldi r24,lo8(1)
+ 846 044a 8093 0000 		sts tracknbr,r24
+ 847               	.LM126:
+ 848 044e 8091 0000 		lds r24,unilink_command
+ 849 0452 877F      		andi r24,lo8(-9)
+ 850 0454 5CC0      		rjmp .L75
+ 851               	.L70:
+ 852               	.LBE5:
+ 853               	.LM127:
+ 854 0456 8091 0000 		lds r24,unilink_command
+ 855 045a 85FF      		sbrs r24,5
+ 856 045c 14C0      		rjmp .L71
+ 857               	.LBB6:
+ 858               	.LM128:
+ 859 045e 80E1      		ldi r24,lo8(16)
+ 860 0460 8983      		std Y+1,r24
+ 861 0462 8091 0000 		lds r24,unilink_ownaddr
+ 862 0466 8A83      		std Y+2,r24
+ 863 0468 84E9      		ldi r24,lo8(-108)
+ 864 046a 8B83      		std Y+3,r24
+ 865 046c 9C83      		std Y+4,r25
+ 866 046e 9D83      		std Y+5,r25
+ 867 0470 80E8      		ldi r24,lo8(-128)
+ 868 0472 8E83      		std Y+6,r24
+ 869 0474 9F83      		std Y+7,r25
+ 870 0476 9887      		std Y+8,r25
+ 871               	.LM129:
+ 872 0478 CE01      		movw r24,r28
+ 873 047a 0196      		adiw r24,1
+ 874 047c A4DE      		rcall unilink_tx
+ 875               	.LM130:
+ 876 047e 8091 0000 		lds r24,unilink_command
+ 877 0482 8F7D      		andi r24,lo8(-33)
+ 878 0484 44C0      		rjmp .L75
+ 879               	.L71:
+ 880               	.LBE6:
+ 881               	.LM131:
+ 882 0486 8091 0000 		lds r24,unilink_command
+ 883 048a 982F      		mov r25,r24
+ 884 048c 9270      		andi r25,lo8(2)
+ 885 048e 81FF      		sbrs r24,1
+ 886 0490 07C0      		rjmp .L72
+ 887               	.LM132:
+ 888 0492 80E0      		ldi r24,lo8(unilink_timeinfo)
+ 889 0494 90E0      		ldi r25,hi8(unilink_timeinfo)
+ 890 0496 97DE      		rcall unilink_tx
+ 891               	.LM133:
+ 892 0498 8091 0000 		lds r24,unilink_command
+ 893 049c 8D7F      		andi r24,lo8(-3)
+ 894 049e 37C0      		rjmp .L75
+ 895               	.L72:
+ 896               	.LM134:
+ 897 04a0 8091 0000 		lds r24,unilink_command
+ 898 04a4 80FF      		sbrs r24,0
+ 899 04a6 29C0      		rjmp .L73
+ 900               	.LBB7:
+ 901               	.LM135:
+ 902 04a8 80E7      		ldi r24,lo8(112)
+ 903 04aa 8987      		std Y+9,r24
+ 904 04ac 8091 0000 		lds r24,unilink_ownaddr
+ 905 04b0 8A87      		std Y+10,r24
+ 906 04b2 8DEC      		ldi r24,lo8(-51)
+ 907 04b4 8B87      		std Y+11,r24
+ 908 04b6 8091 0000 		lds r24,unilink_discname
+ 909 04ba 8C87      		std Y+12,r24
+ 910 04bc 8091 0000 		lds r24,unilink_discname+1
+ 911 04c0 8D87      		std Y+13,r24
+ 912 04c2 8091 0000 		lds r24,unilink_discname+2
+ 913 04c6 8E87      		std Y+14,r24
+ 914 04c8 8091 0000 		lds r24,unilink_discname+3
+ 915 04cc 8F87      		std Y+15,r24
+ 916 04ce 8091 0000 		lds r24,unilink_discname+4
+ 917 04d2 888B      		std Y+16,r24
+ 918 04d4 8091 0000 		lds r24,unilink_discname+5
+ 919 04d8 898B      		std Y+17,r24
+ 920 04da 8091 0000 		lds r24,unilink_discname+6
+ 921 04de 8A8B      		std Y+18,r24
+ 922 04e0 8091 0000 		lds r24,unilink_discname+7
+ 923 04e4 8B8B      		std Y+19,r24
+ 924 04e6 9C8B      		std Y+20,r25
+ 925 04e8 8EE0      		ldi r24,lo8(14)
+ 926 04ea 8D8B      		std Y+21,r24
+ 927               	.LM136:
+ 928 04ec CE01      		movw r24,r28
+ 929 04ee 0996      		adiw r24,9
+ 930 04f0 6ADE      		rcall unilink_tx
+ 931               	.LM137:
+ 932 04f2 8091 0000 		lds r24,unilink_command
+ 933 04f6 8E7F      		andi r24,lo8(-2)
+ 934 04f8 0AC0      		rjmp .L75
+ 935               	.L73:
+ 936               	.LBE7:
+ 937               	.LM138:
+ 938 04fa 8091 0000 		lds r24,unilink_command
+ 939 04fe 84FF      		sbrs r24,4
+ 940 0500 08C0      		rjmp .L68
+ 941               	.LM139:
+ 942 0502 80E0      		ldi r24,lo8(raw)
+ 943 0504 90E0      		ldi r25,hi8(raw)
+ 944 0506 5FDE      		rcall unilink_tx
+ 945               	.LM140:
+ 946 0508 8091 0000 		lds r24,unilink_command
+ 947 050c 8F7E      		andi r24,lo8(-17)
+ 948               	.L75:
+ 949 050e 8093 0000 		sts unilink_command,r24
+ 950               	.L68:
+ 951               	/* epilogue: frame size=21 */
+ 952 0512 6596      		adiw r28,21
+ 953 0514 0FB6      		in __tmp_reg__,__SREG__
+ 954 0516 F894      		cli
+ 955 0518 DEBF      		out __SP_H__,r29
+ 956 051a 0FBE      		out __SREG__,__tmp_reg__
+ 957 051c CDBF      		out __SP_L__,r28
+ 958 051e DF91      		pop r29
+ 959 0520 CF91      		pop r28
+ 960 0522 0895      		ret
+ 961               	/* epilogue end (size=9) */
+ 962               	/* function send_command size 177 (158) */
+ 963               	.LFE14:
+ 965               	.global	unilink_myid_cmd
+ 967               	unilink_myid_cmd:
+ 968               	.LFB12:
+ 969               	.LM141:
+ 970               	/* prologue: frame size=17 */
+ 971 0524 CF93      		push r28
+ 972 0526 DF93      		push r29
+ 973 0528 CDB7      		in r28,__SP_L__
+ 974 052a DEB7      		in r29,__SP_H__
+ 975 052c 6197      		sbiw r28,17
+ 976 052e 0FB6      		in __tmp_reg__,__SREG__
+ 977 0530 F894      		cli
+ 978 0532 DEBF      		out __SP_H__,r29
+ 979 0534 0FBE      		out __SREG__,__tmp_reg__
+ 980 0536 CDBF      		out __SP_L__,r28
+ 981               	/* prologue end (size=10) */
+ 982               	.LM142:
+ 983 0538 8091 0000 		lds r24,unilink_rxdata+2
+ 984 053c 9927      		clr r25
+ 985 053e 8132      		cpi r24,33
+ 986 0540 9105      		cpc r25,__zero_reg__
+ 987 0542 09F4      		brne .+2
+ 988 0544 62C0      		rjmp .L88
+ 989               	.LM143:
+ 990 0546 8232      		cpi r24,34
+ 991 0548 9105      		cpc r25,__zero_reg__
+ 992 054a 3CF4      		brge .L106
+ 993 054c 8130      		cpi r24,1
+ 994 054e 9105      		cpc r25,__zero_reg__
+ 995 0550 A1F0      		breq .L78
+ 996 0552 8097      		sbiw r24,32
+ 997 0554 09F4      		brne .+2
+ 998 0556 3EC0      		rjmp .L87
+ 999 0558 95C0      		rjmp .L76
+ 1000               	.L106:
+ 1001 055a 8438      		cpi r24,132
+ 1002 055c 9105      		cpc r25,__zero_reg__
+ 1003 055e 09F4      		brne .+2
+ 1004 0560 62C0      		rjmp .L95
+ 1005 0562 8538      		cpi r24,133
+ 1006 0564 9105      		cpc r25,__zero_reg__
+ 1007 0566 24F4      		brge .L107
+ 1008 0568 C497      		sbiw r24,52
+ 1009 056a 09F4      		brne .+2
+ 1010 056c 57C0      		rjmp .L93
+ 1011 056e 8AC0      		rjmp .L76
+ 1012               	.L107:
+ 1013 0570 803B      		cpi r24,176
+ 1014 0572 9105      		cpc r25,__zero_reg__
+ 1015 0574 09F4      		brne .+2
+ 1016 0576 6DC0      		rjmp .L99
+ 1017 0578 85C0      		rjmp .L76
+ 1018               	.L78:
+ 1019               	.LBB8:
+ 1020               	.LM144:
+ 1021 057a 8091 0000 		lds r24,unilink_rxdata+3
+ 1022 057e 9927      		clr r25
+ 1023 0580 8231      		cpi r24,18
+ 1024 0582 9105      		cpc r25,__zero_reg__
+ 1025 0584 19F0      		breq .L80
+ 1026 0586 4397      		sbiw r24,19
+ 1027 0588 19F1      		breq .L86
+ 1028 058a 7CC0      		rjmp .L76
+ 1029               	.L80:
+ 1030               	.LBB9:
+ 1031               	.LM145:
+ 1032               	/* #APP */
+ 1033 058c 0000      		nop
+ 1034               	.LM146:
+ 1035               	/* #NOAPP */
+ 1036 058e 8091 0000 		lds r24,flags
+ 1037 0592 8F7B      		andi r24,lo8(-65)
+ 1038 0594 8093 0000 		sts flags,r24
+ 1039               	.LM147:
+ 1040 0598 80E1      		ldi r24,lo8(16)
+ 1041 059a 8E87      		std Y+14,r24
+ 1042 059c 8091 0000 		lds r24,unilink_ownaddr
+ 1043 05a0 8F87      		std Y+15,r24
+ 1044 05a2 188A      		std Y+16,__zero_reg__
+ 1045 05a4 8091 0000 		lds r24,unilink_status
+ 1046 05a8 898B      		std Y+17,r24
+ 1047               	.LM148:
+ 1048 05aa CE01      		movw r24,r28
+ 1049 05ac 0E96      		adiw r24,14
+ 1050 05ae 0BDE      		rcall unilink_tx
+ 1051               	.LM149:
+ 1052 05b0 8091 0000 		lds r24,unilink_status
+ 1053 05b4 8034      		cpi r24,lo8(64)
+ 1054 05b6 11F4      		brne .L81
+ 1055               	.LM150:
+ 1056 05b8 80E2      		ldi r24,lo8(32)
+ 1057 05ba 62C0      		rjmp .L111
+ 1058               	.L81:
+ 1059               	.LM151:
+ 1060 05bc 8032      		cpi r24,lo8(32)
+ 1061 05be 11F4      		brne .L83
+ 1062               	.LM152:
+ 1063 05c0 81E2      		ldi r24,lo8(33)
+ 1064 05c2 5EC0      		rjmp .L111
+ 1065               	.L83:
+ 1066               	.LM153:
+ 1067 05c4 8132      		cpi r24,lo8(33)
+ 1068 05c6 09F0      		breq .+2
+ 1069 05c8 5DC0      		rjmp .L76
+ 1070               	.LM154:
+ 1071 05ca 1092 0000 		sts unilink_status,__zero_reg__
+ 1072               	.LM155:
+ 1073 05ce 5AC0      		rjmp .L76
+ 1074               	.L86:
+ 1075               	.LM156:
+ 1076 05d0 F8DE      		rcall send_command
+ 1077               	.LBE9:
+ 1078               	.LM157:
+ 1079 05d2 58C0      		rjmp .L76
+ 1080               	.L87:
+ 1081               	.LM158:
+ 1082 05d4 939A      		sbi 50-0x20,3
+ 1083               	.LM159:
+ 1084 05d6 979A      		sbi 50-0x20,7
+ 1085               	.LM160:
+ 1086 05d8 1092 0000 		sts unilink_status,__zero_reg__
+ 1087               	.LM161:
+ 1088 05dc 80E7      		ldi r24,lo8(112)
+ 1089 05de 8983      		std Y+1,r24
+ 1090 05e0 8091 0000 		lds r24,unilink_ownaddr
+ 1091 05e4 8A83      		std Y+2,r24
+ 1092 05e6 80EC      		ldi r24,lo8(-64)
+ 1093 05e8 8B83      		std Y+3,r24
+ 1094 05ea 1C82      		std Y+4,__zero_reg__
+ 1095 05ec 1D82      		std Y+5,__zero_reg__
+ 1096 05ee 1E82      		std Y+6,__zero_reg__
+ 1097 05f0 1F82      		std Y+7,__zero_reg__
+ 1098 05f2 1886      		std Y+8,__zero_reg__
+ 1099 05f4 1986      		std Y+9,__zero_reg__
+ 1100 05f6 81E0      		ldi r24,lo8(1)
+ 1101 05f8 8A87      		std Y+10,r24
+ 1102 05fa 1B86      		std Y+11,__zero_reg__
+ 1103 05fc 1C86      		std Y+12,__zero_reg__
+ 1104 05fe 88E1      		ldi r24,lo8(24)
+ 1105 0600 8D87      		std Y+13,r24
+ 1106               	.LM162:
+ 1107 0602 CE01      		movw r24,r28
+ 1108 0604 0196      		adiw r24,1
+ 1109 0606 DFDD      		rcall unilink_tx
+ 1110               	.LM163:
+ 1111 0608 3DC0      		rjmp .L76
+ 1112               	.L88:
+ 1113               	.LM164:
+ 1114 060a 8091 0000 		lds r24,unilink_rxdata+3
+ 1115 060e 8032      		cpi r24,lo8(32)
+ 1116 0610 C9F5      		brne .L76
+ 1117               	.LM165:
+ 1118 0612 80E8      		ldi r24,lo8(-128)
+ 1119 0614 8093 0000 		sts unilink_status,r24
+ 1120               	.LM166:
+ 1121 0618 9398      		cbi 50-0x20,3
+ 1122               	.LM167:
+ 1123 061a 34C0      		rjmp .L76
+ 1124               	.L93:
+ 1125               	.LM168:
+ 1126 061c 1FDD      		rcall slavebreak
+ 1127               	.LM169:
+ 1128 061e 8091 0000 		lds r24,unilink_command
+ 1129 0622 8062      		ori r24,lo8(32)
+ 1130 0624 13C0      		rjmp .L110
+ 1131               	.L95:
+ 1132               	.LM170:
+ 1133 0626 8091 0000 		lds r24,unilink_rxdata+3
+ 1134 062a 9927      		clr r25
+ 1135 062c 8539      		cpi r24,149
+ 1136 062e 9105      		cpc r25,__zero_reg__
+ 1137 0630 21F0      		breq .L97
+ 1138 0632 8739      		cpi r24,151
+ 1139 0634 9105      		cpc r25,__zero_reg__
+ 1140 0636 31F0      		breq .L98
+ 1141 0638 25C0      		rjmp .L76
+ 1142               	.L97:
+ 1143               	.LM171:
+ 1144 063a 10DD      		rcall slavebreak
+ 1145               	.LM172:
+ 1146 063c 8091 0000 		lds r24,unilink_command
+ 1147 0640 8460      		ori r24,lo8(4)
+ 1148 0642 04C0      		rjmp .L110
+ 1149               	.L98:
+ 1150               	.LM173:
+ 1151 0644 0BDD      		rcall slavebreak
+ 1152               	.LM174:
+ 1153 0646 8091 0000 		lds r24,unilink_command
+ 1154 064a 8860      		ori r24,lo8(8)
+ 1155               	.L110:
+ 1156 064c 8093 0000 		sts unilink_command,r24
+ 1157               	.LM175:
+ 1158 0650 19C0      		rjmp .L76
+ 1159               	.L99:
+ 1160               	.LM176:
+ 1161 0652 1092 0000 		sts tracknbr,__zero_reg__
+ 1162               	.LM177:
+ 1163 0656 9091 0000 		lds r25,unilink_lastdisc
+ 1164 065a 8091 0000 		lds r24,unilink_rxdata+3
+ 1165 065e 8917      		cp r24,r25
+ 1166 0660 10F0      		brlo .L108
+ 1167               	.LM178:
+ 1168 0662 9817      		cp r25,r24
+ 1169 0664 10F4      		brsh .L101
+ 1170               	.L108:
+ 1171               	.LM179:
+ 1172 0666 8093 0000 		sts unilink_lastdisc,r24
+ 1173               	.L101:
+ 1174               	.LM180:
+ 1175 066a 9091 0000 		lds r25,unilink_lasttrack
+ 1176 066e 8091 0000 		lds r24,unilink_rxdata+5
+ 1177 0672 8917      		cp r24,r25
+ 1178 0674 10F0      		brlo .L109
+ 1179               	.LM181:
+ 1180 0676 9817      		cp r25,r24
+ 1181 0678 10F4      		brsh .L104
+ 1182               	.L109:
+ 1183               	.LM182:
+ 1184 067a 8093 0000 		sts unilink_lasttrack,r24
+ 1185               	.L104:
+ 1186               	.LM183:
+ 1187 067e 80E4      		ldi r24,lo8(64)
+ 1188               	.L111:
+ 1189 0680 8093 0000 		sts unilink_status,r24
+ 1190               	.L76:
+ 1191               	.LBE8:
+ 1192               	/* epilogue: frame size=17 */
+ 1193 0684 6196      		adiw r28,17
+ 1194 0686 0FB6      		in __tmp_reg__,__SREG__
+ 1195 0688 F894      		cli
+ 1196 068a DEBF      		out __SP_H__,r29
+ 1197 068c 0FBE      		out __SREG__,__tmp_reg__
+ 1198 068e CDBF      		out __SP_L__,r28
+ 1199 0690 DF91      		pop r29
+ 1200 0692 CF91      		pop r28
+ 1201 0694 0895      		ret
+ 1202               	/* epilogue end (size=9) */
+ 1203               	/* function unilink_myid_cmd size 189 (170) */
+ 1204               	.LFE12:
+ 1206               	.global	unilink_parse
+ 1208               	unilink_parse:
+ 1209               	.LFB10:
+ 1210               	.LM184:
+ 1211               	/* prologue: frame size=0 */
+ 1212               	/* prologue end (size=0) */
+ 1213               	.LM185:
+ 1214 0696 8091 0000 		lds r24,unilink_rxdata
+ 1215 069a 8831      		cpi r24,lo8(24)
+ 1216 069c 11F4      		brne .L113
+ 1217               	.LM186:
+ 1218 069e ECDD      		rcall unilink_broadcast
+ 1219               	.LM187:
+ 1220 06a0 0895      		ret
+ 1221               	.L113:
+ 1222               	.LM188:
+ 1223 06a2 9091 0000 		lds r25,unilink_ownaddr
+ 1224 06a6 8917      		cp r24,r25
+ 1225 06a8 11F4      		brne .L114
+ 1226               	.LM189:
+ 1227 06aa 3CDF      		rcall unilink_myid_cmd
+ 1228               	.LM190:
+ 1229 06ac 0895      		ret
+ 1230               	.L114:
+ 1231               	.LM191:
+ 1232 06ae 8091 0000 		lds r24,unilink_groupid
+ 1233 06b2 9817      		cp r25,r24
+ 1234 06b4 09F4      		brne .L112
+ 1235               	.LM192:
+ 1236 06b6 42DE      		rcall unilink_appoint
+ 1237               	.L112:
+ 1238 06b8 0895      		ret
+ 1239               	/* epilogue: frame size=0 */
+ 1240               	/* epilogue: noreturn */
+ 1241               	/* epilogue end (size=0) */
+ 1242               	/* function unilink_parse size 18 (18) */
+ 1243               	.LFE10:
+ 1245               	.global	checksum_check
+ 1247               	checksum_check:
+ 1248               	.LFB15:
+ 1249               	.LM193:
+ 1250               	/* prologue: frame size=0 */
+ 1251               	/* prologue end (size=0) */
+ 1252               	.LM194:
+ 1253 06ba 2091 0000 		lds r18,unilink_rxsize
+ 1254 06be 2250      		subi r18,lo8(-(-2))
+ 1255               	.LM195:
+ 1256 06c0 30E0      		ldi r19,lo8(0)
+ 1257 06c2 E0E0      		ldi r30,lo8(unilink_rxdata)
+ 1258 06c4 F0E0      		ldi r31,hi8(unilink_rxdata)
+ 1259 06c6 93E0      		ldi r25,lo8(3)
+ 1260               	.L120:
+ 1261               	.LM196:
+ 1262 06c8 8191      		ld r24,Z+
+ 1263 06ca 380F      		add r19,r24
+ 1264               	.LM197:
+ 1265 06cc 9150      		subi r25,lo8(-(-1))
+ 1266 06ce 97FF      		sbrs r25,7
+ 1267 06d0 FBCF      		rjmp .L120
+ 1268 06d2 94E0      		ldi r25,lo8(4)
+ 1269               	.LM198:
+ 1270 06d4 8091 0000 		lds r24,unilink_rxdata+4
+ 1271 06d8 3817      		cp r19,r24
+ 1272 06da 51F4      		brne .L121
+ 1273               	.LM199:
+ 1274 06dc 9217      		cp r25,r18
+ 1275 06de 69F4      		brne .L124
+ 1276               	.LM200:
+ 1277 06e0 8091 0000 		lds r24,unilink_rxdata+6
+ 1278 06e4 8823      		tst r24
+ 1279 06e6 49F4      		brne .L124
+ 1280               	.LM201:
+ 1281 06e8 8091 0000 		lds r24,flags
+ 1282 06ec 8160      		ori r24,lo8(1)
+ 1283 06ee 03C0      		rjmp .L137
+ 1284               	.L121:
+ 1285               	.LM202:
+ 1286 06f0 8091 0000 		lds r24,flags
+ 1287 06f4 8E7F      		andi r24,lo8(-2)
+ 1288               	.L137:
+ 1289 06f6 8093 0000 		sts flags,r24
+ 1290               	.L124:
+ 1291               	.LM203:
+ 1292 06fa 95E0      		ldi r25,lo8(5)
+ 1293               	.LM204:
+ 1294 06fc 9217      		cp r25,r18
+ 1295 06fe 38F4      		brsh .L136
+ 1296 0700 E0E0      		ldi r30,lo8(unilink_rxdata+5)
+ 1297 0702 F0E0      		ldi r31,hi8(unilink_rxdata+5)
+ 1298               	.L128:
+ 1299               	.LM205:
+ 1300 0704 8191      		ld r24,Z+
+ 1301 0706 380F      		add r19,r24
+ 1302               	.LM206:
+ 1303 0708 9F5F      		subi r25,lo8(-(1))
+ 1304 070a 9217      		cp r25,r18
+ 1305 070c D8F3      		brlo .L128
+ 1306               	.L136:
+ 1307               	.LM207:
+ 1308 070e 9217      		cp r25,r18
+ 1309 0710 A9F4      		brne .L116
+ 1310               	.LM208:
+ 1311 0712 E92F      		mov r30,r25
+ 1312 0714 FF27      		clr r31
+ 1313 0716 E050      		subi r30,lo8(-(unilink_rxdata))
+ 1314 0718 F040      		sbci r31,hi8(-(unilink_rxdata))
+ 1315 071a 8081      		ld r24,Z
+ 1316 071c 3817      		cp r19,r24
+ 1317 071e 49F4      		brne .L130
+ 1318               	.LM209:
+ 1319 0720 8181      		ldd r24,Z+1
+ 1320 0722 8823      		tst r24
+ 1321 0724 59F4      		brne .L116
+ 1322               	.LM210:
+ 1323 0726 8091 0000 		lds r24,flags
+ 1324 072a 8160      		ori r24,lo8(1)
+ 1325 072c 8093 0000 		sts flags,r24
+ 1326 0730 0895      		ret
+ 1327               	.L130:
+ 1328               	.LM211:
+ 1329 0732 8091 0000 		lds r24,flags
+ 1330 0736 8E7F      		andi r24,lo8(-2)
+ 1331 0738 8093 0000 		sts flags,r24
+ 1332               	.L116:
+ 1333 073c 0895      		ret
+ 1334               	/* epilogue: frame size=0 */
+ 1335               	/* epilogue: noreturn */
+ 1336               	/* epilogue end (size=0) */
+ 1337               	/* function checksum_check size 66 (66) */
+ 1338               	.LFE15:
+ 1340               	.global	bcd2hex
+ 1342               	bcd2hex:
+ 1343               	.LFB17:
+ 1344               	.LM212:
+ 1345               	/* prologue: frame size=0 */
+ 1346               	/* prologue end (size=0) */
+ 1347               	.LM213:
+ 1348 073e 282F      		mov r18,r24
+ 1349 0740 2F70      		andi r18,lo8(15)
+ 1350 0742 8295      		swap r24
+ 1351 0744 8F70      		andi r24,0x0f
+ 1352 0746 9AE0      		ldi r25,lo8(10)
+ 1353 0748 899F      		mul r24,r25
+ 1354 074a C001      		movw r24,r0
+ 1355 074c 1124      		clr r1
+ 1356 074e 280F      		add r18,r24
+ 1357               	.LM214:
+ 1358 0750 822F      		mov r24,r18
+ 1359 0752 9927      		clr r25
+ 1360               	/* epilogue: frame size=0 */
+ 1361 0754 0895      		ret
+ 1362               	/* epilogue end (size=1) */
+ 1363               	/* function bcd2hex size 12 (11) */
+ 1364               	.LFE17:
+ 1366               	.global	bin2ascii
+ 1368               	bin2ascii:
+ 1369               	.LFB18:
+ 1370               	.LM215:
+ 1371               	/* prologue: frame size=0 */
+ 1372               	/* prologue end (size=0) */
+ 1373               	.LM216:
+ 1374 0756 8F70      		andi r24,lo8(15)
+ 1375               	.LM217:
+ 1376 0758 8A30      		cpi r24,lo8(10)
+ 1377 075a 18F4      		brsh .L140
+ 1378               	.LM218:
+ 1379 075c 805D      		subi r24,lo8(-(48))
+ 1380 075e 9927      		clr r25
+ 1381 0760 0895      		ret
+ 1382               	.L140:
+ 1383               	.LM219:
+ 1384 0762 895C      		subi r24,lo8(-(55))
+ 1385 0764 9927      		clr r25
+ 1386               	.LM220:
+ 1387 0766 0895      		ret
+ 1388               	/* epilogue: frame size=0 */
+ 1389               	/* epilogue: noreturn */
+ 1390               	/* epilogue end (size=0) */
+ 1391               	/* function bin2ascii size 9 (9) */
+ 1392               	.LFE18:
+ 1394               	.global	bus_logging
+ 1396               	bus_logging:
+ 1397               	.LFB19:
+ 1398               	.LM221:
+ 1399               	/* prologue: frame size=0 */
+ 1400 0768 EF92      		push r14
+ 1401 076a FF92      		push r15
+ 1402 076c 1F93      		push r17
+ 1403 076e CF93      		push r28
+ 1404               	/* prologue end (size=4) */
+ 1405               	.LM222:
+ 1406 0770 8091 0000 		lds r24,flags
+ 1407 0774 83FF      		sbrs r24,3
+ 1408 0776 12C0      		rjmp .L143
+ 1409               	.LM223:
+ 1410 0778 8091 0000 		lds r24,flags
+ 1411 077c 877F      		andi r24,lo8(-9)
+ 1412 077e 8093 0000 		sts flags,r24
+ 1413               	.LM224:
+ 1414 0782 E0E0      		ldi r30,lo8(unilink_txdata)
+ 1415 0784 EE2E      		mov r14,r30
+ 1416 0786 E0E0      		ldi r30,hi8(unilink_txdata)
+ 1417 0788 FE2E      		mov r15,r30
+ 1418               	.LM225:
+ 1419 078a C091 0000 		lds r28,unilink_txsize
+ 1420 078e CF5F      		subi r28,lo8(-(1))
+ 1421               	.LM226:
+ 1422 0790 8AE0      		ldi r24,lo8(10)
+ 1423 0792 58DC      		rcall usart_putc
+ 1424               	.LM227:
+ 1425 0794 8DE0      		ldi r24,lo8(13)
+ 1426 0796 56DC      		rcall usart_putc
+ 1427               	.LM228:
+ 1428 0798 83E2      		ldi r24,lo8(35)
+ 1429 079a 0CC0      		rjmp .L151
+ 1430               	.L143:
+ 1431               	.LM229:
+ 1432 079c 8AE0      		ldi r24,lo8(10)
+ 1433 079e 52DC      		rcall usart_putc
+ 1434               	.LM230:
+ 1435 07a0 8DE0      		ldi r24,lo8(13)
+ 1436 07a2 50DC      		rcall usart_putc
+ 1437               	.LM231:
+ 1438 07a4 70E0      		ldi r23,lo8(unilink_rxdata)
+ 1439 07a6 E72E      		mov r14,r23
+ 1440 07a8 70E0      		ldi r23,hi8(unilink_rxdata)
+ 1441 07aa F72E      		mov r15,r23
+ 1442               	.LM232:
+ 1443 07ac C091 0000 		lds r28,unilink_rxsize
+ 1444 07b0 C150      		subi r28,lo8(-(-1))
+ 1445               	.LM233:
+ 1446 07b2 8BEA      		ldi r24,lo8(-85)
+ 1447               	.L151:
+ 1448 07b4 47DC      		rcall usart_putc
+ 1449               	.L152:
+ 1450               	.LM234:
+ 1451 07b6 CC23      		tst r28
+ 1452 07b8 79F0      		breq .L150
+ 1453               	.LM235:
+ 1454 07ba F701      		movw r30,r14
+ 1455 07bc 1191      		ld r17,Z+
+ 1456 07be 7F01      		movw r14,r30
+ 1457               	.LM236:
+ 1458 07c0 812F      		mov r24,r17
+ 1459 07c2 8295      		swap r24
+ 1460 07c4 8F70      		andi r24,0x0f
+ 1461 07c6 C7DF      		rcall bin2ascii
+ 1462 07c8 3DDC      		rcall usart_putc
+ 1463               	.LM237:
+ 1464 07ca 812F      		mov r24,r17
+ 1465 07cc C4DF      		rcall bin2ascii
+ 1466 07ce 3ADC      		rcall usart_putc
+ 1467               	.LM238:
+ 1468 07d0 80E2      		ldi r24,lo8(32)
+ 1469 07d2 38DC      		rcall usart_putc
+ 1470               	.LM239:
+ 1471 07d4 C150      		subi r28,lo8(-(-1))
+ 1472 07d6 EFCF      		rjmp .L152
+ 1473               	.L150:
+ 1474               	.LM240:
+ 1475 07d8 80E3      		ldi r24,lo8(48)
+ 1476 07da 34DC      		rcall usart_putc
+ 1477               	.LM241:
+ 1478 07dc 80E3      		ldi r24,lo8(48)
+ 1479 07de 32DC      		rcall usart_putc
+ 1480               	/* epilogue: frame size=0 */
+ 1481 07e0 CF91      		pop r28
+ 1482 07e2 1F91      		pop r17
+ 1483 07e4 FF90      		pop r15
+ 1484 07e6 EF90      		pop r14
+ 1485 07e8 0895      		ret
+ 1486               	/* epilogue end (size=5) */
+ 1487               	/* function bus_logging size 65 (56) */
+ 1488               	.LFE19:
+ 1490               	.global	__vector_10
+ 1492               	__vector_10:
+ 1493               	.LFB7:
+ 1494               	.LM242:
+ 1495               	/* prologue: frame size=0 */
+ 1496 07ea 7894      		sei
+ 1497 07ec 1F92      		push __zero_reg__
+ 1498 07ee 0F92      		push __tmp_reg__
+ 1499 07f0 0FB6      		in __tmp_reg__,__SREG__
+ 1500 07f2 0F92      		push __tmp_reg__
+ 1501 07f4 1124      		clr __zero_reg__
+ 1502 07f6 2F93      		push r18
+ 1503 07f8 3F93      		push r19
+ 1504 07fa 4F93      		push r20
+ 1505 07fc 5F93      		push r21
+ 1506 07fe 6F93      		push r22
+ 1507 0800 7F93      		push r23
+ 1508 0802 8F93      		push r24
+ 1509 0804 9F93      		push r25
+ 1510 0806 AF93      		push r26
+ 1511 0808 BF93      		push r27
+ 1512 080a EF93      		push r30
+ 1513 080c FF93      		push r31
+ 1514               	/* prologue end (size=18) */
+ 1515               	.LM243:
+ 1516 080e 8091 0000 		lds r24,flags
+ 1517 0812 81FD      		sbrc r24,1
+ 1518 0814 44C0      		rjmp .L154
+ 1519               	.LM244:
+ 1520 0816 949A      		sbi 50-0x20,4
+ 1521               	.LM245:
+ 1522 0818 8091 0000 		lds r24,unilink_bytecount
+ 1523 081c 8F71      		andi r24,lo8(31)
+ 1524 081e E82F      		mov r30,r24
+ 1525 0820 FF27      		clr r31
+ 1526 0822 E050      		subi r30,lo8(-(unilink_rxdata))
+ 1527 0824 F040      		sbci r31,hi8(-(unilink_rxdata))
+ 1528 0826 8FB1      		in r24,47-0x20
+ 1529 0828 8083      		st Z,r24
+ 1530               	.LM246:
+ 1531 082a C8DC      		rcall reset_spi
+ 1532               	.LM247:
+ 1533 082c 8091 0000 		lds r24,unilink_rxdata
+ 1534 0830 8823      		tst r24
+ 1535 0832 29F4      		brne .L155
+ 1536 0834 8091 0000 		lds r24,unilink_bytecount
+ 1537 0838 8F71      		andi r24,lo8(31)
+ 1538 083a 09F4      		brne .+2
+ 1539 083c 88C0      		rjmp .L153
+ 1540               	.L155:
+ 1541               	.LM248:
+ 1542 083e 86E0      		ldi r24,lo8(6)
+ 1543 0840 8093 0000 		sts unilink_rxsize,r24
+ 1544               	.LM249:
+ 1545 0844 9091 0000 		lds r25,unilink_rxdata+2
+ 1546 0848 97FF      		sbrs r25,7
+ 1547 084a 03C0      		rjmp .L156
+ 1548               	.LM250:
+ 1549 084c 8BE0      		ldi r24,lo8(11)
+ 1550 084e 8093 0000 		sts unilink_rxsize,r24
+ 1551               	.L156:
+ 1552               	.LM251:
+ 1553 0852 903C      		cpi r25,lo8(-64)
+ 1554 0854 18F0      		brlo .L157
+ 1555               	.LM252:
+ 1556 0856 80E1      		ldi r24,lo8(16)
+ 1557 0858 8093 0000 		sts unilink_rxsize,r24
+ 1558               	.L157:
+ 1559               	.LM253:
+ 1560 085c 8091 0000 		lds r24,unilink_bytecount
+ 1561 0860 8091 0000 		lds r24,unilink_bytecount
+ 1562 0864 8F71      		andi r24,lo8(31)
+ 1563 0866 8F5F      		subi r24,lo8(-(1))
+ 1564 0868 8F71      		andi r24,lo8(31)
+ 1565 086a 9091 0000 		lds r25,unilink_bytecount
+ 1566 086e 907E      		andi r25,lo8(-32)
+ 1567 0870 982B      		or r25,r24
+ 1568 0872 9093 0000 		sts unilink_bytecount,r25
+ 1569               	.LM254:
+ 1570 0876 8091 0000 		lds r24,unilink_bytecount
+ 1571 087a 8F71      		andi r24,lo8(31)
+ 1572 087c 9091 0000 		lds r25,unilink_rxsize
+ 1573 0880 8917      		cp r24,r25
+ 1574 0882 08F4      		brsh .+2
+ 1575 0884 64C0      		rjmp .L153
+ 1576               	.LM255:
+ 1577 0886 9498      		cbi 50-0x20,4
+ 1578               	.LM256:
+ 1579 0888 8091 0000 		lds r24,unilink_bytecount
+ 1580 088c 807E      		andi r24,lo8(-32)
+ 1581 088e 8093 0000 		sts unilink_bytecount,r24
+ 1582               	.LM257:
+ 1583 0892 8091 0000 		lds r24,flags
+ 1584 0896 8460      		ori r24,lo8(4)
+ 1585 0898 8093 0000 		sts flags,r24
+ 1586 089c 58C0      		rjmp .L153
+ 1587               	.L154:
+ 1588               	.LM258:
+ 1589 089e 8091 0000 		lds r24,unilink_bytecount
+ 1590 08a2 8295      		swap r24
+ 1591 08a4 8695      		lsr r24
+ 1592 08a6 8770      		andi r24,0x7
+ 1593 08a8 9091 0000 		lds r25,unilink_bytecount+1
+ 1594 08ac 9370      		andi r25,lo8(3)
+ 1595 08ae 990F      		lsl r25
+ 1596 08b0 990F      		lsl r25
+ 1597 08b2 990F      		lsl r25
+ 1598 08b4 982B      		or r25,r24
+ 1599 08b6 8091 0000 		lds r24,unilink_txsize
+ 1600 08ba 8917      		cp r24,r25
+ 1601 08bc C0F1      		brlo .L160
+ 1602               	.LM259:
+ 1603 08be 9091 0000 		lds r25,unilink_bytecount
+ 1604 08c2 9295      		swap r25
+ 1605 08c4 9695      		lsr r25
+ 1606 08c6 9770      		andi r25,0x7
+ 1607 08c8 8091 0000 		lds r24,unilink_bytecount+1
+ 1608 08cc 8370      		andi r24,lo8(3)
+ 1609 08ce 880F      		lsl r24
+ 1610 08d0 880F      		lsl r24
+ 1611 08d2 880F      		lsl r24
+ 1612 08d4 892B      		or r24,r25
+ 1613 08d6 E82F      		mov r30,r24
+ 1614 08d8 FF27      		clr r31
+ 1615 08da E050      		subi r30,lo8(-(unilink_txdata))
+ 1616 08dc F040      		sbci r31,hi8(-(unilink_txdata))
+ 1617 08de 8081      		ld r24,Z
+ 1618 08e0 8FB9      		out 47-0x20,r24
+ 1619               	.LM260:
+ 1620 08e2 8091 0000 		lds r24,unilink_bytecount
+ 1621 08e6 8091 0000 		lds r24,unilink_bytecount+1
+ 1622 08ea 8091 0000 		lds r24,unilink_bytecount
+ 1623 08ee 8295      		swap r24
+ 1624 08f0 8695      		lsr r24
+ 1625 08f2 8770      		andi r24,0x7
+ 1626 08f4 9091 0000 		lds r25,unilink_bytecount+1
+ 1627 08f8 9370      		andi r25,lo8(3)
+ 1628 08fa 990F      		lsl r25
+ 1629 08fc 990F      		lsl r25
+ 1630 08fe 990F      		lsl r25
+ 1631 0900 982B      		or r25,r24
+ 1632 0902 9F5F      		subi r25,lo8(-(1))
+ 1633 0904 292F      		mov r18,r25
+ 1634 0906 2295      		swap r18
+ 1635 0908 220F      		lsl r18
+ 1636 090a 207E      		andi r18,0xe0
+ 1637 090c 8091 0000 		lds r24,unilink_bytecount
+ 1638 0910 8F71      		andi r24,lo8(31)
+ 1639 0912 822B      		or r24,r18
+ 1640 0914 8093 0000 		sts unilink_bytecount,r24
+ 1641 0918 9695      		lsr r25
+ 1642 091a 9695      		lsr r25
+ 1643 091c 9695      		lsr r25
+ 1644 091e 9370      		andi r25,lo8(3)
+ 1645 0920 8091 0000 		lds r24,unilink_bytecount+1
+ 1646 0924 8C7F      		andi r24,lo8(-4)
+ 1647 0926 892B      		or r24,r25
+ 1648 0928 8093 0000 		sts unilink_bytecount+1,r24
+ 1649 092c 10C0      		rjmp .L153
+ 1650               	.L160:
+ 1651               	.LM261:
+ 1652 092e 46DC      		rcall reset_spi
+ 1653               	.LM262:
+ 1654 0930 1FB8      		out 47-0x20,__zero_reg__
+ 1655               	.LM263:
+ 1656 0932 8091 0000 		lds r24,flags
+ 1657 0936 8D7F      		andi r24,lo8(-3)
+ 1658 0938 8093 0000 		sts flags,r24
+ 1659               	.LM264:
+ 1660 093c 8091 0000 		lds r24,flags
+ 1661 0940 8860      		ori r24,lo8(8)
+ 1662 0942 8093 0000 		sts flags,r24
+ 1663               	.LM265:
+ 1664 0946 10DF      		rcall bus_logging
+ 1665               	.LM266:
+ 1666 0948 9498      		cbi 50-0x20,4
+ 1667               	.LM267:
+ 1668 094a BC98      		cbi 55-0x20,4
+ 1669               	.LM268:
+ 1670               	/* #APP */
+ 1671 094c 0000      		nop
+ 1672               	/* #NOAPP */
+ 1673               	.L153:
+ 1674               	/* epilogue: frame size=0 */
+ 1675 094e FF91      		pop r31
+ 1676 0950 EF91      		pop r30
+ 1677 0952 BF91      		pop r27
+ 1678 0954 AF91      		pop r26
+ 1679 0956 9F91      		pop r25
+ 1680 0958 8F91      		pop r24
+ 1681 095a 7F91      		pop r23
+ 1682 095c 6F91      		pop r22
+ 1683 095e 5F91      		pop r21
+ 1684 0960 4F91      		pop r20
+ 1685 0962 3F91      		pop r19
+ 1686 0964 2F91      		pop r18
+ 1687 0966 0F90      		pop __tmp_reg__
+ 1688 0968 0FBE      		out __SREG__,__tmp_reg__
+ 1689 096a 0F90      		pop __tmp_reg__
+ 1690 096c 1F90      		pop __zero_reg__
+ 1691 096e 1895      		reti
+ 1692               	/* epilogue end (size=17) */
+ 1693               	/* function __vector_10 size 197 (162) */
+ 1694               	.LFE7:
+ 1696               	.global	main
+ 1698               	main:
+ 1699               	.LFB20:
+ 1700               	.LM269:
+ 1701               	/* prologue: frame size=0 */
+ 1702 0970 C0E0      		ldi r28,lo8(__stack - 0)
+ 1703 0972 D0E0      		ldi r29,hi8(__stack - 0)
+ 1704 0974 DEBF      		out __SP_H__,r29
+ 1705 0976 CDBF      		out __SP_L__,r28
+ 1706               	/* prologue end (size=4) */
+ 1707               	.LM270:
+ 1708               	/* #APP */
+ 1709 0978 F894      		cli
+ 1710               	.LM271:
+ 1711               	/* #NOAPP */
+ 1712 097a 88E1      		ldi r24,lo8(24)
+ 1713 097c 90E0      		ldi r25,hi8(24)
+ 1714 097e 2FE0      		ldi r18,lo8(15)
+ 1715               	/* #APP */
+ 1716 0980 0FB6      		in __tmp_reg__,__SREG__
+ 1717 0982 F894      		cli
+ 1718 0984 A895      		wdr
+ 1719 0986 81BD      		out 33,r24
+ 1720 0988 0FBE      		out __SREG__,__tmp_reg__
+ 1721 098a 21BD      		out 33,r18
+ 1722               	.LM272:
+ 1723               	/* #NOAPP */
+ 1724 098c 1BBE      		out 91-0x20,__zero_reg__
+ 1725               	.LM273:
+ 1726 098e 18BA      		out 56-0x20,__zero_reg__
+ 1727               	.LM274:
+ 1728 0990 17BA      		out 55-0x20,__zero_reg__
+ 1729               	.LM275:
+ 1730 0992 15BA      		out 53-0x20,__zero_reg__
+ 1731               	.LM276:
+ 1732 0994 14BA      		out 52-0x20,__zero_reg__
+ 1733               	.LM277:
+ 1734 0996 12BA      		out 50-0x20,__zero_reg__
+ 1735               	.LM278:
+ 1736 0998 8CE1      		ldi r24,lo8(28)
+ 1737 099a 81BB      		out 49-0x20,r24
+ 1738               	.LM279:
+ 1739 099c 84E0      		ldi r24,lo8(4)
+ 1740 099e 89BF      		out 89-0x20,r24
+ 1741               	.LM280:
+ 1742 09a0 13BE      		out 83-0x20,__zero_reg__
+ 1743               	.LM281:
+ 1744 09a2 1FBC      		out 79-0x20,__zero_reg__
+ 1745               	.LM282:
+ 1746 09a4 80EC      		ldi r24,lo8(-14144)
+ 1747 09a6 98EC      		ldi r25,hi8(-14144)
+ 1748 09a8 9DBD      		out (76)+1-0x20,r25
+ 1749 09aa 8CBD      		out 76-0x20,r24
+ 1750               	.LM283:
+ 1751 09ac 1EBC      		out 78-0x20,__zero_reg__
+ 1752               	.LM284:
+ 1753 09ae 84EC      		ldi r24,lo8(-60)
+ 1754 09b0 8DB9      		out 45-0x20,r24
+ 1755               	.LM285:
+ 1756 09b2 80E4      		ldi r24,lo8(64)
+ 1757 09b4 87BB      		out 55-0x20,r24
+ 1758               	.LM286:
+ 1759 09b6 1FB8      		out 47-0x20,__zero_reg__
+ 1760               	.LM287:
+ 1761 09b8 49DB      		rcall usart_init
+ 1762               	.LM288:
+ 1763 09ba 80E3      		ldi r24,lo8(48)
+ 1764 09bc 8093 0000 		sts unilink_ownaddr,r24
+ 1765               	.LM289:
+ 1766 09c0 8093 0000 		sts unilink_groupid,r24
+ 1767               	.LM290:
+ 1768 09c4 86E1      		ldi r24,lo8(22)
+ 1769 09c6 8093 0000 		sts unilink_lastdisc,r24
+ 1770               	.LM291:
+ 1771 09ca 1092 0000 		sts unilink_lasttrack,__zero_reg__
+ 1772               	.LM292:
+ 1773 09ce 8091 0000 		lds r24,flags
+ 1774 09d2 8F77      		andi r24,lo8(127)
+ 1775 09d4 8093 0000 		sts flags,r24
+ 1776               	.LM293:
+ 1777               	/* #APP */
+ 1778 09d8 7894      		sei
+ 1779               	.LM294:
+ 1780               	/* #NOAPP */
+ 1781 09da 94E5      		ldi r25,lo8(84)
+ 1782 09dc 92BF      		out 82-0x20,r25
+ 1783               	.LM295:
+ 1784 09de 84E0      		ldi r24,lo8(4)
+ 1785 09e0 83BF      		out 83-0x20,r24
+ 1786               	.LM296:
+ 1787 09e2 08B6      		in __tmp_reg__,88-0x20
+ 1788 09e4 00FC      		sbrc __tmp_reg__,0
+ 1789 09e6 06C0      		rjmp .L192
+ 1790 09e8 892F      		mov r24,r25
+ 1791               	.L166:
+ 1792               	.LM297:
+ 1793 09ea B39B      		sbis 54-0x20,3
+ 1794 09ec 82BF      		out 82-0x20,r24
+ 1795               	.L163:
+ 1796 09ee 08B6      		in __tmp_reg__,88-0x20
+ 1797 09f0 00FE      		sbrs __tmp_reg__,0
+ 1798 09f2 FBCF      		rjmp .L166
+ 1799               	.L192:
+ 1800               	.LM298:
+ 1801 09f4 88B7      		in r24,88-0x20
+ 1802 09f6 8160      		ori r24,lo8(1)
+ 1803 09f8 88BF      		out 88-0x20,r24
+ 1804               	.LM299:
+ 1805 09fa 84E5      		ldi r24,lo8(84)
+ 1806 09fc 82BF      		out 82-0x20,r24
+ 1807               	.LM300:
+ 1808 09fe 08B6      		in __tmp_reg__,88-0x20
+ 1809 0a00 00FC      		sbrc __tmp_reg__,0
+ 1810 0a02 05C0      		rjmp .L194
+ 1811               	.L170:
+ 1812 0a04 B399      		sbic 54-0x20,3
+ 1813 0a06 82BF      		out 82-0x20,r24
+ 1814               	.L167:
+ 1815 0a08 08B6      		in __tmp_reg__,88-0x20
+ 1816 0a0a 00FE      		sbrs __tmp_reg__,0
+ 1817 0a0c FBCF      		rjmp .L170
+ 1818               	.L194:
+ 1819               	.LM301:
+ 1820 0a0e 12BE      		out 82-0x20,__zero_reg__
+ 1821               	.L200:
+ 1822               	.LM302:
+ 1823 0a10 B39B      		sbis 54-0x20,3
+ 1824 0a12 01C0      		rjmp .L176
+ 1825               	.LM303:
+ 1826               	/* #APP */
+ 1827 0a14 A895      		wdr
+ 1828               	/* #NOAPP */
+ 1829               	.L176:
+ 1830               	.LM304:
+ 1831 0a16 8091 0000 		lds r24,usart_rx_buffer
+ 1832 0a1a 8437      		cpi r24,lo8(116)
+ 1833 0a1c 29F4      		brne .L177
+ 1834 0a1e 8091 0000 		lds r24,usart_rx_index
+ 1835 0a22 8830      		cpi r24,lo8(8)
+ 1836 0a24 38F1      		brlo .L175
+ 1837 0a26 25C0      		rjmp .L187
+ 1838               	.L177:
+ 1839               	.LM305:
+ 1840 0a28 8434      		cpi r24,lo8(68)
+ 1841 0a2a 11F0      		breq .L199
+ 1842               	.LM306:
+ 1843 0a2c 8435      		cpi r24,lo8(84)
+ 1844 0a2e 59F4      		brne .L182
+ 1845               	.L199:
+ 1846 0a30 E091 0000 		lds r30,usart_rx_index
+ 1847 0a34 E131      		cpi r30,lo8(17)
+ 1848 0a36 E8F4      		brsh .L187
+ 1849 0a38 FF27      		clr r31
+ 1850 0a3a E050      		subi r30,lo8(-(usart_rx_buffer-1))
+ 1851 0a3c F040      		sbci r31,hi8(-(usart_rx_buffer-1))
+ 1852 0a3e 8081      		ld r24,Z
+ 1853 0a40 8E37      		cpi r24,lo8(126)
+ 1854 0a42 C1F4      		brne .L175
+ 1855 0a44 16C0      		rjmp .L187
+ 1856               	.L182:
+ 1857               	.LM307:
+ 1858 0a46 8A32      		cpi r24,lo8(42)
+ 1859 0a48 A9F4      		brne .L175
+ 1860               	.LM308:
+ 1861 0a4a 9091 0000 		lds r25,usart_rx_buffer+3
+ 1862 0a4e 97FD      		sbrc r25,7
+ 1863 0a50 04C0      		rjmp .L188
+ 1864 0a52 8091 0000 		lds r24,usart_rx_index
+ 1865 0a56 8530      		cpi r24,lo8(5)
+ 1866 0a58 60F4      		brsh .L187
+ 1867               	.L188:
+ 1868 0a5a 903C      		cpi r25,lo8(-64)
+ 1869 0a5c 20F4      		brsh .L189
+ 1870 0a5e 8091 0000 		lds r24,usart_rx_index
+ 1871 0a62 8930      		cpi r24,lo8(9)
+ 1872 0a64 30F4      		brsh .L187
+ 1873               	.L189:
+ 1874 0a66 903C      		cpi r25,lo8(-64)
+ 1875 0a68 28F0      		brlo .L175
+ 1876 0a6a 8091 0000 		lds r24,usart_rx_index
+ 1877 0a6e 8E30      		cpi r24,lo8(14)
+ 1878 0a70 08F0      		brlo .L175
+ 1879               	.L187:
+ 1880               	.LM309:
+ 1881 0a72 2CDB      		rcall usart_rx_proc
+ 1882               	.L175:
+ 1883               	.LM310:
+ 1884 0a74 8091 0000 		lds r24,flags
+ 1885 0a78 82FF      		sbrs r24,2
+ 1886 0a7a CACF      		rjmp .L200
+ 1887               	.LM311:
+ 1888 0a7c 8091 0000 		lds r24,flags
+ 1889 0a80 8B7F      		andi r24,lo8(-5)
+ 1890 0a82 8093 0000 		sts flags,r24
+ 1891               	.LM312:
+ 1892 0a86 19DE      		rcall checksum_check
+ 1893               	.LM313:
+ 1894 0a88 8091 0000 		lds r24,flags
+ 1895 0a8c 80FF      		sbrs r24,0
+ 1896 0a8e C0CF      		rjmp .L200
+ 1897               	.LM314:
+ 1898 0a90 02DE      		rcall unilink_parse
+ 1899               	.LM315:
+ 1900 0a92 8091 0000 		lds r24,flags
+ 1901 0a96 877F      		andi r24,lo8(-9)
+ 1902 0a98 8093 0000 		sts flags,r24
+ 1903               	.LM316:
+ 1904 0a9c 65DE      		rcall bus_logging
+ 1905 0a9e B8CF      		rjmp .L200
+ 1906               	/* epilogue: frame size=0 */
+ 1907               	/* epilogue: noreturn */
+ 1908               	/* epilogue end (size=0) */
+ 1909               	/* function main size 163 (159) */
+ 1910               	.LFE20:
+ 1912               	.global	__vector_8
+ 1914               	__vector_8:
+ 1915               	.LFB21:
+ 1916               	.LM317:
+ 1917               	/* prologue: frame size=0 */
+ 1918 0aa0 1F92      		push __zero_reg__
+ 1919 0aa2 0F92      		push __tmp_reg__
+ 1920 0aa4 0FB6      		in __tmp_reg__,__SREG__
+ 1921 0aa6 0F92      		push __tmp_reg__
+ 1922 0aa8 1124      		clr __zero_reg__
+ 1923 0aaa 8F93      		push r24
+ 1924 0aac 9F93      		push r25
+ 1925               	/* prologue end (size=7) */
+ 1926               	.LM318:
+ 1927 0aae 8091 0000 		lds r24,flags
+ 1928 0ab2 8062      		ori r24,lo8(32)
+ 1929 0ab4 8093 0000 		sts flags,r24
+ 1930               	.LM319:
+ 1931 0ab8 80EC      		ldi r24,lo8(-14144)
+ 1932 0aba 98EC      		ldi r25,hi8(-14144)
+ 1933 0abc 9DBD      		out (76)+1-0x20,r25
+ 1934 0abe 8CBD      		out 76-0x20,r24
+ 1935               	/* epilogue: frame size=0 */
+ 1936 0ac0 9F91      		pop r25
+ 1937 0ac2 8F91      		pop r24
+ 1938 0ac4 0F90      		pop __tmp_reg__
+ 1939 0ac6 0FBE      		out __SREG__,__tmp_reg__
+ 1940 0ac8 0F90      		pop __tmp_reg__
+ 1941 0aca 1F90      		pop __zero_reg__
+ 1942 0acc 1895      		reti
+ 1943               	/* epilogue end (size=7) */
+ 1944               	/* function __vector_8 size 23 (9) */
+ 1945               	.LFE21:
+ 1947               		.comm flags,1,1
+ 1948               		.comm unilink_command,1,1
+ 1949               		.comm unilink_bytecount,2,1
+ 1950               		.comm unilink_rxdata,16,1
+ 1951               		.comm unilink_txdata,16,1
+ 1952               		.comm unilink_discname,8,1
+ 1953               		.comm unilink_lasttrack,1,1
+ 1954               		.comm usart_rx_buffer,51,1
+ 1955               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+  D:/TEMP/ccPaaaaa.s:3      *ABS*:0000003f __SREG__
+  D:/TEMP/ccPaaaaa.s:4      *ABS*:0000003e __SP_H__
+  D:/TEMP/ccPaaaaa.s:5      *ABS*:0000003d __SP_L__
+  D:/TEMP/ccPaaaaa.s:6      *ABS*:00000000 __tmp_reg__
+  D:/TEMP/ccPaaaaa.s:7      *ABS*:00000001 __zero_reg__
+  D:/TEMP/ccPaaaaa.s:23     .bss:00000000 raw
+  D:/TEMP/ccPaaaaa.s:29     .bss:0000000d usart_rx_index
+  D:/TEMP/ccPaaaaa.s:35     .bss:0000000e unilink_lastdisc
+  D:/TEMP/ccPaaaaa.s:41     .data:00000000 tracknbr
+  D:/TEMP/ccPaaaaa.s:48     .bss:0000000f unilink_bitid
+  D:/TEMP/ccPaaaaa.s:54     .data:00000001 unilink_status
+  D:/TEMP/ccPaaaaa.s:59     .data:00000002 unilink_timeinfo
+  D:/TEMP/ccPaaaaa.s:73     .bss:00000010 unilink_txsize
+  D:/TEMP/ccPaaaaa.s:79     .bss:00000011 unilink_rxsize
+  D:/TEMP/ccPaaaaa.s:85     .bss:00000012 unilink_groupid
+  D:/TEMP/ccPaaaaa.s:91     .bss:00000013 unilink_ownaddr
+  D:/TEMP/ccPaaaaa.s:96     .text:00000000 __vector_11
+                            *COM*:00000033 usart_rx_buffer
+  D:/TEMP/ccPaaaaa.s:143    .text:00000044 usart_putc
+  D:/TEMP/ccPaaaaa.s:162    .text:0000004c usart_init
+  D:/TEMP/ccPaaaaa.s:186    .text:0000005c slavebreak
+                            *COM*:00000001 flags
+  D:/TEMP/ccPaaaaa.s:280    .text:000000cc usart_rx_proc
+                            *COM*:00000001 unilink_command
+                            *COM*:00000008 unilink_discname
+  D:/TEMP/ccPaaaaa.s:421    .text:000001bc reset_spi
+  D:/TEMP/ccPaaaaa.s:441    .text:000001c6 unilink_tx
+                            *COM*:00000010 unilink_txdata
+                            *COM*:00000002 unilink_bytecount
+  D:/TEMP/ccPaaaaa.s:562    .text:00000278 unilink_broadcast
+                            *COM*:00000010 unilink_rxdata
+  D:/TEMP/ccPaaaaa.s:685    .text:0000033c unilink_appoint
+  D:/TEMP/ccPaaaaa.s:768    .text:000003c2 send_command
+  D:/TEMP/ccPaaaaa.s:967    .text:00000524 unilink_myid_cmd
+                            *COM*:00000001 unilink_lasttrack
+  D:/TEMP/ccPaaaaa.s:1208   .text:00000696 unilink_parse
+  D:/TEMP/ccPaaaaa.s:1247   .text:000006ba checksum_check
+  D:/TEMP/ccPaaaaa.s:1342   .text:0000073e bcd2hex
+  D:/TEMP/ccPaaaaa.s:1368   .text:00000756 bin2ascii
+  D:/TEMP/ccPaaaaa.s:1396   .text:00000768 bus_logging
+  D:/TEMP/ccPaaaaa.s:1492   .text:000007ea __vector_10
+  D:/TEMP/ccPaaaaa.s:1698   .text:00000970 main
+  D:/TEMP/ccPaaaaa.s:1914   .text:00000aa0 __vector_8
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__stack

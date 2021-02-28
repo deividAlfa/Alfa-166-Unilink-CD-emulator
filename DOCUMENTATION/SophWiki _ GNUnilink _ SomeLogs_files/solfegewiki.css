@@ -1,0 +1,158 @@
+/***********************************************************************
+** pmwiki.css
+**  Copyright 2004 Patrick R. Michaud (pmichaud@pobox.com)
+**  This file is part of PmWiki; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published
+**  by the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.  See pmwiki.php for full details.
+***********************************************************************/
+
+#wikititle { font-size: 200%; font-weight: bold; }
+pre {
+  border: 1px solid #ccc;
+  background-color: #eee;
+}
+.vspace {  }
+body { margin: 0px; padding: 0px;}
+#banner {
+    background-color: #00009a;
+    font-family: Verdana, sans-serif;
+    color: white;
+    padding: 0.5em;
+    border-left: 10px solid #000085;
+}
+#banner a { color: white; text-decoration: none; }
+#banner-line1 {
+    font-size: 200%;
+}
+#banner-line2 {
+    font-size: large;
+    padding-left: 1em;
+}
+
+#wikihead { 
+  position:absolute; 
+  top:10px; right:0px; 
+  font-size:smaller; text-align:right;
+  clear: right;
+  color: white;
+}
+#wikihead input { font-size:smaller; }
+#wikihead form { margin:0px; }
+#wikihead a { color: white; }
+
+#wikileft
+{
+ padding: 0 0 1em 0;
+ font-family: Verdana, Lucida, Geneva, Helvetica, Arial, sans-serif;
+ background-color: #000085;
+ color: #ffffff;
+ float:left;
+ width: 9em;
+}
+html>body #wikileft { width: 12em;}
+
+#wikileft ul
+{
+list-style: none;
+margin: 0;
+padding: 0;
+border: none;
+border-top: 1px solid #0000d0;
+}
+#wikileft li
+{
+border-bottom: 1px solid #7070e0;
+margin: 0;
+}
+
+#wikileft li a
+{
+   display: block;
+   padding: 2px 5px 2px 5px;
+   border-left: 10px solid #2050a5;
+   border-right: 10px solid #2050a5;
+   background-color: #00009a;
+   color: #fff;
+   font-size: 80%;
+   text-decoration: none;
+   width: 100%;
+}
+html>body #wikileft li a { width: auto; }
+
+
+#wikileft li a:hover
+{
+background-color: #8080f0;
+color: #fff;
+}
+
+#wikileft h1 {
+    font-size: 100%;
+    color: white;
+    display: block;
+    padding: 2px 5px 2px 5px;
+
+    border-top: 2px solid #d0d0ff;
+    border-bottom: 2px solid #d0d0ff;
+    background: #9090f5;
+    padding: 0;
+    margin: 0;
+
+    padding-left:  15px;
+    padding-right: 15px;/*FIXME why 15 and not 10 to get IE6 happy ? */
+
+    width: 100%;
+}
+
+#wikileft h1 a:hover
+{
+    color: white;
+    background: #c0c0c5;
+}
+
+html>body #wikileft h1 { width: auto; }
+#wikileft h2 { font-size: small; }
+#wikileft h1 a,
+#wikileft h2 a { color: white; }
+/*
+#wikiright {
+  float:right;
+  width: 160px;
+  margin-left: 1em;
+}
+.googlead {
+border-top: 1px solid #00d000;
+}
+*/
+
+#wikibody {
+  background-color: #f0f0ff;
+  margin-left:  12em;
+  margin-right: 10px;
+
+  padding: 10px;
+  padding-top: 1em;
+}
+html>body #wikibody { margin-left: 12em;}
+#wikitext { padding-top: 0.5em; }
+
+#wikicmds { font-size:smaller; text-align:right; vertical-align:top; 
+    float: right;
+    width: 13em; 
+}
+#wikicmds a { display:block; }
+
+#wikifoot { 
+	border-top:2px solid #cccccc; 
+	font-size:smaller;
+        clear:both;
+}
+
+h1.wikiaction { font-size:150%; margin:0px;}
+#wikiedit { 
+   margin-left: 0px;
+    margin-right: 0px;
+   width: 95%;
+}
+/*#wikiedit form { margin:0px;  }*/

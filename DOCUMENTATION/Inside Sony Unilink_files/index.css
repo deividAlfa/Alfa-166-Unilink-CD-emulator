@@ -1,0 +1,251 @@
+:root {
+    --mictronics: #ec5e00;
+    --carrot: #e67e22;
+    --asbestos: #7f8c8d;
+    --concrete: #95a5a6;
+    --silver: #bdc3c7;
+    --clouds: #ecf0f1;
+    --midnight-blue: #2c3e50;
+    --wet-asphalt: #34495e;
+    --orange: #f39c12;
+    --pumkin: #d35400;
+    --pomegranate: #c0392b;
+    --alizarin: #e74c3c;
+    --belize-hole: #2980b9;
+    --sun-flower: #f1c40f;
+    --green-sea: #16a085;
+    --nephritis: #27ae60;
+    --wisteria: #8e44ad;
+    --amethyst: #9b59b6;
+    --peter-river: #3498db;
+    --emerald: #2ecc71;
+    --turquoise: #1abc9c;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: var(--darkgray);
+    background-color: var(--white);
+    line-height: 1.5em;
+    font-size: 14px;
+    word-break: break-word;
+    -webkit-tap-highlight-color: transparent;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+p,
+.tmpl-post li {
+    line-height: 1.45;
+}
+
+a[href] {
+    color: var(--midnight-blue);
+    text-decoration: none;
+}
+
+a[href]:visited {
+    color: var(--wet-asphalt);
+}
+
+a[href]:hover {
+    color: var(--mictronics);
+}
+
+main {
+    padding: 1rem;
+}
+
+main :first-child {
+    margin-top: 0;
+}
+
+header {
+    border-bottom: 1px dashed var(--silver);
+    display: grid;
+}
+
+header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+footer {
+    border-top: 1px dashed var(--silver);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0; /* 16px /16 */
+    font-size: 1em; /* 16px /16 */
+}
+
+table {
+    margin: 1em 0;
+}
+
+table td,
+table th {
+    padding-right: 1em;
+}
+
+.h1,
+.h2,
+.h3,
+h1,
+h2,
+h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+pre {
+    background-color: var(--clouds);
+}
+
+.highlight-line {
+    display: block;
+    padding: 0.125em 1em;
+    text-decoration: none; /* override del, ins, mark defaults */
+    color: inherit; /* override del, ins, mark defaults */
+}
+
+/* allow highlighting empty lines */
+.highlight-line:empty:before {
+    content: " ";
+}
+
+/* avoid double line breaks when using display: block; */
+.highlight-line + br {
+    display: none;
+}
+
+.highlight-line-isdir {
+    color: var(--concrete);
+    background-color: var(--midnight-blue);
+}
+
+.highlight-line-active {
+    background-color: var(--wet-asphalt);
+    background-color: var(--silver);
+}
+
+.highlight-line-add {
+    background-color: var(--emerald);
+}
+
+.highlight-line-remove {
+    background-color: var(--alizarin);
+}
+
+/* Header */
+.home {
+    padding: 0 1rem;
+    float: left;
+    margin: 1rem 0; /* 16px /16 */
+    font-size: 1em; /* 16px /16 */
+}
+
+.home :link:not(:hover) {
+    text-decoration: none;
+}
+
+/* Posts list */
+.postlist {
+    list-style: none;
+    padding: 0;
+}
+
+.postlist-item {
+    counter-increment: start-from -1;
+}
+
+.postlist-item:before {
+    display: inline-block;
+    pointer-events: none;
+    content: "" counter(start-from, decimal-leading-zero) ". ";
+    line-height: 100%;
+    text-align: right;
+}
+
+.postlist-date,
+.postlist-item:before {
+    font-size: small;
+    color: var(--darkgray);
+}
+
+.postlist-date {
+    word-spacing: -0.5px;
+    padding: 0.25em 1em;
+}
+
+.postlist-link {
+    display: inline-block;
+    padding: 0.25em 0.1875em; /* 4px 3px /16 */
+    text-decoration: none;
+}
+
+/* Tags */
+.tag {
+    display: inline-block;
+    vertical-align: text-top;
+    text-transform: uppercase;
+    font-size: small;
+    padding: 2px 4px;
+    margin-left: 0.8em; /* 8px /10 */
+    color: var(--asbestos);
+    border-radius: 0.25em; /* 3px /12 */
+    text-decoration: none;
+}
+
+.tag-list {
+    font-size: larger;
+}
+
+a[href].tag,
+a[href].tag:visited {
+    color: var(--asbestos);
+}
+
+/* Direct Links / Markdown Headers */
+.direct-link {
+    font-family: sans-serif;
+    text-decoration: none;
+    font-style: normal;
+    margin-left: 0.1em;
+}
+
+a[href].direct-link,
+a[href].direct-link:visited {
+    color: transparent;
+}
+
+a[href].direct-link:focus,
+a[href].direct-link:focus:visited,
+:hover > a[href].direct-link,
+:hover > a[href].direct-link:visited {
+    color: var(--wet-asphalt);
+}
+
+figure {
+    border: 1px solid var(--clouds);
+    padding: 4px;
+    border-radius: 4px;
+    width: max-content;
+    text-align: center;
+    max-width: 100%;
+    font-size: small;
+}
+
+figcaption {
+    margin: 0.5em 0;
+    color: var(--asbestos);
+}

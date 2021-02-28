@@ -1,0 +1,7 @@
+This code has been written on Linux using the free PIC assembler gpasm
+see http://gpasm.sourceforge.net for more information.
+
+It should also compile with the offical Microchip MASM compilier, though
+I can't routinely test this as I don't have it, or run Windows.
+
+Simon Wood.

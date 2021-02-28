@@ -1,0 +1,117 @@
+Introduction
+============
+The GNUnilink project is based around a small microcontroller (a PIC) 
+which is wired directly to the back of the Head Unit.
+
+A microcontoller is like a CPU but it includes RAM and runs a programme 
+stored it's internal ROM.
+
+This project was started using a 16C84, as that's a very common part,
+but is intended to portable across all of the PIC range and hopefully
+will be able to support the slower devices (at present it looks like
+you need a speed at least 8MHz).
+
+This does not mean that the project is limited to this device, the code
+has been written for both the PIC12 and PIC16 series. In fact the code
+should easily compile and work on any PIC from these families.
+
+The only other requirement is that the chosen PIC has at least 3
+inputs/outputs, these are for:
+	Clock	- input
+	Data	- input/output
+	BusOn	- input
+
+The smallest (physical) device that Microchip do is the 12C509 which 
+has only 8 pins, so there are just enough.... ;-)
+
+The basic concept of the code is too be nice and simple. It uses 4 pins
+of PORTA (or GPIO in the PIC12) to connect to Clock, Data, BusOn and
+RESET. For a full schematic see the website.
+
+The CD_not_MD input is used to select between emulating a CD Changer,
+or a MD Changer - the MD changer can accept a larger number of tracks
+or minutes (on the counter) as these are entered in HEX. If not the
+link is not fitted then CD mode is assumed.
+
+The pin connections are:
+		16C84 (18 DIL)		12C509 (8 DIL)
+Data		 17			 7
+Clock		 18			 6
+BusOn		 1			 5
+Reset (via tranistor)
+		 4			 4
+CD_not_MD	 2
+
+Serial Option (with MAX232 or similar)
+RX		 7
+TX		 8
+CTS		 9
+RTS		 6
+
+The Unilink Socket
+==================
+Unfortunately these plug/sockets aren't readily available, so the easiet
+method is to buy a cable and chop it up. This a little bit of a nerver as
+they aren't exactly cheap. My local shop was quoting 40UKP for a 5m one.
+
+But I was recomended 'www.unbeatable.co.uk' by someone on the Unilink web
+board, they do a 1m (part code RC61) cable for 15UKP but charge 8UKP P&P. 
+Obviously if you can get to gether with others and do a bulk order....
+
+pin-out:
+       end            rear
+        of             of
+       cable          radio
+
+      1  2  3        3  2  1
+      #  #  #        #  #  #   
+    [~~~~~~~~~]    [~~~~~~~~~]
+     |4#| |#5|      |5#| |#4|
+     |_______|      |_______|
+      #  #  #        #  #  #
+      6  7  8        8  7  6   
+
+1 - Clock, Yellow
+2 - Data, Green
+3 - BusOn, Blue
+4 - 12v, Red
+5 - 0v, Black
+6 - Ready, Brown
+7 - Reset, Purple
+8 - SIRCS, Orange
+
+If you also have CD/Minidisk Changer, or the like, you have two options;
+either connect the GNUnilink hardware as the last in the chain, or make 
+it up with the two halves of the cable.
+
+All the signals should be connect straight through, with the exception of 
+BusOn. The connection from the headunit should be connected to BUS_ON and
+the output to the next unit should be taken from BUS_ON_OUT, which is 
+controlled by GNUnilink so that the link initlisation works correctly.
+
+Programming the PIC
+===================
+
+Before the PIC can do anything the code must be compiled (I provide
+some prebuilt versions, but you might want to adjust it) and programmed
+into the device. This process is far too complicated to explain here,
+if you want to find out more here's a good starting place:
+	http://www.gnupic.org
+
+and a 'Free' PIC assembler can be found here:
+	http://gpasm.sourceforge.net
+
+As I am using the 16F627 during developement, I can use the LVP feature.
+A programmer application (although there are many available on the net)
+which runs on Linux/DOS can be found at:
+	http://www.finitesite.com/d3jsys/
+
+Hope you find this code useful and enjoy playing with it... don't forget
+you are required to publish your improvements under the GPL (should you 
+sell or distribute hardware or software based on this project).
+
+If you do have sucess with the project or want to contribute just let
+me know,
+
+Simon Wood
+unilink@mungewell.org

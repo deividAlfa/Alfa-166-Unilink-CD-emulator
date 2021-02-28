@@ -1,0 +1,110 @@
+This is the README for the programme GNUnilink, which is code for a PIC micro
+to emulate a Sony CD-Multichanger. Once connected to the Unilink socket of a
+suitable Sony car radio it will let the users select the Aux line inputs as a
+music source to which they might connect a portable CD player or a MP3 player.
+
+The latest information about the project, and the latest code, can be found
+at the projects home page:
+	http://gnunilink.sourceforge.net
+
+The information to make this project possible has been reversed engineered 
+and thus can not be garanteed to be correct but seems to be working for at 
+least some people.
+
+More information on this protocol can be found on:
+	http://www.cus.org.uk/~cleggy/
+
+Hope you have fun and please feed back any information so that others can
+benefit.
+
+Hardware
+========
+
+Details of how to build/programme the project can be found in the HARDWARE
+file.
+
+Operation
+=========
+
+Once built/purchased/stolen the GNUnilink 'dongle' simply needs to plugged 
+into Unilink socket of the Headunit, and optionally connected to a PC or 
+other controller.
+
+When the Headunit is powered up, it will enquire of the Unilink bus what is
+availble, GNUnilink will repsond that it is a CD (or MD) Multichanger. The 
+Headunit will then 'add' this to the list of available sources.
+
+The 'fake' CD/MD Changer can then be selected (or deselected) by pressing
+the 'Source' button. When selected GNUnilink will enable the Aux Inputs and
+control the display. By default the display will show Disk 1, Track 1 and 
+a counter of 0:00. This will not change unless the SERIAL_INPUT option is
+enabled and the controlling PC instructs it to display something else (see
+below).
+
+Connecting GNUnilink to a PC (or other hardware)
+================================================
+
+If the SERIAL_INPUT or SERIAL_OUT options are selected then GNUnilink can
+control/be controlled via the serial link. This option is only available on
+PIC with an inbuilt UART.
+
+With SERIAL_OUTPUT button presses on the Headunit are reported to the PC as
+follows.
+
+ 	PLAY		- GNUnilink has been selected via 'source'
+ 	PAUSE		- GNUnilink has been deselected
+ 	STOP		- the headunit has been switched off
+ 	NEXT		- select next track
+ 	PREVIOUS	- select previous track
+ 	NXT_LIST	- select next disk in the changer
+ 	PRV_LIST	- select previous disk
+
+Option - Trackmode
+ 	INTRO		- Intro mode selected
+ 	SHUFF		- Shuffle mode selected
+ 	REPEAT		- Repeat mode selected
+
+Option - Direct Disk Buttons
+	LIST_x	 	- Button 'x' [instead of DISKNEXT/DISKPREV]
+
+If you have the ability to recompile the code then these can be changed to
+whatevere you want (see the start of 'functions.asm').
+
+With SERIAL_OUTPUT the PC has the ability to control what is on the display
+of the Headunit. The commands to do this are based around a single charater
+command followed by the data. The following commands are supported.
+
+	c1234		- set counter to 12:34
+ 	t56		- set track to 56 
+ 	d7		- set disk to 7
+
+Option - Minidisk
+Whether to emulate a CD or a MD changer is selected by the link on PORTA/3,
+unconnected = CD, GND = MD. This changes the track and counter/mins as they 
+are entered in HEX to provide a larger range, so 'c1234' sets 18:34.
+		 	
+ 	Dthatdisk	- set disk name to 'thatdisk'
+ 	Tthistrak	- set track name to 'thistrak'
+
+Option - Longnames.
+This allows 16 characters for the disk and track names
+
+It is relatively easy to customise the strings output by GNUnilink 
+(SERIAL_OUT option), just change the strings at the start of the file 
+'functions.asm' and recompile.
+
+Changing the SERIAL_INPUT 'codes' is more complicated and not recommended.
+
+With SERIAL_INPUT it is possible to overflow the serial RX buffer within 
+the PIC. This occurs because the interrupts have to be disabled during the 
+reading or sending of a byte down the Unilink bus. The software should cope
+by aborting a serial input if this occurs (there is no other option).
+
+You can minimise the chance of this occuring by sending the serial bytes
+one by one rather than all at once (i.e. do 'c', '1', '2', '3', '4' rather
+than 'c1234').
+
+Simon Wood.
+unilink@mungewell.org
+
+

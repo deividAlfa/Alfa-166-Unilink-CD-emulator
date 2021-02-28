@@ -1,0 +1,943 @@
+
+<!-- saved from url=(0037)https://www.mictronics.de/command.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body marginwidth="0" marginheight="0" leftmargin="0" topmargin="0" bgcolor="#CCE6FF">
+<link href="./Unilink command_files/mictronics.css" rel="stylesheet" type="text/css"> 
+<table width="100%" height="100%" border="1" rules="rows" frame="below" align="left" cellpadding="2" cellspacing="0" class="font_s">
+  <tbody><tr> 
+    <th> Update </th>
+    <th align="center">Typ&nbsp;</th>
+    <th><div align="center">CMD1&nbsp;</div></th>
+    <th><div align="center">CMD2&nbsp;</div></th>
+    <th>Description&nbsp;</th>
+    <th>Notes&nbsp;</th>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">30/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x00</div></td>
+    <td valign="top"> <p align="center"><br>
+        0x00<br>
+        0x01<br>
+        0x02<br>
+        0x20<br>
+        0x21<br>
+        0x40<br>
+        0x80<br>
+        0x81<br>
+        0xC0 <br>
+        0xC1<br>
+        <br>
+        0xF0<br>
+        0xFA </p></td>
+    <td valign="top"> <p>Status (from slave)<br>
+        Playing<br>
+        Playing tape???<br>
+        Tuned??<br>
+        Changed CD<br>
+        Seeking<br>
+        Changing CD<br>
+        Idle <br>
+        ????<br>
+        Ejecting <br>
+        No tape inside<br>
+        Remote Joystick key<br>
+        Second level SEEK switch pressed and released</p>
+      <p></p></td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x01</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x00<br>
+        0x02<br>
+        0x03<br>
+        0x04 <br>
+        0x11<br>
+        0x12<br>
+        0x13 </div></td>
+    <td valign="top">Requests (from master)<br>
+      Re-initialize bus<br>
+      Anyone? (initial link)<br>
+      Anyone special?<br>
+      Appoint end<br>
+      Time poll end<br>
+      Time poll (answered with status)<br>
+      Request time poll</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x02</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x01<br>
+        0x44 </div></td>
+    <td valign="top">Configuration from master<br>
+      Tell slave about assigned ID<br>
+      ??? </td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x08</div></td>
+    <td valign="top"> <div align="center">0x00</div></td>
+    <td valign="top">Key off (Cancel)</td>
+    <td valign="top">ie: If the fast forward key is presset, this command is send 
+      when the key is released.</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">30/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"><div align="center">0x10</div></td>
+    <td valign="top"><div align="center"><br>
+        0x50<br>
+        0x5A<br>
+        0x80<br>
+        0x8A </div></td>
+    <td valign="top">Remote Joystick keys<br>
+      OFF pressed<br>
+      OFF released<br>
+      SOURCE pressed<br>
+      SOURCE released</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">30/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x12</div></td>
+    <td valign="top"><div align="center"><br>
+        0x00<br>
+        0x0A<br>
+        0x80<br>
+        0x8A </div></td>
+    <td valign="top">Remote Joystick keys<br>
+      DISP pressed<br>
+      DISP released<br>
+      LIST pressed<br>
+      LIST released</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x20</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Play (from master)</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x21</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x00<br>
+        0x20<br>
+        0x40<br>
+        0x50<br>
+        0x60</div></td>
+    <td valign="top">Switch to….<br>
+      FM1<br>
+      Bass<br>
+      Treble<br>
+      Balance<br>
+      Fader</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x22</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x00<br>
+        0x10</div></td>
+    <td valign="top">Change down …<br>
+      Bass / Treble / Fader<br>
+      Volume</td>
+    <td valign="top">Fader works inverted (e.g. Up with decreasing)</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x23</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x00<br>
+        0x10 </div></td>
+    <td valign="top">Change up…<br>
+      Bass/Treble/Fader<br>
+      Volume </td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x24</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Fast Forward (from master)</td>
+    <td valign="top">start fast forwarding, end with broadcast cmd 0x08</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x25</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Fast Reverse (from master)</td>
+    <td valign="top">starts fast reverse, end with broadcast cmd 0x08</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x26</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Next Track</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x27</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Previous Track</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x28</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Next CD</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x29</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Previous CD</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x2B</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Switch tuner to station in (HIGH)CMD2</td>
+    <td valign="top">change to a saved channel number</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x2D</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Next tuner station</td>
+    <td valign="top">change to next saved channel</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x2E</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Previous tuner station</td>
+    <td valign="top">change to previous saved channel</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x30</div></td>
+    <td valign="top"> <div align="center">0x10<br>
+        0x1A<br>
+        0x20<br>
+        0x2A</div></td>
+    <td valign="top">Change down<br>
+      End of change down<br>
+      Change up<br>
+      End of change up</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x32</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Toggle tuner between stereo and mono mode</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x34</div></td>
+    <td valign="top"> <div align="center">0x00<br>
+        0x0A</div></td>
+    <td valign="top">Sound button pressed<br>
+      Sound button released</td>
+    <td valign="top">by Massimiliano</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x34</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Toggle Repeat mode (CD/MD)</td>
+    <td valign="top">by Cleggy,<br>
+      switch between different repeat modes</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x35</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Toggle Shuffle mode (CD/MD)</td>
+    <td valign="top">switch between different shuffle modes</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x36</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Toggle Intro mode (CD/MD)</td>
+    <td valign="top">switch between different intro modes</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x37</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Toggle Bank mode (CD/MD)</td>
+    <td valign="top">switch between different bank modes</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x3C</div></td>
+    <td valign="top"> <div align="center">0x10<br>
+        0x1A<br>
+        0x20<br>
+        0x2A<br>
+        0x30<br>
+        0x3A<br>
+        0x40<br>
+        0x4A<br>
+        0x50<br>
+        0x5A<br>
+        0x60<br>
+        0x6A<br>
+        0x70<br>
+        0x7A<br>
+        0x80<br>
+        0x8A<br>
+        0x90<br>
+        0x9A<br>
+        0xA0<br>
+        0xAA</div></td>
+    <td valign="top"> Pressed puls.1<br>
+      Released puls.1<br>
+      Pressed puls.2<br>
+      Released puls.2<br>
+      Pressed puls.3<br>
+      Released puls.3<br>
+      Pressed puls.4<br>
+      Released puls.4<br>
+      Pressed puls.5<br>
+      Released puls.5<br>
+      Pressed puls.6<br>
+      Released puls.6<br>
+      Pressed puls.7<br>
+      Released puls.7<br>
+      Pressed puls.8<br>
+      Released puls.8<br>
+      Pressed puls.9<br>
+      Released puls.9<br>
+      Pressed puls.A (10)<br>
+      Released puls.A (10)</td>
+    <td valign="top">Direct disc keys</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x41</div></td>
+    <td valign="top"> <div align="center"><br>
+        0x00<br>
+        0x40<br>
+        0x50 </div></td>
+    <td valign="top">Edit CD name (from master to CD)<br>
+      put cursor forward by one<br>
+      change to next higher char A-&gt;B<br>
+      change to next lower char B-&gt;A</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="center">30/12/02</td>
+    <td align="center">s</td>
+    <td> <div align="center">0x70</div></td>
+    <td> <div align="center"><br>
+        0x10<br>
+        0x1A<br>
+        0x20<br>
+        0x2A </div></td>
+    <td>Remote Joystick keys<br>
+      VOLUME- pressed<br>
+      VOLUME- released<br>
+      VOLUME+ pressed<br>
+      VOLUME+ released</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="center">30/12/02</td>
+    <td align="center">s</td>
+    <td> <div align="center">0x71</div></td>
+    <td> <div align="center"><br>
+        0x00<br>
+        0x0A</div></td>
+    <td>Remote Joystick keys<br>
+      MUTE pressed<br>
+      MUTE released</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="center">30/12/02</td>
+    <td align="center">s</td>
+    <td> <div align="center">0x74</div></td>
+    <td> <div align="center"><br>
+        0x00<br>
+        0x0A</div></td>
+    <td>Remote Joystick keys<br>
+      SOUND pressed<br>
+      SOUND released</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center">s</td>
+    <td><div align="center">0x75</div></td>
+    <td><div align="center">0x10</div></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="center">30/12/02</td>
+    <td align="center">s</td>
+    <td> <div align="center">0x7E</div></td>
+    <td> <div align="center"><br>
+        0x40<br>
+        0x4A<br>
+        0x50<br>
+        0x5A <br>
+        0x80<br>
+        0x8A<br>
+        0x90<br>
+        0x9A</div></td>
+    <td>Remote Joystick keys<br>
+      PREV DISC pressed<br>
+      PREV DISC released<br>
+      NEXT DISC pressed<br>
+      NEXT DISC released<br>
+      SEEK- pressed<br>
+      SEEK- released<br>
+      SEEK+ pressed<br>
+      SEEK+ released</td>
+    <td>disc selections works in tuner mode as station selection</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x80</div></td>
+    <td valign="top"> <p align="center"><br>
+        0x07<br>
+        0x09<br>
+        0x0E<br>
+        0x0F<br>
+        0x19<br>
+        0x1F<br>
+        0x29</p></td>
+    <td valign="top">Display shows …<br>
+      Display shows Track time<br>
+      Display shows Tape infos<br>
+      Display shows …<br>
+      Display shows Track name<br>
+      Display shows …<br>
+      Display shows clock </td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"><div align="center">0x81</div></td>
+    <td valign="top"><div align="center">0x00<br>
+        0x03</div></td>
+    <td valign="top">???<br>
+      Switch settings to BASS<br>
+      Switch settings to TREBLE<br>
+      Switch settings to BALANCE<br>
+      Switch settings to FADER</td>
+    <td valign="top">Bass<br>
+      Treble<br>
+      Balance<br>
+      Fader</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">29/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x82</div></td>
+    <td valign="top"> <div align="center">0x00<br>
+        0x00<br>
+        0x80<br>
+        <br>
+        0x80 </div></td>
+    <td valign="top">Tuner1 has something to say<br>
+      Tape1 has something to say<br>
+      CD1 has something to say<br> <br>
+      Group 0xB0 has something to say</td>
+    <td valign="top">May be a combination between more 0x82 sub command</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">28/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td align="center" valign="top">0x84</td>
+    <td valign="top"><br>
+      0xD9<br>
+      0xDD </td>
+    <td valign="top">Request for more text fields (from display)<br>
+      send track name<br>
+      send disc name</td>
+    <td valign="top">Cmd2 = requested text, see command 0xD9 and 0xDD<br>
+      D1 = destination adress<br>
+      D2 = requested field number</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="center">13/04/03</td>
+    <td align="center">m</td>
+    <td> <div align="center">0x87</div></td>
+    <td> <div align="center"> 
+        <p>0x6B<br>
+          <br>
+          0xEB</p>
+      </div></td>
+    <td>Test mode<br> <br>
+      Power status</td>
+    <td>D2_1 = 0x01<br> <br>
+      D1 = 0x10 system off<br>
+      D1 = 0x90 switch to green backlight<br>
+      D1 = 0x80 switch to amber backlight</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">29/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"><div align="center">0x88</div></td>
+    <td valign="top"><div align="center">???</div></td>
+    <td valign="top">from master to group ID after "Anyone special 0x01 x03 
+      " </td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">s</td>
+    <td valign="top"> <div align="center">0x8C</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Anyone respond from slave</td>
+    <td valign="top">device info</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x8E</div></td>
+    <td valign="top"> <p align="center"><br>
+        0x40<br>
+        0x80<br>
+        0xC0 </p></td>
+    <td valign="top">Magazin/Cartridge info<br>
+      Slot in magazin is empty<br>
+      A magazin was put into changer<br>
+      No magazin</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">13/04/03</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x90</div></td>
+    <td valign="top"> <p align="center"> <br>
+        0x00<br>
+        0x01<br>
+        0x01<br>
+        0x10<br>
+        <br>
+        0x20<br>
+        0x40<br>
+        0x50<br>
+        0x60<br>
+        <br>
+        0x50 <br>
+        <br>
+        0xA0<br>
+        0xE0</p></td>
+    <td valign="top">Current settings of<br>
+      current play position<br>
+      ???<br>
+      ???<br>
+      Volume<br> <br>
+      Bass<br>
+      Treble<br>
+      Balance<br>
+      Fade <br> <br>
+      in MD/CD mode<br> <br>
+      no disc and no track name<br>
+      Disc name avail. but no track name<br> <br>
+      CMD2 is a bit field.</td>
+    <td valign="top">in CD/MD mode:<br>
+      D1 = track number<br>
+      D2 = minutes<br>
+      D3 = seconds<br>
+      D4_HIGH = disc number<br>
+      D4_LOW = display control<br>
+      6bit + sign (-x / +x)<br>
+      6bit + sign (-x / +x)<br>
+      6bit + sign (-x / +x)<br>
+      6bit + sign (-x / +x)<br> <br>
+      its possible to display Disc and Track names (without 0x50, you can't display 
+      names) <br> <br>
+      CMD2:<br>
+      x1xxxxxx = Disc name enable<br>
+      xxx1xxxx = Track name enable</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">13/04/03</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x91</div></td>
+    <td valign="top"> <div align="center">0xXX</div></td>
+    <td valign="top">Controls display navigation signs</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x91</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Current Time</td>
+    <td valign="top">by Cleggy<br>
+      Cmd1 = hours<br>
+      D1 = minutes</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x93</div></td>
+    <td valign="top"> <p align="center">0x02<br>
+        0xF7</p></td>
+    <td valign="top"><br>
+      Display DSP function on clock space</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">30/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x94</div></td>
+    <td valign="top"> <div align="center">0x00</div></td>
+    <td valign="top">&nbsp;</td>
+    <td valign="top"><p>In MD/CD mode:<br>
+        D1 =0x04 little "REPEAT 3" is on<br>
+        D1 =0x02 little "REPEAT 2" is on<br>
+        D1 =0x01 little "REPEAT 1" is on<br>
+        D1 =0x08 "REPEAT OFF"<br>
+        D1 =0x09"REPEAT-1"<br>
+        D1 =0x0A"REPEAT-2"<br>
+        D1 =0x0C"REPEAT-3"<br>
+        D1=0x80 "D.SCAN.OFF"<br>
+        D1 =0x20 "INTRO.OFF"<br>
+        D1 =0x30 "INTRO ON"<br>
+        D1 =0x10 little "INTRO" is on<br>
+        D1 =0xC0 "D.SCAN.ON"<br>
+        D1 =0x40 little "D.SCAN" is on<br>
+        <br>
+        D2 =0x02 little "SHUFFLE 3" is on<br>
+        D2 =0x20 little "SHUFFLE 2" is on<br>
+        D2 =0x10 little "SHUFFLE 1" is on<br>
+        D2 =0x80 "SHUF.OFF"<br>
+        D2 =0xA0 "SHUF-2"<br>
+        D2 =0xD0 "SHUF-1"<br>
+        D2 =0x82 "SHUF-3"<br>
+        <br>
+        D3 =0x80 "BANK OFF"<br>
+        D3 =0x40 little "BANK" is blinking <br>
+        D3 =0x20 "BANK OFF"<br>
+        D3 =0x10 little "BANK" is on<br>
+        D3 =0x30 "BANK ON"<br>
+        D3 =0xC0 "BANK INV"</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"><div align="center">0x95</div></td>
+    <td valign="top"><div align="center"></div></td>
+    <td valign="top">Magazin info, CD in or not,<br>
+      send after a disc scan is finished (after magazin change)</td>
+    <td valign="top"><p>Cmd2-D4 holds a bit mask, each bit is for one CD,<br>
+        bit set = CD present<br>
+        bit cleared = no CD<br>
+        CD1 = Bit 4 in Cmd2<br>
+        CD10 = Bit 5 in D1</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x97</div></td>
+    <td valign="top"> <div align="center">0x01</div></td>
+    <td valign="top">Disc info</td>
+    <td valign="top">D1 = trackcount<br>
+      D2 = min<br>
+      D3 = sec<br>
+      D4_high = disc<br>
+      D4_low = ???</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x98</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Intro play finish</td>
+    <td valign="top">Intro play was finished for a specified track<br>
+      D3 = track<br>
+      D2_HIGH = disc</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0x99</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Auto Adjust clock<br>
+      Hours=CMD2, Minutes = D1</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"><div align="center">0x9C</div></td>
+    <td valign="top"><div align="center">0x00</div></td>
+    <td valign="top">???<br>
+      send on disc change from changer to RAD 0x90</td>
+    <td valign="top">D4 low = disc number<br>
+      D4 high = 8 = no disc name<br>
+      D4 high = C = disc name avail.</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">m</td>
+    <td valign="top"> <div align="center">0xB0</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Change to CD in CMD2<br>
+      Set position</td>
+    <td valign="top"> <p>Cmd1_high = ???<br>
+        Cmd1_low = disc<br>
+        D1 = track</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xC0</div></td>
+    <td valign="top"> <div align="center"> 
+        <p>0x00<br>
+          0x02<br>
+          0x02<br>
+          0x40 <br>
+          0x20<br>
+          0x10 <br>
+          <br>
+          0x00 </p>
+      </div></td>
+    <td valign="top">Seeking to station HIGH D2_5<br>
+      Seeking …<br> <br> "LOAD" blinking<br> "--.--" displayed<br> 
+      "0.00" displayed<br> <br>
+      send to RAD 0x77 to enter disc name edit mode</td>
+    <td valign="top">in MD mode:<br>
+      D2_2 = Track count,<br>
+      D2_3 = minutes,<br>
+      D2_4 = seconds,<br>
+      D2_5 low nibble = disc number,<br>
+      D2_5 high nibble = display control<br> <br>
+      followed by 0xCD command with disc name</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xC1</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Station PTY infos<br>
+      CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII infos<br>
+      D2_4 always 0xEA or 0x0A<br>
+      D2_5 HIGH = station number</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">29/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td align="center" valign="top">0xC2</td>
+    <td valign="top"><div align="center">ASCII</div></td>
+    <td valign="top">String for left upper text field (from master)</td>
+    <td valign="top"> CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII name<br>
+      D2_4, D2_5 always 0x00</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">06/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"><div align="center">0xC5</div></td>
+    <td valign="top"><div align="center"></div></td>
+    <td valign="top">Disc identifier for Custom file changer<br>
+      send to master on disc scan after reset or magazin change,<br>
+      see also command 0xD5</td>
+    <td valign="top"><p>Cmd2,D1-D4 unique disc number, calculated from disc data<br>
+        <br>
+        CMD2_high = always 0xA<br>
+        CMD2_low = 1/100 seconds<br>
+        <br>
+        D1 = number of tracks</p>
+      <p>D2 Bit 0-6 = minutes of total time<br>
+        D2 Bit 7 = Bit 0 of binary value of 1/10 seconds</p>
+      <p>D3 Bit 0-6 = seconds of total time<br>
+        D3 Bit 7 = Bit 1 of binary value of 1/10 seconds</p>
+      <p>D4 = always 0xF0</p>
+      <p>D2_1-D2_3 = always 0x00</p>
+      <p>D2_5 high = disc number<br>
+        D2_5 low = C disc name avail.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 
+        8 no disc name avail.</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xC9</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">CD/MD track name<br>
+      CMD2 to D2_3 ASCII name<br>
+      D2_4 always 0x00<br>
+      D2_5 HIGH = station/CD number</td>
+    <td valign="top">In MD mode, D2_5 HIGH is a text field number [field 0-1],<br>
+      0 = first 8 characters,<br>
+      1 = second 8 characters</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">04/05/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xCD</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top"> CD/MD disc name<br>
+      CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII name<br>
+      D2_4 always 0x00<br>
+      D2_5 HIGH = station/CD number<br> <br>
+      also used in disc name edit mode to send the disc name</td>
+    <td valign="top">In MD mode, D2_5 HIGH is a text field number [field 0-1],<br>
+      0 = first 8 characters,<br>
+      1 = second 8 characters<br> <br>
+      In disc name edit mode:<br>
+      D2_4 low = cursor position (blinking)</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"><div align="center">0xCE</div></td>
+    <td valign="top"><div align="center">ASCII</div></td>
+    <td valign="top">Disc name (Custom file changer), send after LIST key is pressed, 
+      the changer send all 10 names to the master</td>
+    <td valign="top"><p>Cmd2-D2_3 = ASCII name, D2_4 = 0x00<br>
+        D2_5 high = disc number<br>
+        D2_5 low = 8 = no disc name<br>
+        D2_5 low = C = disc name avail.</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"><div align="center">0xCF</div></td>
+    <td valign="top"><div align="center">ASCII</div></td>
+    <td valign="top">Same like Cmd1 = 0xCE but the disc name is blinking<br>
+      a blinking name indicates the currently playing CD</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">23/06/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"><div align="center">0xD2</div></td>
+    <td valign="top"><div align="center">ASCII</div></td>
+    <td valign="top">CMD2, D1, D2, D3, D4, D2_1, (D2_2 only field 1-5) ASCII<br>
+      D2_2 in field 0 always 0x04?<br>
+      D2_3 field count<br>
+      D2_4 always 0xF6?</td>
+    <td valign="top">CD-Text track name in CD mode</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">06/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xD5</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">Disc identifier for Custom file changer<br>
+      send to master on disc change during play,<br>
+      see also command 0xC5</td>
+    <td valign="top"><p>Cmd2,D1-D4 unique disc number, calculated from disc data<br>
+        <br>
+        CMD2_high = always 0xA<br>
+        CMD2_low = 1/100 seconds<br>
+        <br>
+        D1 = number of tracks</p>
+      <p>D2 Bit 0-6 = minutes of total time<br>
+        D2 Bit 7 = Bit 0 of binary value of 1/10 seconds</p>
+      <p>D3 Bit 0-6 = seconds of total time<br>
+        D3 Bit 7 = Bit 1 of binary value of 1/10 seconds</p>
+      <p>D4 = always 0xF0</p>
+      <p>D2_1-D2_3 = always 0x00</p>
+      <p>D2_5 high = disc number<br>
+        D2_5 low = C disc name avail.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 
+        8 no disc name avail.</p></td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">03/01/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xD6</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">actual Station / CD name<br>
+      CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII name<br>
+      D2_4 always 0x00<br>
+      D2_5 HIGH = station/CD number</td>
+    <td valign="top">send on CD change</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">28/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xD9</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top"> CD/MD track name<br>
+      CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII name<br>
+      D2_4 always 0x00<br>
+      D2_5 HIGH = station/CD number</td>
+    <td valign="top">In MD mode, D2_5 HIGH is a text field number [field 2-]</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">23/06/03</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"><div align="center">0xDA</div></td>
+    <td valign="top"><div align="center">ASCII</div></td>
+    <td valign="top">CMD2, D1, D2, D3, D4, D2_1, (D2_2 only field 1-5) ASCII<br>
+      D2_2 in field 0 always 0x04?<br>
+      D2_3 field count<br>
+      D2_4 always 0x01?</td>
+    <td valign="top">CD-Text disc name in CD mode</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">28/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xDD</div></td>
+    <td valign="top"> <div align="center"></div></td>
+    <td valign="top">CD/MD disc name<br>
+      CMD2, D1, D2, D3, D4, D2_1, D2_2, D2_3 ASCII name<br>
+      D2_4 always 0x00<br>
+      D2_5 HIGH = station/CD number</td>
+    <td valign="top">In MD mode, D2_5 HIGH is a text field number [field 2-]</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">27/12/02</td>
+    <td align="center" valign="top">l</td>
+    <td valign="top"> <div align="center">0xF0</div></td>
+    <td valign="top"> <div align="center">ON</div></td>
+    <td valign="top">Switch source from D1 to CMD2</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+</tbody></table>
+</body></html>

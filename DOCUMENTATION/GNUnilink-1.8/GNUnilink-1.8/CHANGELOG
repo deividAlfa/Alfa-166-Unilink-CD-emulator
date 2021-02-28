@@ -1,0 +1,167 @@
+Release 1.8
+-----------
+Enabled watchdog, to reset the PIC if not pinged for more than
+(approx) 2.8 seconds.
+
+Uses universal responses to ANYONE and APPOINT. Changed SERIAL
+OUPUT to match those of the PRJC project.
+
+Can now support either CD or MD depending on state of PORTA/3 
+(pin 2 on 16F...). 5v = CD, 0v = MD.
+
+LONGNAMES now work, but only with MD emulation.
+
+Release 1.7
+-----------
+More changes and code improvements, and hopefully at least a few
+of them work. I've also spent some effort in shrinking the code
+down so that more features can be squeezed into 1K parts.
+
+Bit the Bullet and purchased a new (well to me anyway) unit
+XR-C33R, and I can confirm that in CD mode this unit works
+including Disk Name. This unit does not like MD mode, don't
+know why.  My XR-C450RDS continues to work, but without the text.
+
+Had report of sucess from a XR-C500RDS and hopefully this is 
+indicative of other units. This unit also appears to work with 
+MINIDISK mode, but is yet to display text names.
+
+Found out that as well as the track number being in hex for MINI
+DISK, so is the minutes of the counter. But the seconds is in 
+decimal..... weird system!!
+
+
+Release 1.6
+-----------
+Big changes to the layout of the file (and hopefully not too many
+bugs). Now split into a series of files hopefully to make editting
+easier.
+
+Started with MiniDisk emulation, although this does not appear to 
+work with my head unit. Adjusted the Serial Input to allow for 
+upto 255 tracks when in MiniDisk mode.
+
+Improved the receiving code to handle all the lengths of command,
+this is required to process the medium and long commands.
+
+Changed the output serial names to be more generic, you can change
+these to what you want in 'functions.asm' but beware of code length
+as it's close to filling a '627.
+
+Plus some general formating and code optimisations.
+
+
+Release 1.5
+-----------
+Serial IN and OUT now working with suitable PIC (tested on 16F627).
+
+Baud rate 19200, no parity. Hardcoded but value can be recalculated.
+
+Serial_Out issues strings on CD+, CD-, Seek+, Seek-. Again hard coded
+but as Null terminated strings - change to whatever you want.
+
+Serial_In sets the disk, track and counter. Disk and track names may
+work but are untested as my unit does not support them. Commands are
+as follows:
+ 	'd1'	-	sets disk 1
+ 	't 5'	-	sets track ' 5'
+ 	'c1234'	-	sets counter to '12:34'
+ 	'Dthisdisk' -	sets disk name
+ 	'Tthatsong' -	sets track name
+
+I'd be particularly interested if any one has the text working, you
+should be able to switch between numbers and text with the 'disp'
+button.
+
+Simon Wood.
+7Jan2001
+
+Release 1.4
+-----------
+
+More tidying... you'd believe that I was a tidy person, but then you 
+haven't seen my play room ;-)
+
+Found out why the 16F627 isn't updating the display, but have only
+implemented a hacky solution, it is failing to issue a SlaveRequest.
+
+I've also added the starting bits of using the buttons to control a PC, 
+no serial output as yet but the button presses change what is displayed 
+on the screen.
+
+Simon Wood.
+17Dec2001
+
+Release 1.3
+-----------
+
+A few more bits of tidying up.
+
+Oh and the display now does something ;-) Should display the CD name 'GPL 
+2001' and track name ' AUX-IN ', although it doesn't on my head unit - I
+hope that this is due to my unit not supporting CD Text although it does
+RDS names. The Track Time should flick between 0:00 and 23:45, this does
+work on my unit!
+
+The volume/tone/mute/etc all work, but the PIC doesn't recieve any key 
+presses other than source, at which point it is deselected. Reselecting
+it works, and will run though the display sequence again.
+
+If you have a head unit with a CD already in it you may have to modify
+the response to the slave poll to allow for a different ID being allocated.
+
+Simon Wood,
+20Nov2001
+
+Release 1.2
+-----------
+
+Further Tidying and correcting of the code, mostly in the build system and
+the '#if's for processor selection. The PIC type and speed can now be 
+selected at the head of the file, this should be the only change needed.
+
+I have successfully run this code at 5.6MHz, 8MHz and 10MHz. I even have
+a report of it 'working' at 9.2Mhz from 'Mode'.
+
+The absolute acuracy of the timing loops is not required, just pick the 
+closest to what you're actually using.
+
+The file HARDWARE describes how to connect the PIC to the radio, note that
+the BusOn signal must now be connected for the code to work.
+
+Simon Wood
+24-Oct-2001
+
+
+Release 1.1
+-----------
+
+This is the first version of GNUnilink that actually functions, that is that 
+it enables the AUX Inputs to be selected/deselected by pressing the Source 
+button.
+
+Unfortunately the display is frozen during AUX input, i.e. it remains in the 
+state it was before pushing the Source button. Whilst frozen like this the 
+Source, Volume and Off buttons still function so you can still use the Head 
+Unit to some degree. Pushing Source again will select the next source 
+(Radio, Cassette).
+
+We're working on getting at least some indication of the AUX inputs on the 
+display.
+
+Still only tested at 10MHz on a C-XR450RDS, I would be interested of reports 
+at other speeds (see the start of the code for adjusting it to your speed) 
+or on other Head Units.
+
+Simon Wood.
+18 Oct 2001
+
+
+Issue 1.0 11th October 2001
+---------------------------
+
+Initial Issue, not yet proven to function. Though does at least decode a few
+commands from the Head Unit and attempt to reply to 2nd 'Anyone' enquiry. 
+
+Simon Wood.
+
