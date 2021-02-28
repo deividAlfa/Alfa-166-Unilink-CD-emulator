@@ -13,10 +13,13 @@
 <a id="intro"></a>
 ## Introduction
 First of all, this project is not supported in any way.<br>
-I began developing it, but stopped prematurely before finishing. So don't ask me to do "X" or "Y" thing.
+I began to develop it, but the complexity and other circumstances caused it to be prematurely cancelled.<br>
+Don't ask me to do "X" or "Y" thing.
 
-If you want to learn how Unilink works, check the DOCUMENTATION folder. There is a lot of data there.<br>
-Most of it is gone from Internet, as the sites were very old. Some were dated back to 2001!<br>
+If you want to learn how Unilink works, check the DOCUMENTATION folder.<br>
+There is a lot of data. All I learned from is there.<br>
+
+Most of it is actually gone from Internet, as the sites were very old. Some were dated back to 2001!<br>
 I could recover some thanks to www.archive.org.<br>
 The code is very valuable, there's almost no information about this on the net.<br>
 
