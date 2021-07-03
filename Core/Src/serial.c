@@ -36,34 +36,34 @@ void initSerial(UART_HandleTypeDef* huart){
 void putString(char *str){
   uint16_t len=0;
   uint8_t tmp;
-  if(*str){                                                           // If empty string, return
-    //printf(str);                                                    // "Hack", printf is redirected to SWO through ITM_Send
-    while(str[len]){
-      len++;                                                          // Get string length
+  char *input=str;
+  //printf(str);                                                    // "Hack", printf is redirected to SWO through ITM_Send
+  while(*input++){ len++; }                                         // Get string length
+  if(!len){ return; }                                               // If empty string, return
+  
+  __disable_irq();                                                  // Disable interrupts to prevent errors, double-calling, etc
+  tmp=HAL_UART_Transmit_DMA(serial.uart, (uint8_t *)str, len);      // Try to send data
+  __enable_irq();
+  
+  if(tmp==HAL_OK){
+    return;                                                         // If OK, return (Fifo empty)
+  }
+  else if(tmp==HAL_BUSY){                                           // If busy, try to store in queue
+    if(serial.Pending>(SerFifoLen-1)){                              // If queue full, discard data
+      serial.LostinPutString++;                                     // Increase lost counter (For debugging)
+      return;                                                       // return
     }
-    __disable_irq();                                                  // Disable interrupts to prevent errors, double-calling, etc
-    tmp=HAL_UART_Transmit_DMA(serial.uart, (uint8_t *)str, len);      // Try to send data
+    serial.Queue[serial.BfPos]=str;                                 // Store string pointer
+    serial.QueueLen[serial.BfPos]=len;                              // Store string length
+    if(++serial.BfPos>(SerFifoLen-1)){                              // Increase Input FIFO position (Circular mode)
+      serial.BfPos=0;
+    }
+    __disable_irq();                                                // Disable irq to prevent Pending variable corruption
+    serial.Pending++;                                               // Increase pending transfers
     __enable_irq();
-    if(tmp==HAL_OK){
-      return;                                                         // If OK, return (Fifo empty)
-    }
-    if(tmp==HAL_BUSY){                                                // If busy, try to store in queue
-      if(serial.Pending>(SerFifoLen-1)){                              // If queue full, discard data
-        serial.LostinPutString++;                                     // Increase lost counter (For debugging)
-        return;                                                       // return
-      }
-      serial.Queue[serial.BfPos]=str;                                 // Store string pointer
-      serial.QueueLen[serial.BfPos]=len;                              // Store string length
-      if(++serial.BfPos>(SerFifoLen-1)){                              // Increase Input FIFO position (Circular mode)
-        serial.BfPos=0;
-      }
-      __disable_irq();                                                // Disable irq to prevent Pending variable corruption
-      serial.Pending++;                                               // Increase pending transfers
-      __enable_irq();
-    }
-    else if(tmp==HAL_ERROR){                                          // If error
-      serial.errPutString++;                                          // Increase error counter ( For debugging)
-    }
+  }
+  else if(tmp==HAL_ERROR){                                          // If error
+    serial.errPutString++;                                          // Increase error counter ( For debugging)
   }
 }
 
