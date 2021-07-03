@@ -77,7 +77,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
                                   serial.QueueLen[serial.TxPos]);
       if(tmp==HAL_OK){                                                // If OK
         serial.Pending--;                                             // Decrease pending
-        if(++serial.TxPos>7){                                         // Increase Output FIFO position (Circular mode)
+        if(++serial.TxPos>(SerFifoLen-1)){                            // Increase Output FIFO position (Circular mode)
           serial.TxPos=0;                                             
         }
       }
